@@ -367,7 +367,7 @@
 
   /* Discovery banner */
   #discovery-banner {
-    position: absolute; top: 18%; left: 50%;
+    position: absolute; top: calc(18% + 100px); left: 50%;
     transform: translateX(-50%);
     padding: 14px 36px;
     border: 1px solid var(--amber);
@@ -1148,10 +1148,65 @@
     color: #00f0ff;
     margin-bottom: 14px;
     text-shadow: 0 0 8px rgba(0, 240, 255, 0.5);
+    /* Allow long ciphers to wrap to the next line within the panel */
+    white-space: normal;
+    word-spacing: 0.4em;
+    line-height: 1.55;
+  }
+  /* Key reference panel: 26 cells showing letter <-> glyph mappings */
+  .dec-key-label {
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: rgba(176, 240, 255, 0.85);
+    margin: 4px 0 8px;
+  }
+  .dec-key {
+    display: grid;
+    grid-template-columns: repeat(13, 1fr);
+    gap: 4px;
+    margin-bottom: 14px;
+    background: rgba(0, 240, 255, 0.03);
+    border: 1px solid rgba(0, 240, 255, 0.18);
+    padding: 8px;
+  }
+  .dec-key-cell {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 4px 0;
+    background: rgba(0, 240, 255, 0.02);
+    border: 1px solid rgba(0, 240, 255, 0.10);
+    border-radius: 2px;
+  }
+  .dec-key-cell.known {
+    background: rgba(0, 240, 255, 0.16);
+    border-color: rgba(0, 240, 255, 0.7);
+    box-shadow: inset 0 0 6px rgba(0, 240, 255, 0.25);
+  }
+  .dec-key-glyph {
+    font-size: 14px;
+    color: rgba(176, 240, 255, 0.4);
+    line-height: 1;
+    height: 18px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .dec-key-cell.known .dec-key-glyph {
+    color: #00f0ff;
+    text-shadow: 0 0 6px rgba(0, 240, 255, 0.7);
+  }
+  .dec-key-letter {
+    font-size: 9px;
+    letter-spacing: 1px;
+    color: rgba(176, 240, 255, 0.7);
+    margin-top: 2px;
+  }
+  .dec-key-cell.known .dec-key-letter {
+    color: #fff;
+    font-weight: bold;
   }
   .dec-options {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: 1fr 1fr;
     gap: 8px;
     margin-bottom: 14px;
   }
@@ -1161,10 +1216,12 @@
     color: #b0f0ff;
     padding: 12px;
     font-family: inherit;
-    font-size: 16px;
-    letter-spacing: 3px;
+    font-size: 13px;
+    letter-spacing: 2px;
     cursor: pointer;
     transition: all 0.12s;
+    text-align: center;
+    line-height: 1.4;
   }
   .dec-opt:hover {
     background: rgba(0, 240, 255, 0.2);
@@ -1309,9 +1366,15 @@
 
   /* ===== Scan readout panel (centered on screen) ===== */
   #scan-result {
-    position: fixed; left: 50%; top: 50%;
+    position: fixed;
+    left: calc(50% - 350px);    /* shifted 350px left of screen center */
+    top:  calc(50% - 425px);    /* top edge of box (was center anchor); ~125px raised so a typical 250px panel lands where the centered one used to */
     width: 400px;
-    transform: translate(-50%, -50%) scale(0.96);
+    /* Anchor from top-center instead of dead-center so any height growth
+       extends DOWNWARD rather than half-up / half-down. Prevents tall
+       scan results from clipping off the top of the screen. */
+    transform: translate(-50%, 0) scale(0.96);
+    transform-origin: 50% 0;
     border: 1px solid var(--green);
     background: rgba(8, 24, 14, 0.95);
     padding: 16px 20px;
@@ -1323,11 +1386,15 @@
     z-index: 90;
     opacity: 0;
     transition: opacity 0.25s ease-out, transform 0.25s ease-out;
+    /* Safety: if the panel grows tall enough to reach the bottom of the
+       viewport, scroll inside the panel instead of clipping. */
+    max-height: calc(100vh - 80px);
+    overflow-y: auto;
   }
   #scan-result.show {
     display: block;
     opacity: 1;
-    transform: translate(-50%, -50%) scale(1);
+    transform: translate(-50%, 0) scale(1);
   }
   #scan-result::before {
     content: 'SCAN // RESULT'; position: absolute;
@@ -4162,6 +4229,8 @@
           <div style="position:absolute;left:66.6%;top:-2px;width:1px;height:12px;background:rgba(255,154,31,0.45);"></div>
         </div>
         <span id="throttle-val" style="font-size:11px;color:var(--amber);font-weight:bold;letter-spacing:1px;min-width:24px;text-align:right;">00</span>
+        <!-- Footstep muffle toggle: when ON, footstep audio drops to 20% volume -->
+        <button id="footstep-muffle-btn" title="Muffle footstep audio (quieter cockpit)" style="font-family:inherit;font-size:9px;letter-spacing:1.5px;padding:2px 6px;background:rgba(255,154,31,0.08);border:1px solid var(--amber-dim);color:var(--amber);cursor:pointer;min-width:48px;pointer-events:auto;">MUFFLE</button>
       </div>
       <div class="compass">
         <div class="compass-strip" id="compass-strip"></div>
@@ -4467,6 +4536,8 @@
       <div class="dec-progress" id="dec-progress"></div>
       <div class="dec-target" id="dec-target">RECONSTRUCTING PLAINTEXT...</div>
       <div class="dec-cipher" id="dec-cipher">— — — — —</div>
+      <div class="dec-key-label">DECRYPTION KEY ▾ <span style="font-size:9px;color:rgba(176,240,255,0.5);letter-spacing:2px;">(known glyphs revealed; deduce the rest)</span></div>
+      <div class="dec-key" id="dec-key"></div>
       <div class="dec-options" id="dec-options"></div>
       <div class="dec-status" id="dec-status">SELECT MATCHING GLYPH</div>
     </div>
@@ -4625,7 +4696,7 @@
 </div>
 
 <!-- Drone POV monitor (only visible when drone is airborne) -->
-<div id="drone-pov" style="position:absolute;left:50%;top:80px;transform:translateX(calc(-50% - 335px));width:280px;display:none;pointer-events:none;z-index:11;">
+<div id="drone-pov" style="position:absolute;right:256px;bottom:188px;width:280px;display:none;pointer-events:none;z-index:11;">
   <div style="border:1px solid var(--amber);background:rgba(0,0,0,0.4);padding:4px 8px;font-size:9px;letter-spacing:3px;color:var(--amber-dim);display:flex;justify-content:space-between;align-items:center;">
     <span>▶ DRONE POV // LIVE</span>
     <span id="drone-pov-alt" style="color:var(--amber);">ALT 0055</span>
@@ -6704,9 +6775,11 @@ const player = {
   isBoosting: false,
   overheated: false,
   dead: false,
-  // Throttle: 0-75 km/h. Persists; W ramps up, S ramps down, X stops.
+  // Throttle: -reverseMax to +throttleMax km/h. Persists; W ramps up, S ramps down, X stops.
+  // Reverse is slower than forward - a 30-ton biped does not run backwards.
   throttle: 0,
   throttleMax: 75,
+  reverseMax: 20,
 };
 
 let kills = 0;
@@ -8796,7 +8869,7 @@ function buildWildlifeMesh(species) {
   if (species === 'deer') {
     // Slender body with long legs and a small head
     const body = new THREE.Mesh(
-      new THREE.CapsuleGeometry(0.45, 1.2, 4, 6),
+      new THREE.CylinderGeometry(0.45, 0.45, 2.1, 8),
       new THREE.MeshStandardMaterial({ color, roughness: 0.85 })
     );
     body.rotation.z = Math.PI / 2;
@@ -8833,7 +8906,7 @@ function buildWildlifeMesh(species) {
   } else if (species === 'bear') {
     // Bulky low body
     const body = new THREE.Mesh(
-      new THREE.CapsuleGeometry(0.7, 1.4, 4, 6),
+      new THREE.CylinderGeometry(0.7, 0.7, 2.8, 8),
       new THREE.MeshStandardMaterial({ color, roughness: 0.95 })
     );
     body.rotation.z = Math.PI / 2;
@@ -8865,7 +8938,7 @@ function buildWildlifeMesh(species) {
   } else if (species === 'fox') {
     // Small slim body
     const body = new THREE.Mesh(
-      new THREE.CapsuleGeometry(0.18, 0.5, 4, 6),
+      new THREE.CylinderGeometry(0.18, 0.18, 0.86, 8),
       new THREE.MeshStandardMaterial({ color, roughness: 0.9 })
     );
     body.rotation.z = Math.PI / 2;
@@ -9763,14 +9836,16 @@ function update(dt) {
   }
   // X = emergency stop
   if (keys['KeyX']) player.throttle = 0;
-  // Ramp the throttle. Up at 25 km/h per second, down at 38 km/h per second.
+  // Ramp the throttle. W ramps up (toward forward max), S ramps down (toward
+  // reverse max). Up is 25 km/h per sec, down is 38 km/h per sec, so braking
+  // and shifting into reverse feels more responsive than acceleration.
   if (throttleInput > 0) {
     player.throttle = Math.min(player.throttleMax, player.throttle + 25 * dt);
   } else if (throttleInput < 0) {
-    player.throttle = Math.max(0, player.throttle - 38 * dt);
+    player.throttle = Math.max(-player.reverseMax, player.throttle - 38 * dt);
   }
-  // A/D adds to yaw rotation. Yaw rate scales modestly inverse with throttle.
-  const yawRate = 1.05 * (1 - 0.35 * (player.throttle / player.throttleMax));
+  // A/D adds to yaw rotation. Yaw rate scales modestly inverse with speed magnitude.
+  const yawRate = 1.05 * (1 - 0.35 * (Math.abs(player.throttle) / player.throttleMax));
   if (yawInput !== 0) {
     player.yaw -= yawInput * yawRate * dt;
   }
@@ -9823,8 +9898,9 @@ function update(dt) {
     addComm('TITAN-7', 'Manual override. Waypoint retained.', true);
   }
 
-  // Convert throttle (km/h) to internal m/s for the velocity vector.
-  // Boost adds a transient multiplier on top of the throttle setting.
+  // Convert throttle (km/h) to internal m/s. Negative throttle = walking
+  // backwards: the direction vector simply gets a negative scalar, which
+  // flips it. Boost only applies to forward motion.
   const kphToMs = 1 / 3.6;
   player.isBoosting = keys['ShiftLeft'] && player.throttle > 1 && !player.overheated;
   let speed = player.throttle * kphToMs;
@@ -9835,11 +9911,13 @@ function update(dt) {
   } else {
     player.fovTarget = 74;
   }
-  const moving = speed > 0.3;
+  const moving = Math.abs(speed) > 0.3;
   player.isWalking = moving && player.onGround;
 
   if (moving) {
-    // Walk in the direction the mech is facing (forward = -Z rotated by yaw)
+    // Walk in the direction the mech is facing (forward = -Z rotated by yaw).
+    // Speed can be negative; the direction vector then flips, producing
+    // proper backward walking.
     const dir = new THREE.Vector3(0, 0, -1);
     dir.applyEuler(new THREE.Euler(0, player.yaw, 0));
     player.vel.x = dir.x * speed;
@@ -9931,9 +10009,14 @@ function update(dt) {
 
   // walk bob + stomp shake
   if (player.isWalking) {
-    // Giant mechs take long, deliberate strides. ~1.25 sec per step at walk,
-    // ~0.77 sec per step when boosting.
-    const stepRate = player.isBoosting ? 0.65 : 0.40;
+    // Step cadence scales with throttle magnitude. At a very slow crawl
+    // the mech takes ~5 sec between steps; at full forward throttle ~0.83
+    // sec; with boost on top, ~0.60 sec. The shallow baseline (0.10) makes
+    // creeping along feel genuinely deliberate, while the 0.50 multiplier
+    // gives a clear, satisfying ramp as you open the throttle up.
+    const throttleFrac = Math.min(1, Math.abs(player.throttle) / player.throttleMax);
+    let stepRate = 0.10 + throttleFrac * 0.50;
+    if (player.isBoosting) stepRate *= 1.4;
     player.walkPhase += dt * stepRate;
     const stepIndex = Math.floor(player.walkPhase * 2);
     if (stepIndex !== player.lastStep) {
@@ -10471,13 +10554,27 @@ function updateHud() {
   const bearing = Math.round((((-player.yaw * 180 / Math.PI) % 360) + 360) % 360);
   bearingEl.textContent = String(bearing).padStart(3, '0') + '°';
 
-  // Throttle widget
+  // Throttle widget. Positive = forward fill from left, normal palette.
+  // Negative = reverse: bar fills using a red palette and the readout
+  // prefixes with R. The bar fill width scales the magnitude against its
+  // own maximum (throttleMax forward, reverseMax backward) so the visual
+  // hits 100% at the directional limit either way.
   const thrEl = document.getElementById('throttle-fill');
   const thrValEl = document.getElementById('throttle-val');
   if (thrEl && thrValEl) {
-    const pct = (player.throttle / player.throttleMax) * 100;
-    thrEl.style.width = pct + '%';
-    thrValEl.textContent = String(Math.round(player.throttle)).padStart(2, '0');
+    if (player.throttle >= 0) {
+      const pct = (player.throttle / player.throttleMax) * 100;
+      thrEl.style.width = pct + '%';
+      thrEl.style.background = 'linear-gradient(90deg, var(--green), var(--amber) 60%, #ff5030 95%)';
+      thrValEl.textContent = String(Math.round(player.throttle)).padStart(2, '0');
+      thrValEl.style.color = 'var(--amber)';
+    } else {
+      const pct = (-player.throttle / player.reverseMax) * 100;
+      thrEl.style.width = pct + '%';
+      thrEl.style.background = 'linear-gradient(90deg, #ff5030, #b03020 95%)';
+      thrValEl.textContent = 'R' + String(Math.round(-player.throttle)).padStart(2, '0');
+      thrValEl.style.color = '#ff8060';
+    }
   }
 
   let anyAggro = false;
@@ -13028,25 +13125,21 @@ function getReticleHit() {
   raycaster.setFromCamera({ x: nx, y: ny }, camera);
   raycaster.far = SCAN_RANGE;
   const hits = raycaster.intersectObjects(scene.children, true);
-  // Mark scannable roots lazily so we don't walk ancestor chains every frame
-  for (const poi of pois) {
-    if (poi.mesh && !poi.mesh.userData.isScannable) poi.mesh.userData.isScannable = true;
-  }
-  for (const e of enemies) {
-    if (e.mesh && !e.mesh.userData.isScannable) e.mesh.userData.isScannable = true;
-  }
-  for (const m of alliedMechs) {
-    if (m.mesh && !m.mesh.userData.isScannable) m.mesh.userData.isScannable = true;
-  }
-  // Find the first hit whose ancestor chain includes a scannable root
+  // Allow any visible solid hit that isn't explicitly flagged as non-scannable.
+  // The game's identifyScanTarget falls back to makeGenericScan for hits that
+  // aren't tagged entities (POIs, sentinels, etc.), giving generic readouts
+  // for trees, rocks, walls, etc. We just need to exclude the new ambient
+  // visuals (wildlife, particles, footprints, trail patches) by checking the
+  // skipScan flag inherited up the parent chain.
   return hits.find(h => {
     if (h.distance <= 1) return false;
     if (!h.object.visible) return false;
-    if (h.object.userData && h.object.userData.skipScan) return false;
+    // Walk the ancestor chain - skipScan is set on the root of compound
+    // entities like wildlife groups, so any descendant inherits the exclusion
     for (let cur = h.object; cur; cur = cur.parent) {
-      if (cur.userData && cur.userData.isScannable) return true;
+      if (cur.userData && cur.userData.skipScan) return false;
     }
-    return false;
+    return true;
   });
 }
 
@@ -13286,6 +13379,9 @@ function performScan() {
   logEntry('system', `Scanned: ${result.name}`);
 }
 
+// Timer handle so reopening cancels a stale auto-close from a previous scan
+let _scanAutoCloseT = null;
+
 function showScanResult(result) {
   scanResult = result;
   scanTargetEl.textContent = result.name;
@@ -13294,11 +13390,22 @@ function showScanResult(result) {
   ).join('');
   scanNoteEl.textContent = result.note;
   scanResultEl.classList.add('show');
+  // Auto-close after 10 seconds. Clear any prior pending close so a rapid
+  // second scan doesn't get prematurely dismissed by the first's timer.
+  if (_scanAutoCloseT) clearTimeout(_scanAutoCloseT);
+  _scanAutoCloseT = setTimeout(() => {
+    _scanAutoCloseT = null;
+    closeScanResult();
+  }, 10000);
 }
 
 function closeScanResult() {
   scanResult = null;
   scanResultEl.classList.remove('show');
+  if (_scanAutoCloseT) {
+    clearTimeout(_scanAutoCloseT);
+    _scanAutoCloseT = null;
+  }
 }
 window.closeScanResult = closeScanResult;
 
@@ -16951,8 +17058,8 @@ const KEYMAP_CARDS = [
   {
     title: 'MOVEMENT',
     rows: [
-      { keys: ['W'],         desc: 'Throttle up',          note: '0 → 75 km/h' },
-      { keys: ['S'],         desc: 'Throttle down',        note: 'brakes the mech' },
+      { keys: ['W'],         desc: 'Throttle up',          note: '0 → 75 km/h forward' },
+      { keys: ['S'],         desc: 'Throttle down / reverse', note: 'brakes; past 0, reverses up to 20 km/h' },
       { keys: ['X'],         desc: 'Emergency stop',       note: 'throttle to 0 instantly' },
       { keys: ['A', 'D'],    desc: 'Yaw left / right',     note: 'turn the mech' },
       { keys: ['Shift'],     desc: 'Boost (afterburner)',  note: '+40% speed, generates heat' },
@@ -17402,8 +17509,37 @@ document.addEventListener('keydown', (e) => {
 // 5 stages of glyph-matching. Player sees a 3-character cipher and must
 // pick its matching plaintext from 6 options. 3 wrong picks = fail.
 // Success unlocks a "decrypted lore" codex entry and returns rare items.
-const DECRYPT_GLYPHS = ['⌬', '⎔', '⌘', '⍟', '⏧', '⎈', '⍙', '⌖', '⍜', '⍞', '⎉', '⏚'];
-const DECRYPT_PLAINS = ['ALPHA', 'BRAVO', 'CHARLIE', 'DELTA', 'ECHO', 'FOXTROT', 'GOLF', 'HOTEL', 'INDIA', 'JULIET', 'KILO', 'LIMA'];
+// ============================================================
+// DECRYPT MINIGAME (substitution cipher)
+// ============================================================
+// Full A-Z substitution cipher. Each letter maps to one distinctive glyph.
+// When the minigame opens, a random puzzle is picked from the pool; the
+// puzzle's "revealed" letters are shown in the key reference panel as a
+// foothold, the rest stay blank for the player to deduce. Solving requires
+// substituting letters until one of four multiple-choice plaintexts clearly
+// matches the cipher pattern.
+const CIPHER_KEY = {
+  A: '⌬', B: '⎔', C: '⌘', D: '⍟', E: '⏧', F: '⎈', G: '⍙', H: '⌖',
+  I: '⍜', J: '⍞', K: '⎉', L: '⏚', M: '⌭', N: '⌒', O: '⏣', P: '⌷',
+  Q: '⌥', R: '⌶', S: '⍝', T: '⌿', U: '⎄', V: '⎌', W: '⎘', X: '⏌',
+  Y: '⎒', Z: '⎚',
+};
+const CIPHER_ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+
+// Encode plaintext to glyphs, preserving spaces and non-letters
+function cipherEncode(plain) {
+  let out = '';
+  for (const ch of plain) {
+    if (CIPHER_KEY[ch]) out += CIPHER_KEY[ch];
+    else if (ch === ' ') out += '  ';     // double-space between words for legibility
+    else out += ch;
+  }
+  return out;
+}
+
+// Five themed puzzles, each paired with one decrypted-lore reward. Distractors
+// are constructed to overlap heavily with the correct answer on the revealed
+// letters but diverge on the unrevealed letters, forcing real substitution.
 const DECRYPTED_REWARDS = [
   { id: 'decrypt_lore_1', title: 'Decrypted Fragment // Cycle Logs', text: "Recovered from a corrupted data shard. Internal logs of Dharma Station 7 referencing a 'sister facility' east of the lake. Personnel rotation schedules show no return trips from the eastern facility for the last fourteen months of operation. Final entry: 'They are not answering. The numbers continue.'" },
   { id: 'decrypt_lore_2', title: 'Decrypted Fragment // Pilot Roster', text: "A partial roster of TITAN pilots predating the formal program. Includes designations TITAN-0 through TITAN-3, none of which appear in current records. Three of the four entries have death dates. The fourth has a question mark." },
@@ -17412,58 +17548,130 @@ const DECRYPTED_REWARDS = [
   { id: 'decrypt_lore_5', title: 'Decrypted Fragment // First Walker', text: "L. Ortega's personal journal, encrypted layer. Excerpt: 'The valley is not what the maps show. Some mornings the ridges are in different places. I am not losing my mind; I am the first to see clearly. Tell whoever takes my place after me: the map is wrong on purpose.'" },
 ];
 
+const DECRYPT_PUZZLES = [
+  {
+    rewardId: 'decrypt_lore_1',
+    plaintext: 'THE EAST FACILITY IS DARK',
+    revealed: ['T', 'H', 'E', 'A', 'I', 'S'],
+    options: [
+      'THE EAST FACILITY IS DARK',
+      'THE EAST FACILITY IS LOST',
+      'THE LAST OPERATIVE IS DARK',
+      'THE PAST ACTIVITY IS BACK',
+    ],
+  },
+  {
+    rewardId: 'decrypt_lore_2',
+    plaintext: 'FOUR NAMES THREE GRAVES',
+    revealed: ['E', 'A', 'R', 'S', 'T'],
+    options: [
+      'FOUR NAMES THREE GRAVES',
+      'FOUR NAMES THREE GHOSTS',
+      'NINE NAMES THREE GRAVES',
+      'FOUR LIVES THREE GRAVES',
+    ],
+  },
+  {
+    rewardId: 'decrypt_lore_3',
+    plaintext: 'HER BROTHER IS LISTED',
+    revealed: ['T', 'E', 'R', 'S', 'I'],
+    options: [
+      'HER BROTHER IS LISTED',
+      'HER BROTHER IS WAITING',
+      'THE BROTHER WAS LISTED',
+      'HER FATHER IS LISTED',
+    ],
+  },
+  {
+    rewardId: 'decrypt_lore_4',
+    plaintext: 'NUMBERS RESOLVE AT ONE OH EIGHT',
+    revealed: ['E', 'N', 'R', 'O', 'T'],
+    options: [
+      'NUMBERS RESOLVE AT ONE OH EIGHT',
+      'NUMBERS COLLAPSE AT ONE OH EIGHT',
+      'NUMBERS REPEAT AT TWELVE EIGHT',
+      'NUMBERS RESOLVE AT FIFTY ONE',
+    ],
+  },
+  {
+    rewardId: 'decrypt_lore_5',
+    plaintext: 'THE MAP IS WRONG ON PURPOSE',
+    revealed: ['T', 'H', 'E', 'O', 'S', 'P'],
+    options: [
+      'THE MAP IS WRONG ON PURPOSE',
+      'THE MAP IS WRONG BY DESIGN',
+      'THE WAR IS LONG AND PRECISE',
+      'THE LAB IS WRONG ON PURPOSE',
+    ],
+  },
+];
+
 const decryptGame = {
   active: false,
-  stage: 0,
-  totalStages: 5,
-  failures: 0,
-  maxFailures: 3,
-  cipher: null,
+  puzzle: null,         // the chosen puzzle for this session
+  attempts: 2,          // wrong attempts allowed before fragment is consumed
   correctIdx: -1,
-  options: [],
+  shuffledOpts: [],
 };
 
 function startDecryptMinigame() {
   if (itemCount('data_fragment') < 1) return;
   removeItem('data_fragment', 1);
+  // Pick a puzzle whose reward isn't already unlocked, if possible
+  const lockedPuzzles = DECRYPT_PUZZLES.filter(p => !codexUnlocked.has(p.rewardId));
+  const puzzlePool = lockedPuzzles.length > 0 ? lockedPuzzles : DECRYPT_PUZZLES;
+  decryptGame.puzzle = puzzlePool[Math.floor(Math.random() * puzzlePool.length)];
   decryptGame.active = true;
-  decryptGame.stage = 0;
-  decryptGame.failures = 0;
+  decryptGame.attempts = 2;
   document.getElementById('decrypt-overlay').classList.add('show');
-  nextDecryptStage();
+  renderDecryptPuzzle();
 }
 
-function nextDecryptStage() {
-  if (decryptGame.stage >= decryptGame.totalStages) {
-    return finishDecrypt(true);
-  }
-  // Pick a random plain-cipher mapping for this stage
-  const idx = Math.floor(Math.random() * DECRYPT_PLAINS.length);
-  const plain = DECRYPT_PLAINS[idx];
-  const cipher = DECRYPT_GLYPHS[idx] + DECRYPT_GLYPHS[(idx + 3) % DECRYPT_GLYPHS.length] + DECRYPT_GLYPHS[(idx + 7) % DECRYPT_GLYPHS.length];
-  decryptGame.cipher = cipher;
-  // Build options: include the correct plain + 5 random distractors
-  const distractors = DECRYPT_PLAINS.filter(p => p !== plain).sort(() => Math.random() - 0.5).slice(0, 5);
-  const all = [plain, ...distractors].sort(() => Math.random() - 0.5);
-  decryptGame.options = all;
-  decryptGame.correctIdx = all.indexOf(plain);
-  // Render
+function renderDecryptPuzzle() {
+  const p = decryptGame.puzzle;
+  if (!p) return;
+  // Shuffle options
+  const shuffled = p.options.slice().sort(() => Math.random() - 0.5);
+  decryptGame.shuffledOpts = shuffled;
+  decryptGame.correctIdx = shuffled.indexOf(p.plaintext);
+  // Cipher text (with double-spaces between words)
+  const cipher = cipherEncode(p.plaintext);
   document.getElementById('dec-cipher').textContent = cipher;
-  document.getElementById('dec-target').textContent = 'GLYPH SEQUENCE DETECTED. RESOLVE TO PLAINTEXT.';
-  document.getElementById('dec-foot-meta').textContent = `STAGE ${decryptGame.stage + 1} / ${decryptGame.totalStages}`;
-  document.getElementById('dec-status').textContent = `SELECT MATCHING GLYPH ▾  (${decryptGame.maxFailures - decryptGame.failures} attempts remaining)`;
-  // Build progress bar
+  document.getElementById('dec-target').textContent = 'INTERCEPTED TRANSMISSION. SUBSTITUTE TO PLAINTEXT.';
+  document.getElementById('dec-foot-meta').textContent = 'SINGLE-FRAGMENT DECRYPT';
+  document.getElementById('dec-status').textContent =
+    `${decryptGame.attempts} attempt${decryptGame.attempts === 1 ? '' : 's'} remaining. Use the key reference below.`;
+  // Render the key reference grid: every letter shown, revealed ones filled with glyph
+  const keyEl = document.getElementById('dec-key');
+  if (keyEl) {
+    keyEl.innerHTML = '';
+    const revealedSet = new Set(p.revealed);
+    for (const ch of CIPHER_ALPHABET) {
+      const cell = document.createElement('div');
+      cell.className = 'dec-key-cell' + (revealedSet.has(ch) ? ' known' : '');
+      const glyphEl = document.createElement('div');
+      glyphEl.className = 'dec-key-glyph';
+      glyphEl.textContent = revealedSet.has(ch) ? CIPHER_KEY[ch] : '?';
+      const letterEl = document.createElement('div');
+      letterEl.className = 'dec-key-letter';
+      letterEl.textContent = ch;
+      cell.appendChild(glyphEl);
+      cell.appendChild(letterEl);
+      keyEl.appendChild(cell);
+    }
+  }
+  // Progress bar (now just a heart-style attempt counter)
   const prog = document.getElementById('dec-progress');
   prog.innerHTML = '';
-  for (let i = 0; i < decryptGame.totalStages; i++) {
+  for (let i = 0; i < 2; i++) {
     const step = document.createElement('div');
-    step.className = 'dec-step' + (i < decryptGame.stage ? ' done' : '');
+    step.className = 'dec-step' + (i < decryptGame.attempts ? ' done' : '');
     prog.appendChild(step);
   }
-  // Build options
+  // Options
   const opts = document.getElementById('dec-options');
   opts.innerHTML = '';
-  all.forEach((p, i) => {
+  shuffled.forEach((p, i) => {
     const btn = document.createElement('button');
     btn.className = 'dec-opt';
     btn.textContent = p;
@@ -17476,18 +17684,28 @@ function onDecryptPick(idx) {
   const opts = document.getElementById('dec-options').children;
   if (idx === decryptGame.correctIdx) {
     opts[idx].classList.add('correct');
-    setTimeout(() => {
-      decryptGame.stage++;
-      nextDecryptStage();
-    }, 600);
+    setTimeout(() => finishDecrypt(true), 800);
   } else {
     opts[idx].classList.add('wrong');
-    opts[decryptGame.correctIdx].classList.add('correct');
-    decryptGame.failures++;
-    if (decryptGame.failures >= decryptGame.maxFailures) {
-      setTimeout(() => finishDecrypt(false), 1000);
+    decryptGame.attempts--;
+    if (decryptGame.attempts <= 0) {
+      // Out of attempts - show correct answer then close
+      opts[decryptGame.correctIdx].classList.add('correct');
+      setTimeout(() => finishDecrypt(false), 1500);
     } else {
-      setTimeout(() => nextDecryptStage(), 1000);
+      document.getElementById('dec-status').textContent =
+        `Incorrect. ${decryptGame.attempts} attempt${decryptGame.attempts === 1 ? '' : 's'} remaining. Re-check your substitutions.`;
+      // Re-enable the buttons except the wrong one
+      opts[idx].style.pointerEvents = 'none';
+      opts[idx].style.opacity = '0.4';
+      // Update progress bar
+      const prog = document.getElementById('dec-progress');
+      prog.innerHTML = '';
+      for (let i = 0; i < 2; i++) {
+        const step = document.createElement('div');
+        step.className = 'dec-step' + (i < decryptGame.attempts ? ' done' : '');
+        prog.appendChild(step);
+      }
     }
   }
 }
@@ -17496,11 +17714,8 @@ function finishDecrypt(success) {
   decryptGame.active = false;
   document.getElementById('decrypt-overlay').classList.remove('show');
   if (success) {
-    // Unlock a random not-yet-unlocked decrypted lore entry
-    const unfound = DECRYPTED_REWARDS.filter(r => !codexUnlocked.has(r.id));
-    if (unfound.length > 0) {
-      const reward = unfound[Math.floor(Math.random() * unfound.length)];
-      // Register if not in codex yet
+    const reward = DECRYPTED_REWARDS.find(r => r.id === decryptGame.puzzle.rewardId);
+    if (reward && !codexUnlocked.has(reward.id)) {
       if (!CODEX_ENTRIES_BY_ID[reward.id]) {
         const entry = { id: reward.id, title: reward.title, source: 'Decrypted data fragment', text: reward.text };
         CODEX_ENTRIES.push(entry);
@@ -17510,10 +17725,10 @@ function finishDecrypt(success) {
       addComm('TITAN-7', `Decryption complete. Recovered: "${reward.title}".`, true);
       if (typeof sfxDiscovery === 'function') sfxDiscovery();
     } else {
-      // No new lore left - give caps instead
-      const reward = 80 + Math.floor(Math.random() * 60);
-      wallet.caps += reward;
-      addComm('TITAN-7', `Decryption complete. No new lore. Sold the residual data for ${reward} caps.`, true);
+      // Lore already unlocked (shouldn't usually happen due to startDecryptMinigame filtering)
+      const caps = 80 + Math.floor(Math.random() * 60);
+      wallet.caps += caps;
+      addComm('TITAN-7', `Decryption complete. Lore already on file. Residual data sold for ${caps} caps.`, true);
     }
   } else {
     addComm('TITAN-7', `Decryption failed. Data fragment corrupted beyond recovery.`, true);
@@ -18029,6 +18244,12 @@ function initAudio() {
     audio.master = audio.ctx.createGain();
     audio.master.gain.value = 0.7;
     audio.master.connect(audio.ctx.destination);
+    // Dedicated bus for footstep audio so a single gain stage can muffle
+    // everything that sfxFootstep emits. Default 1.0; toggle to 0.06 to
+    // muffle to 6% (a 94% reduction) for a deeply quieter cockpit feel.
+    audio.footstepBus = audio.ctx.createGain();
+    audio.footstepBus.gain.value = 1.0;
+    audio.footstepBus.connect(audio.master);
     // Pre-generate 2 seconds of white noise for reuse
     const sr = audio.ctx.sampleRate;
     const buf = audio.ctx.createBuffer(1, sr * 2, sr);
@@ -18178,51 +18399,68 @@ function sfxServoTick() {
   if (!audio.ctx || !audio.enabled) return;
   const t = audio.ctx.currentTime;
 
-  // Layer 1: Low body thump - the weight of metal striking metal.
-  // Big gain bump - low frequencies need substantially more amplitude
-  // to be perceived at the same loudness as midrange.
+  // Layer 1: Sub-bass thump - the heavy industrial gear seating into place.
+  // Pitched sine impulse around 55-70Hz with a hard attack and a long
+  // exponential tail. This is the "felt in your chest" layer.
+  const sub = audio.ctx.createOscillator();
+  const subG = audio.ctx.createGain();
+  sub.type = 'sine';
+  const subF = 55 + Math.random() * 18;
+  sub.frequency.setValueAtTime(subF * 2.4, t);              // chirp down
+  sub.frequency.exponentialRampToValueAtTime(subF, t + 0.04);
+  subG.gain.setValueAtTime(0.0001, t);
+  subG.gain.exponentialRampToValueAtTime(0.95, t + 0.002);
+  subG.gain.exponentialRampToValueAtTime(0.001, t + 0.32);
+  sub.connect(subG); subG.connect(audio.master);
+  sub.start(t); sub.stop(t + 0.34);
+
+  // Layer 2: Low body thud - bandpass filtered noise centered around 130Hz.
+  // This is the bulk of the gear teeth engaging - low-mid weight without
+  // mud. Loud enough to be the dominant audible layer.
   const body = audio.ctx.createBufferSource();
   body.buffer = audio.noiseBuf;
   const bodyBp = audio.ctx.createBiquadFilter();
   bodyBp.type = 'bandpass';
-  bodyBp.frequency.value = 210 + Math.random() * 80;
-  bodyBp.Q.value = 4;
+  bodyBp.frequency.value = 120 + Math.random() * 35;
+  bodyBp.Q.value = 3.2;
   const bodyG = audio.ctx.createGain();
   bodyG.gain.setValueAtTime(0.0001, t);
-  bodyG.gain.exponentialRampToValueAtTime(0.85, t + 0.001);
-  bodyG.gain.exponentialRampToValueAtTime(0.001, t + 0.11);
+  bodyG.gain.exponentialRampToValueAtTime(1.10, t + 0.001);
+  bodyG.gain.exponentialRampToValueAtTime(0.001, t + 0.18);
   body.connect(bodyBp); bodyBp.connect(bodyG); bodyG.connect(audio.master);
-  body.start(t); body.stop(t + 0.12);
+  body.start(t); body.stop(t + 0.20);
 
-  // Layer 2: Low-mid crack - clear definition without being shrill.
-  // Significantly louder than before so the tick reads as an impact, not a tap.
-  const crack = audio.ctx.createBufferSource();
-  crack.buffer = audio.noiseBuf;
-  const crackHp = audio.ctx.createBiquadFilter();
-  crackHp.type = 'highpass';
-  crackHp.frequency.value = 380;
-  const crackBp = audio.ctx.createBiquadFilter();
-  crackBp.type = 'bandpass';
-  crackBp.frequency.value = 820 + Math.random() * 220;
-  crackBp.Q.value = 6;
-  const crackG = audio.ctx.createGain();
-  crackG.gain.setValueAtTime(0.0001, t);
-  crackG.gain.exponentialRampToValueAtTime(0.50, t + 0.001);
-  crackG.gain.exponentialRampToValueAtTime(0.001, t + 0.10);
-  crack.connect(crackHp); crackHp.connect(crackBp); crackBp.connect(crackG); crackG.connect(audio.master);
-  crack.start(t); crack.stop(t + 0.11);
+  // Layer 3: Mid clack - moved well down from the old 820Hz center.
+  // Around 240-310Hz this reads as a hardwood-on-steel clack rather than
+  // a thin metallic ping. Provides definition without brightness.
+  const clack = audio.ctx.createBufferSource();
+  clack.buffer = audio.noiseBuf;
+  const clackHp = audio.ctx.createBiquadFilter();
+  clackHp.type = 'highpass';
+  clackHp.frequency.value = 180;
+  const clackBp = audio.ctx.createBiquadFilter();
+  clackBp.type = 'bandpass';
+  clackBp.frequency.value = 240 + Math.random() * 70;
+  clackBp.Q.value = 4.5;
+  const clackG = audio.ctx.createGain();
+  clackG.gain.setValueAtTime(0.0001, t);
+  clackG.gain.exponentialRampToValueAtTime(0.55, t + 0.001);
+  clackG.gain.exponentialRampToValueAtTime(0.001, t + 0.14);
+  clack.connect(clackHp); clackHp.connect(clackBp); clackBp.connect(clackG); clackG.connect(audio.master);
+  clack.start(t); clack.stop(t + 0.16);
 
-  // Layer 3: Tail resonance - the cog ringing after impact.
-  // Stays in low-mid for the heavier feel, but loud enough to be heard.
+  // Layer 4: Low resonance ring - the cog cavity ringing after impact.
+  // Dropped from 340-450Hz down to 165-210Hz. Long-ish tail to feel like
+  // heavy mass settling.
   const ring = audio.ctx.createOscillator();
   const ringG = audio.ctx.createGain();
   ring.type = 'triangle';
-  ring.frequency.value = 340 + Math.random() * 110;
+  ring.frequency.value = 165 + Math.random() * 45;
   ringG.gain.setValueAtTime(0.0001, t);
-  ringG.gain.exponentialRampToValueAtTime(0.28, t + 0.003);
-  ringG.gain.exponentialRampToValueAtTime(0.001, t + 0.22);
+  ringG.gain.exponentialRampToValueAtTime(0.34, t + 0.004);
+  ringG.gain.exponentialRampToValueAtTime(0.001, t + 0.38);
   ring.connect(ringG); ringG.connect(audio.master);
-  ring.start(t); ring.stop(t + 0.23);
+  ring.start(t); ring.stop(t + 0.40);
 }
 
 // One-shot sounds ===================================================
@@ -18392,7 +18630,7 @@ function sfxFootstep(surface) {
   subGain.gain.setValueAtTime(0.0001, t);
   subGain.gain.exponentialRampToValueAtTime(0.85, t + 0.015);
   subGain.gain.exponentialRampToValueAtTime(0.001, t + 1.4);
-  sub.connect(subGain); subGain.connect(audio.master);
+  sub.connect(subGain); subGain.connect(audio.footstepBus);
   sub.start(t); sub.stop(t + 1.5);
 
   // Layer 2: Low-mid body. Filtered noise burst, very low cutoff that sweeps
@@ -18407,7 +18645,7 @@ function sfxFootstep(surface) {
   const bodyGain = audio.ctx.createGain();
   bodyGain.gain.setValueAtTime(0.42, t);
   bodyGain.gain.exponentialRampToValueAtTime(0.001, t + 0.8);
-  body.connect(bodyLp); bodyLp.connect(bodyGain); bodyGain.connect(audio.master);
+  body.connect(bodyLp); bodyLp.connect(bodyGain); bodyGain.connect(audio.footstepBus);
   body.start(t); body.stop(t + 0.85);
 
   // Layer 3: Ground-shake rumble. Very low filtered noise that lingers
@@ -18421,7 +18659,7 @@ function sfxFootstep(surface) {
   rumbleGain.gain.setValueAtTime(0.0001, t);
   rumbleGain.gain.exponentialRampToValueAtTime(0.22, t + 0.08);
   rumbleGain.gain.exponentialRampToValueAtTime(0.001, t + 1.7);
-  rumble.connect(rumbleLp); rumbleLp.connect(rumbleGain); rumbleGain.connect(audio.master);
+  rumble.connect(rumbleLp); rumbleLp.connect(rumbleGain); rumbleGain.connect(audio.footstepBus);
   rumble.start(t); rumble.stop(t + 1.9);
 
   // === Layer 4: surface accent - what the foot actually contacts ===
@@ -18437,7 +18675,7 @@ function sfxFootstep(surface) {
     g.gain.setValueAtTime(0.0001, t);
     g.gain.exponentialRampToValueAtTime(0.15, t + 0.012);
     g.gain.exponentialRampToValueAtTime(0.001, t + 0.32);
-    ns.connect(hp); hp.connect(lp); lp.connect(g); g.connect(audio.master);
+    ns.connect(hp); hp.connect(lp); lp.connect(g); g.connect(audio.footstepBus);
     ns.start(t); ns.stop(t + 0.35);
   } else if (surface === 'gravel') {
     // Sharp clatter: many short noise grains in succession
@@ -18451,7 +18689,7 @@ function sfxFootstep(surface) {
       g.gain.setValueAtTime(0.0001, t + dt);
       g.gain.exponentialRampToValueAtTime(0.06 + Math.random() * 0.04, t + dt + 0.003);
       g.gain.exponentialRampToValueAtTime(0.001, t + dt + 0.04);
-      ns.connect(bp); bp.connect(g); g.connect(audio.master);
+      ns.connect(bp); bp.connect(g); g.connect(audio.footstepBus);
       ns.start(t + dt); ns.stop(t + dt + 0.06);
     }
   } else if (surface === 'mud') {
@@ -18464,7 +18702,7 @@ function sfxFootstep(surface) {
     g.gain.setValueAtTime(0.0001, t);
     g.gain.exponentialRampToValueAtTime(0.28, t + 0.018);
     g.gain.exponentialRampToValueAtTime(0.001, t + 0.55);
-    ns.connect(bp); bp.connect(g); g.connect(audio.master);
+    ns.connect(bp); bp.connect(g); g.connect(audio.footstepBus);
     ns.start(t); ns.stop(t + 0.6);
     // Suction lift on release
     const lift = audio.ctx.createBufferSource();
@@ -18475,7 +18713,7 @@ function sfxFootstep(surface) {
     lg.gain.setValueAtTime(0.0001, t + 0.18);
     lg.gain.exponentialRampToValueAtTime(0.10, t + 0.22);
     lg.gain.exponentialRampToValueAtTime(0.001, t + 0.4);
-    lift.connect(lbp); lbp.connect(lg); lg.connect(audio.master);
+    lift.connect(lbp); lbp.connect(lg); lg.connect(audio.footstepBus);
     lift.start(t + 0.18); lift.stop(t + 0.45);
   } else if (surface === 'water') {
     // Heavy splash + droplet patter
@@ -18488,7 +18726,7 @@ function sfxFootstep(surface) {
     g.gain.setValueAtTime(0.0001, t);
     g.gain.exponentialRampToValueAtTime(0.45, t + 0.02);
     g.gain.exponentialRampToValueAtTime(0.001, t + 0.7);
-    splash.connect(lp); lp.connect(g); g.connect(audio.master);
+    splash.connect(lp); lp.connect(g); g.connect(audio.footstepBus);
     splash.start(t); splash.stop(t + 0.8);
     // Falling droplets: 5-8 short noise blips after the main splash
     const drops = 5 + Math.floor(Math.random() * 4);
@@ -18502,7 +18740,7 @@ function sfxFootstep(surface) {
       dg.gain.setValueAtTime(0.0001, t + dt);
       dg.gain.exponentialRampToValueAtTime(0.03, t + dt + 0.005);
       dg.gain.exponentialRampToValueAtTime(0.001, t + dt + 0.07);
-      d.connect(bp); bp.connect(dg); dg.connect(audio.master);
+      d.connect(bp); bp.connect(dg); dg.connect(audio.footstepBus);
       d.start(t + dt); d.stop(t + dt + 0.1);
     }
   } else if (surface === 'leaves') {
@@ -18517,7 +18755,7 @@ function sfxFootstep(surface) {
     g.gain.setValueAtTime(0.0001, t);
     g.gain.exponentialRampToValueAtTime(0.18, t + 0.014);
     g.gain.exponentialRampToValueAtTime(0.001, t + 0.42);
-    ns.connect(hp); hp.connect(lp); lp.connect(g); g.connect(audio.master);
+    ns.connect(hp); hp.connect(lp); lp.connect(g); g.connect(audio.footstepBus);
     ns.start(t); ns.stop(t + 0.45);
   } else if (surface === 'rock') {
     // Hard contact: sharp click on hard ceramic plate
@@ -18529,7 +18767,7 @@ function sfxFootstep(surface) {
     cg.gain.setValueAtTime(0.0001, t);
     cg.gain.exponentialRampToValueAtTime(0.16, t + 0.004);
     cg.gain.exponentialRampToValueAtTime(0.001, t + 0.12);
-    click.connect(cg); cg.connect(audio.master);
+    click.connect(cg); cg.connect(audio.footstepBus);
     click.start(t); click.stop(t + 0.14);
     // Brief echo tail
     const echo = audio.ctx.createBufferSource();
@@ -18540,7 +18778,7 @@ function sfxFootstep(surface) {
     eg.gain.setValueAtTime(0.0001, t + 0.05);
     eg.gain.exponentialRampToValueAtTime(0.08, t + 0.08);
     eg.gain.exponentialRampToValueAtTime(0.001, t + 0.35);
-    echo.connect(ehp); ehp.connect(eg); eg.connect(audio.master);
+    echo.connect(ehp); ehp.connect(eg); eg.connect(audio.footstepBus);
     echo.start(t + 0.05); echo.stop(t + 0.4);
   } else {  // grass / default
     // Soft rustle: low-mid filtered noise
@@ -18552,7 +18790,7 @@ function sfxFootstep(surface) {
     g.gain.setValueAtTime(0.0001, t);
     g.gain.exponentialRampToValueAtTime(0.12, t + 0.018);
     g.gain.exponentialRampToValueAtTime(0.001, t + 0.35);
-    ns.connect(bp); bp.connect(g); g.connect(audio.master);
+    ns.connect(bp); bp.connect(g); g.connect(audio.footstepBus);
     ns.start(t); ns.stop(t + 0.38);
   }
 }
@@ -19176,10 +19414,12 @@ function updateAudio(dt) {
     audio.pitchServo.osc2.frequency.value += (f2 - audio.pitchServo.osc2.frequency.value) * dt * 6;
     audio.pitchServo.lp.frequency.value = 460 + pt * 160;
     // Accumulate movement and fire a ratchet tick at threshold.
-    // Heavy industrial gear teeth - spaced widely apart.
+    // Threshold of 0.045 rad (~2.6 degrees per click) gives a dense,
+    // mechanical ratcheting feel - many small gear teeth engaging in
+    // succession rather than a few widely-spaced clunks.
     audio._pitchAccum += Math.abs(dp);
-    while (audio._pitchAccum > 0.22) {
-      audio._pitchAccum -= 0.22;
+    while (audio._pitchAccum > 0.045) {
+      audio._pitchAccum -= 0.045;
       sfxServoTick();
     }
     // Decay accumulator a bit if no movement, so a tiny twitch later doesn't
@@ -19801,6 +20041,31 @@ document.getElementById('start-btn').addEventListener('click', () => {
         try {
           localStorage.setItem('cpCollapsed', panel.classList.contains('collapsed') ? '1' : '0');
         } catch (e) {}
+        if (typeof sfxClick === 'function') sfxClick();
+      });
+    }
+    // Wire footstep muffle toggle. Persists across sessions in localStorage.
+    {
+      const btn = document.getElementById('footstep-muffle-btn');
+      let muffled = false;
+      try { muffled = localStorage.getItem('footstepMuffled') === '1'; } catch (e) {}
+      const apply = () => {
+        if (audio && audio.footstepBus) {
+          // Muffled = 6% volume (94% reduction). Smooth 50ms crossfade.
+          audio.footstepBus.gain.setTargetAtTime(muffled ? 0.06 : 1.0, audio.ctx.currentTime, 0.05);
+        }
+        if (btn) {
+          btn.textContent = muffled ? 'MUFFLED' : 'MUFFLE';
+          btn.style.background = muffled ? 'rgba(255,154,31,0.32)' : 'rgba(255,154,31,0.08)';
+          btn.style.color = muffled ? '#fff' : 'var(--amber)';
+          btn.style.borderColor = muffled ? 'var(--amber)' : 'var(--amber-dim)';
+        }
+      };
+      apply();
+      if (btn) btn.addEventListener('click', () => {
+        muffled = !muffled;
+        try { localStorage.setItem('footstepMuffled', muffled ? '1' : '0'); } catch (e) {}
+        apply();
         if (typeof sfxClick === 'function') sfxClick();
       });
     }
