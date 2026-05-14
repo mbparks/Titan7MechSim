@@ -9034,8 +9034,10 @@ function updateWildlife3D(dt) {
   }
   // Tick each wildlife entity
   for (let i = wildlife3d.length - 1; i >= 0; i--) {
-    const w = wildlife[i];
+    const w = wildlife3d[i];
+    if (!w) { wildlife3d.splice(i, 1); continue; }   // defensive: skip holes
     const spec = WILDLIFE_SPECIES[w.species];
+    if (!spec) { wildlife3d.splice(i, 1); continue; }
     const dx = player.pos.x - w.pos.x;
     const dz = player.pos.z - w.pos.z;
     const d = Math.hypot(dx, dz);
