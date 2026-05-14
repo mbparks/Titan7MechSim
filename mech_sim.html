@@ -422,6 +422,62 @@
     color: #ffd060;
     border-bottom-color: var(--amber);
   }
+  /* Pilot ID inputs on start screen */
+  .pilot-setup {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    width: 320px;
+    padding: 18px 22px;
+    border: 1px solid var(--amber-dim);
+    background: rgba(20, 14, 6, 0.55);
+    margin-bottom: 28px;
+    pointer-events: auto;
+  }
+  .ps-label {
+    color: var(--amber-dim);
+    font-size: 10px;
+    letter-spacing: 3px;
+    margin-bottom: 6px;
+  }
+  .ps-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .ps-row label {
+    color: var(--amber-dim);
+    font-size: 11px;
+    letter-spacing: 2px;
+    width: 70px;
+  }
+  .ps-row input {
+    flex: 1;
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid var(--amber-dim);
+    color: var(--amber);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 1.5px;
+    padding: 5px 8px;
+    outline: none;
+  }
+  .ps-row input:focus {
+    border-color: var(--amber);
+    box-shadow: 0 0 6px rgba(255, 154, 31, 0.3);
+  }
+  .ps-row input::placeholder {
+    color: rgba(255, 154, 31, 0.3);
+    font-style: italic;
+  }
+  .ps-hint {
+    margin-top: 6px;
+    font-size: 9px;
+    letter-spacing: 1.5px;
+    color: rgba(255, 154, 31, 0.45);
+    font-style: italic;
+  }
+
   #start-btn {
     pointer-events: auto; cursor: pointer;
     background: transparent;
@@ -464,11 +520,12 @@
 
   /* ===== Coral the dog (cockpit companion) ===== */
   #coral-frame {
-    position: absolute; right: 24px; top: 240px;
+    position: absolute; right: 24px; top: 244px;
     width: 200px;
     border: 1px solid var(--amber-dim);
     background: var(--panel);
     padding: 8px 10px 10px;
+    pointer-events: auto;
   }
   #coral-frame::before {
     content: 'K9 // CORAL // GOLDEN'; position: absolute;
@@ -476,7 +533,7 @@
     padding: 0 6px; font-size: 10px; letter-spacing: 2px; color: var(--amber);
   }
   #coral-canvas {
-    width: 100%; height: 80px; display: block;
+    width: 100%; height: 60px; display: block;
     image-rendering: pixelated;
   }
   #coral-status {
@@ -490,22 +547,29 @@
 
   /* ===== Comms log (allied mech chatter) ===== */
   #comms-log {
-    position: absolute; left: 24px; top: 288px; bottom: 220px;
+    position: absolute; left: 24px; top: 296px; bottom: 220px;
     width: 300px;
     border: 1px solid var(--amber-dim);
     background: var(--panel);
     padding: 10px 12px;
     font-size: 11px; letter-spacing: 1px;
     line-height: 1.5;
-    overflow: hidden;
     box-sizing: border-box;
+    z-index: 11;
   }
   #comms-log::before {
     content: 'COMMS // CHANNEL 47'; position: absolute;
-    top: -8px; left: 12px; background: var(--bg);
-    padding: 0 6px; font-size: 10px; letter-spacing: 3px;
+    top: -9px; left: 12px; background: var(--bg);
+    padding: 1px 8px; font-size: 10px; letter-spacing: 3px;
+    color: var(--amber);
+    z-index: 12;
+    white-space: nowrap;
   }
-  #comms-messages { color: var(--amber-dim); }
+  #comms-messages {
+    color: var(--amber-dim);
+    height: 100%;
+    overflow: hidden;
+  }
   #comms-messages .line { margin-bottom: 4px; opacity: 0; animation: fadeInMsg 0.5s forwards; }
   #comms-messages .from { color: var(--amber); font-weight: bold; letter-spacing: 2px; }
   #comms-messages .from.you { color: var(--green); }
@@ -863,6 +927,263 @@
     color: var(--amber-dim);
   }
 
+  /* ===== Journal overlay (J key) ===== */
+  #journal-overlay {
+    position: fixed; inset: 0; z-index: 60;
+    background: rgba(8, 6, 4, 0.97);
+    display: none;
+    flex-direction: column;
+    color: var(--amber);
+    padding: 24px;
+  }
+  #journal-overlay.show { display: flex; }
+  .jrn-header {
+    display: flex; justify-content: space-between;
+    border: 1px solid var(--amber-dim);
+    padding: 14px 20px;
+    background: var(--panel);
+    margin-bottom: 14px;
+    font-size: 14px; letter-spacing: 4px;
+  }
+  .jrn-header .right { color: var(--amber-dim); font-size: 11px; }
+  #journal-entries {
+    flex: 1; overflow-y: auto;
+    border: 1px solid var(--amber-dim);
+    background: rgba(20, 14, 6, 0.4);
+    padding: 22px 28px;
+    font-size: 13px; letter-spacing: 0.5px;
+    line-height: 1.9;
+    max-width: 800px;
+    align-self: center;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  #journal-entries::-webkit-scrollbar { width: 8px; }
+  #journal-entries::-webkit-scrollbar-track { background: rgba(255,154,31,0.04); }
+  #journal-entries::-webkit-scrollbar-thumb { background: var(--amber-dim); }
+  .jrn-empty {
+    color: var(--amber-dim);
+    font-style: italic;
+    text-align: center;
+    padding: 60px 20px;
+    letter-spacing: 1px;
+  }
+  .jrn-entry {
+    padding: 14px 0 16px;
+    border-bottom: 1px dashed rgba(255, 154, 31, 0.18);
+  }
+  .jrn-entry:last-child { border-bottom: none; }
+  .jrn-head {
+    display: flex; gap: 18px;
+    font-size: 10px; letter-spacing: 3px;
+    color: var(--amber-dim);
+    margin-bottom: 6px;
+  }
+  .jrn-time { color: var(--amber); font-weight: bold; }
+  .jrn-phase { text-transform: uppercase; }
+  .jrn-text {
+    color: rgba(255, 230, 180, 0.92);
+    font-family: 'Share Tech Mono', monospace;
+  }
+  .jrn-footer {
+    display: flex; justify-content: space-between;
+    padding: 10px 12px; margin-top: 12px;
+    border-top: 1px solid var(--amber-dim);
+    font-size: 10px; letter-spacing: 3px;
+    color: var(--amber-dim);
+  }
+
+  /* ===== Photo mode ===== */
+  #photo-overlay {
+    position: fixed; inset: 0;
+    pointer-events: none;
+    z-index: 70;
+    display: none;
+  }
+  #photo-overlay.show { display: block; }
+  /* Film-frame corner brackets */
+  #photo-overlay .pframe {
+    position: absolute;
+    width: 56px; height: 56px;
+    border: 2px solid var(--amber);
+    opacity: 0.9;
+  }
+  #photo-overlay .pframe.tl { top: 60px;    left: 60px;    border-right: none; border-bottom: none; }
+  #photo-overlay .pframe.tr { top: 60px;    right: 60px;   border-left:  none; border-bottom: none; }
+  #photo-overlay .pframe.bl { bottom: 60px; left: 60px;    border-right: none; border-top:    none; }
+  #photo-overlay .pframe.br { bottom: 60px; right: 60px;   border-left:  none; border-top:    none; }
+  /* Center recticle dot */
+  #photo-overlay .pdot {
+    position: absolute; left: 50%; top: 50%;
+    transform: translate(-50%, -50%);
+    width: 4px; height: 4px;
+    border-radius: 50%;
+    background: var(--amber);
+    box-shadow: 0 0 8px var(--amber);
+  }
+  /* Burn-in labels */
+  #photo-overlay .ptag {
+    position: absolute;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 3px;
+    color: var(--amber);
+    text-shadow: 0 0 4px rgba(0,0,0,0.9);
+  }
+  #photo-overlay .ptag.top    { top: 28px;    left: 50%; transform: translateX(-50%); }
+  #photo-overlay .ptag.bl     { bottom: 28px; left: 60px; }
+  #photo-overlay .ptag.br     { bottom: 28px; right: 60px; }
+  /* Photo-mode controls strip */
+  #photo-controls {
+    position: fixed;
+    bottom: 90px; left: 50%;
+    transform: translateX(-50%);
+    z-index: 71;
+    display: none;
+    pointer-events: auto;
+    background: rgba(0,0,0,0.85);
+    border: 1px solid var(--amber-dim);
+    padding: 10px 18px;
+    color: var(--amber);
+    font-size: 11px; letter-spacing: 2px;
+    display: none;
+  }
+  #photo-controls.show { display: flex; gap: 16px; align-items: center; }
+  .photo-action {
+    cursor: pointer;
+    border: 1px solid var(--amber);
+    padding: 6px 14px;
+    background: transparent;
+    color: var(--amber);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 3px;
+    transition: all 0.12s;
+  }
+  .photo-action:hover { background: var(--amber); color: var(--bg); }
+  /* Gallery strip across the bottom */
+  #photo-gallery {
+    position: fixed;
+    left: 50%; bottom: 20px;
+    transform: translateX(-50%);
+    z-index: 71;
+    display: none;
+    gap: 8px;
+    max-width: 90vw;
+    overflow-x: auto;
+    padding: 4px;
+  }
+  #photo-gallery.show { display: flex; }
+  #photo-gallery img {
+    width: 96px; height: 60px;
+    object-fit: cover;
+    border: 1px solid var(--amber-dim);
+    opacity: 0.85;
+    cursor: pointer;
+    transition: opacity 0.12s, border-color 0.12s;
+  }
+  #photo-gallery img:hover {
+    opacity: 1;
+    border-color: var(--amber);
+  }
+  /* Subtle vignette overlay during photo mode */
+  body.photo-mode canvas#scene {
+    filter: contrast(1.02) saturate(1.05);
+  }
+  #boot-sequence {
+    position: fixed; inset: 0;
+    background: #000;
+    z-index: 1500;
+    display: none;
+    flex-direction: column;
+    padding: 80px 96px;
+    color: var(--amber);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 13px;
+    letter-spacing: 2px;
+    overflow: hidden;
+  }
+  #boot-sequence.show { display: flex; }
+  #boot-sequence .boot-title {
+    color: var(--amber);
+    font-size: 16px;
+    letter-spacing: 4px;
+    margin-bottom: 28px;
+    opacity: 0.85;
+  }
+  #boot-sequence .boot-lines {
+    flex: 1;
+    overflow: hidden;
+  }
+  #boot-sequence .boot-line {
+    display: flex;
+    justify-content: space-between;
+    padding: 3px 0;
+    opacity: 0;
+    animation: bootLineIn 0.18s ease-out forwards;
+  }
+  @keyframes bootLineIn {
+    from { opacity: 0; transform: translateX(-6px); }
+    to   { opacity: 0.92; transform: translateX(0); }
+  }
+  .boot-line .b-name { color: var(--amber-dim); }
+  .boot-line .b-state {
+    min-width: 140px;
+    text-align: right;
+    letter-spacing: 3px;
+    font-weight: bold;
+  }
+  .boot-line .b-state.ok      { color: var(--green); }
+  .boot-line .b-state.warm    { color: var(--amber); }
+  .boot-line .b-state.standby { color: var(--amber-dim); }
+  .boot-line .b-state.warn    { color: var(--red); }
+  /* Pulsing cursor at the end of each line */
+  .boot-line .b-cursor {
+    display: inline-block;
+    margin-left: 6px;
+    animation: bootCursor 0.5s infinite step-end;
+  }
+  @keyframes bootCursor {
+    0%, 50% { opacity: 1; }
+    51%, 100% { opacity: 0; }
+  }
+  #boot-final {
+    margin-top: 30px;
+    font-size: 22px;
+    letter-spacing: 6px;
+    text-align: center;
+    color: var(--amber);
+    opacity: 0;
+    transition: opacity 1.2s ease-out;
+  }
+  #boot-final.show { opacity: 1; }
+  #boot-final .blink {
+    animation: bootBlink 1s infinite step-end;
+  }
+  @keyframes bootBlink {
+    0%, 50% { opacity: 1; }
+    51%, 100% { opacity: 0.2; }
+  }
+  /* Scanline overlay for that CRT warm-up feel */
+  #boot-sequence::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      rgba(0, 0, 0, 0) 0px,
+      rgba(0, 0, 0, 0) 2px,
+      rgba(255, 154, 31, 0.04) 3px,
+      rgba(0, 0, 0, 0) 4px);
+    pointer-events: none;
+  }
+  /* Subtle vignette */
+  #boot-sequence::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.65) 100%);
+    pointer-events: none;
+  }
+
   /* ===== Mini-game modal (inside diag) ===== */
   #minigame-modal {
     position: fixed; inset: 0; z-index: 70;
@@ -991,7 +1312,7 @@
   /* ===== Rugged on-screen control panel ===== */
   #control-panel {
     position: absolute;
-    right: 24px; bottom: 200px;
+    right: 24px; bottom: 188px;
     width: 220px;
     background: linear-gradient(180deg, #2a1f0e, #1a1208);
     border: 2px solid #4a3520;
@@ -1138,7 +1459,7 @@
   /* Biome badge */
   #biome-badge {
     position: absolute;
-    right: 248px; top: 196px;
+    right: 248px; top: 234px;
     width: 220px;
     border: 1px solid var(--amber-dim);
     background: var(--panel);
@@ -1165,6 +1486,16 @@
   #comms-messages .line.news { color: rgba(255, 204, 136, 0.85); }
   #comms-messages .line.weather .from { color: #88ccff; }
   #comms-messages .line.weather { color: rgba(136, 204, 255, 0.85); }
+  /* Radio intercepts: faded, italic, like a captured fragment */
+  #comms-messages .line.intercept .from { color: #888899; }
+  #comms-messages .line.intercept {
+    color: rgba(180, 180, 200, 0.7);
+    font-style: italic;
+    letter-spacing: 0.5px;
+  }
+  /* Wildlife sightings: muted green, like a field journal */
+  #comms-messages .line.wildlife .from { color: #aaccaa; }
+  #comms-messages .line.wildlife { color: rgba(180, 220, 180, 0.85); }
 
   /* ===== Night Vision Goggles overlay ===== */
   #nvg-overlay {
@@ -1234,10 +1565,144 @@
   }
   body.nvg #nvg-mode-badge { display: block; }
 
+  /* ===== Thermal IR overlay ===== */
+  /* Active when body.thermal is set. Uses CSS filters on the scene canvas to
+     simulate a thermal palette, then adds heat-haze noise, a vignette, and
+     iron-palette legend bars. */
+  #thermal-overlay {
+    position: fixed; inset: 0;
+    pointer-events: none;
+    z-index: 8;
+    display: none;
+    /* Iron-palette tint applied as a colored radial wash */
+    background:
+      radial-gradient(ellipse at center,
+        rgba(255, 80, 20, 0.04) 0%,
+        rgba(120, 20, 60, 0.10) 40%,
+        rgba(20, 8, 40, 0.45) 80%,
+        rgba(2, 2, 12, 0.85) 100%);
+    mix-blend-mode: screen;
+  }
+  #thermal-overlay.active { display: block; }
+  /* Heat-haze noise (warmer, more flicker than NVG static) */
+  #thermal-noise {
+    position: fixed; inset: 0;
+    pointer-events: none;
+    z-index: 9;
+    display: none;
+    opacity: 0.22;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='th'><feTurbulence type='fractalNoise' baseFrequency='0.6' numOctaves='3' seed='5'/></filter><rect width='100%' height='100%' filter='url(%23th)' opacity='0.7'/></svg>");
+    animation: thermalShimmer 2.4s ease-in-out infinite;
+  }
+  @keyframes thermalShimmer {
+    0%, 100% { opacity: 0.22; transform: translate(0, 0); }
+    50%      { opacity: 0.30; transform: translate(0.5px, -0.5px); }
+  }
+  #thermal-noise.active { display: block; }
+  /* Thermal vignette (narrower than NVG to feel scopelike) */
+  #thermal-vignette {
+    position: fixed; inset: 0;
+    pointer-events: none;
+    z-index: 10;
+    display: none;
+    background:
+      radial-gradient(circle at 50% 50%, transparent 42%, rgba(0, 0, 0, 0.85) 80%);
+  }
+  #thermal-vignette.active { display: block; }
+  /* Iron-palette filter on the scene canvas:
+     - sepia to push everything into orange/red
+     - hue-rotate to spread the warm palette over the spectrum
+     - high contrast + saturate so cold = blue-purple and hot = white-yellow
+     - slight brightness boost so the image reads on dim backgrounds */
+  body.thermal canvas#scene {
+    filter:
+      brightness(1.4)
+      contrast(1.8)
+      saturate(2.4)
+      sepia(0.9)
+      hue-rotate(-30deg);
+  }
+  /* Dim HUD into matching warm-amber palette */
+  body.thermal #hud {
+    filter: hue-rotate(-10deg) saturate(1.1) brightness(1.05);
+  }
+  /* Thermal scanlines - thicker than NVG */
+  body.thermal::after {
+    content: '';
+    position: fixed; inset: 0;
+    pointer-events: none;
+    z-index: 11;
+    background: repeating-linear-gradient(
+      0deg,
+      rgba(0, 0, 0, 0) 0px,
+      rgba(0, 0, 0, 0) 3px,
+      rgba(80, 0, 0, 0.18) 4px,
+      rgba(0, 0, 0, 0) 5px
+    );
+  }
+  /* Thermal mode badge (top center) and color legend (bottom of viewport) */
+  #thermal-mode-badge {
+    position: fixed; left: 50%; top: 24px;
+    transform: translateX(-50%);
+    z-index: 12;
+    display: none;
+    color: #ffaa48;
+    font-size: 10px; letter-spacing: 4px;
+    padding: 3px 12px;
+    border: 1px solid rgba(255, 170, 72, 0.6);
+    background: rgba(40, 12, 4, 0.55);
+    text-shadow: 0 0 8px rgba(255, 170, 72, 0.8);
+  }
+  body.thermal #thermal-mode-badge { display: block; }
+  /* Iron palette legend bar */
+  #thermal-legend {
+    position: fixed;
+    left: 50%;
+    transform: translateX(-50%);
+    top: 56px;
+    z-index: 12;
+    display: none;
+    width: 280px; height: 12px;
+    background: linear-gradient(90deg,
+      #000020 0%,
+      #240050 12%,
+      #5a0080 25%,
+      #b00040 42%,
+      #ff4000 60%,
+      #ffaa00 76%,
+      #ffeeaa 90%,
+      #ffffff 100%);
+    border: 1px solid rgba(255, 170, 72, 0.5);
+    box-shadow: 0 0 6px rgba(255, 100, 30, 0.5);
+  }
+  #thermal-legend::before {
+    content: 'COLD'; position: absolute;
+    left: 4px; top: 14px;
+    font-size: 8px; letter-spacing: 2px;
+    color: rgba(255, 170, 72, 0.7);
+  }
+  #thermal-legend::after {
+    content: 'HOT'; position: absolute;
+    right: 4px; top: 14px;
+    font-size: 8px; letter-spacing: 2px;
+    color: rgba(255, 170, 72, 0.7);
+  }
+  body.thermal #thermal-legend { display: block; }
+  /* Make NVG and Thermal mutually exclusive */
+  body.thermal #nvg-overlay,
+  body.thermal #nvg-noise,
+  body.thermal #nvg-vignette,
+  body.thermal #nvg-mode-badge { display: none !important; }
+  body.thermal canvas#scene {
+    /* override the NVG filter if both happened to be on */
+    filter: brightness(1.4) contrast(1.8) saturate(2.4) sepia(0.9) hue-rotate(-30deg) !important;
+  }
+
   /* Time of day badge */
   #tod-badge {
     position: absolute;
-    right: 248px; top: 260px;
+    right: 248px; top: 298px;
     width: 220px;
     border: 1px solid var(--amber-dim);
     background: var(--panel);
@@ -1402,9 +1867,9 @@
     content: '';
     position: absolute; inset: 0;
     background-image:
-      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 600'><g fill='none' stroke='rgba(255,220,160,0.06)' stroke-linecap='round'><path stroke-width='0.6' d='M120 80 L240 84'/><path stroke-width='0.5' d='M520 140 L600 138 L640 142'/><path stroke-width='0.5' d='M300 320 L380 326 L420 322'/><path stroke-width='0.6' d='M640 420 L720 416'/><path stroke-width='0.4' d='M80 480 L160 482'/></g><g fill='rgba(255,220,160,0.07)'><circle cx='100' cy='200' r='1.2'/><circle cx='340' cy='150' r='1'/><circle cx='550' cy='280' r='1.4'/><circle cx='680' cy='350' r='1'/><circle cx='220' cy='400' r='0.8'/><circle cx='450' cy='480' r='1.1'/><circle cx='150' cy='340' r='0.9'/><circle cx='720' cy='110' r='1.2'/></g></svg>");
+      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 600'><g fill='none' stroke='rgba(255,220,160,0.04)' stroke-linecap='round'><path stroke-width='0.5' d='M120 80 L240 84'/><path stroke-width='0.4' d='M520 140 L600 138 L640 142'/><path stroke-width='0.4' d='M640 420 L720 416'/></g><g fill='rgba(255,220,160,0.025)'><circle cx='100' cy='200' r='0.9'/><circle cx='340' cy='150' r='0.7'/><circle cx='680' cy='350' r='0.8'/><circle cx='220' cy='400' r='0.6'/><circle cx='450' cy='480' r='0.7'/></g></svg>");
     background-size: 100% 100%;
-    opacity: 0.9;
+    opacity: 0.4;
     mix-blend-mode: screen;
   }
 
@@ -1447,9 +1912,9 @@
       rgba(160, 190, 210, 0.9) 100%);
   }
   @keyframes rainSlide {
-    0%   { transform: translateY(-100px); opacity: 0; }
+    0%   { transform: translateY(-100px) skewX(var(--rain-skew, 0deg)); opacity: 0; }
     10%  { opacity: 0.9; }
-    100% { transform: translateY(660px); opacity: 0; }
+    100% { transform: translateY(660px) skewX(var(--rain-skew, 0deg)); opacity: 0; }
   }
 
   /* Snow accumulation strip on lower canopy edge */
@@ -1964,6 +2429,15 @@
   <div id="weather-badge">
     <div id="weather-current">CLEAR DAWN</div>
     <div style="font-size:9px;color:var(--amber-dim);margin-top:2px;letter-spacing:1.5px;"><span id="weather-sub">stable</span></div>
+    <div style="font-size:9px;color:var(--amber-dim);margin-top:4px;letter-spacing:1.5px;display:flex;justify-content:space-between;align-items:center;">
+      <span>WIND <span id="wind-dir" style="color:var(--amber);">N</span></span>
+      <span><span id="wind-strength" style="color:var(--amber);">0</span> kts</span>
+      <span id="ambient-toggle" title="Toggle ambient noise (wind, rain, hum)" style="cursor:pointer;color:var(--amber);padding:0 4px;user-select:none;border:1px solid var(--amber-dim);font-size:10px;pointer-events:auto;">♪</span>
+    </div>
+    <div style="font-size:9px;color:var(--amber-dim);margin-top:4px;letter-spacing:1.5px;display:flex;justify-content:space-between;border-top:1px dashed rgba(255,154,31,0.18);padding-top:4px;">
+      <span>NEXT <span id="wx-forecast" style="color:var(--amber);">--</span></span>
+      <span id="wx-forecast-time" style="color:var(--amber);">--:--</span>
+    </div>
   </div>
 
   <!-- Biome badge -->
@@ -1982,7 +2456,7 @@
       <div class="cp-btn" data-cp="log"><div class="cp-key">L</div><div class="cp-label">LOGBOOK</div></div>
       <div class="cp-btn" data-cp="drone"><div class="cp-key">Q</div><div class="cp-label">DRONE</div></div>
       <div class="cp-btn" data-cp="hail"><div class="cp-key">H</div><div class="cp-label">HAIL</div></div>
-      <div class="cp-btn" data-cp="nvg"><div class="cp-key">N</div><div class="cp-label">NVG</div></div>
+      <div class="cp-btn" data-cp="vision"><div class="cp-key">N</div><div class="cp-label">VISION</div></div>
     </div>
   </div>
 
@@ -1994,6 +2468,11 @@
   <div id="nvg-noise"></div>
   <div id="nvg-vignette"></div>
   <div id="nvg-mode-badge">▶ NVG // ACTIVE</div>
+  <div id="thermal-overlay"></div>
+  <div id="thermal-noise"></div>
+  <div id="thermal-vignette"></div>
+  <div id="thermal-mode-badge">▶ THERMAL IR // ACTIVE</div>
+  <div id="thermal-legend"></div>
 
   <!-- Time of day badge -->
   <div id="tod-badge">
@@ -2087,6 +2566,18 @@
     FROM HOME BASE. RECON DRONE AND CHATTER ON CHANNEL 47 ARE AVAILABLE.<br>
     <span style="opacity:0.6">SENTINEL ACTIVITY IS POSSIBLE BUT NOT EXPECTED.</span>
   </div>
+  <div class="pilot-setup">
+    <div class="ps-label">PILOT IDENTIFICATION</div>
+    <div class="ps-row">
+      <label for="ps-name">NAME</label>
+      <input id="ps-name" type="text" maxlength="32" placeholder="(your name)" autocomplete="off" spellcheck="false">
+    </div>
+    <div class="ps-row">
+      <label for="ps-callsign">CALLSIGN</label>
+      <input id="ps-callsign" type="text" maxlength="14" placeholder="(personal handle)" autocomplete="off" spellcheck="false">
+    </div>
+    <div class="ps-hint">Kailey will address you by name. Allied units will use your callsign.</div>
+  </div>
   <button id="start-btn">▶ INITIATE NEURAL LINK</button>
   <div class="controls">
     <span class="key">W A S D</span><span>Locomotion (strafe)</span>
@@ -2102,8 +2593,11 @@
     <span class="key">T</span><span>Diagnostics &amp; repair</span>
     <span class="key">Q</span><span>Launch / recall drone</span>
     <span class="key">H</span><span>Hail allied mech</span>
-    <span class="key">N</span><span>Night Vision Goggles</span>
+    <span class="key">N</span><span>Vision (cycle NVG/Thermal)</span>
     <span class="key">L</span><span>Open field logbook</span>
+    <span class="key">J</span><span>Open field journal</span>
+    <span class="key">P</span><span>Photo mode</span>
+    <span class="key">Z</span><span>Kneel / stand</span>
     <span class="key">ESC</span><span>Pause / close panel</span>
   </div>
   <div class="byline">
@@ -2126,8 +2620,8 @@
     <span><span class="legend-dot drone"></span>DRONE</span>
   </div>
   <div class="map-footer">
-    <span>LMB: SET WAYPOINT</span>
-    <span>RMB: CLEAR</span>
+    <span>LMB: ADD WAYPOINT</span>
+    <span>RMB: CLEAR ROUTE</span>
     <span>SCROLL: ZOOM</span>
     <span>M / ESC: CLOSE</span>
   </div>
@@ -2158,6 +2652,64 @@
     <span>L / ESC: CLOSE</span>
   </div>
 </div>
+
+<!-- Journal overlay (J key) -->
+<div id="journal-overlay">
+  <div class="jrn-header">
+    <div>▶ FIELD JOURNAL // TITAN-7</div>
+    <div class="right">ENTRIES POSTED AT EACH PHASE TRANSITION</div>
+  </div>
+  <div id="journal-entries"></div>
+  <div class="jrn-footer">
+    <span>YOUR DAYS, IN YOUR OWN WORDS</span>
+    <span>J / ESC: CLOSE</span>
+  </div>
+</div>
+
+<!-- Drone POV monitor (only visible when drone is airborne) -->
+<div id="drone-pov" style="position:absolute;left:50%;top:80px;transform:translateX(-50%);width:280px;display:none;pointer-events:none;z-index:11;">
+  <div style="border:1px solid var(--amber);background:rgba(0,0,0,0.4);padding:4px 8px;font-size:9px;letter-spacing:3px;color:var(--amber-dim);display:flex;justify-content:space-between;align-items:center;">
+    <span>▶ DRONE POV // LIVE</span>
+    <span id="drone-pov-alt" style="color:var(--amber);">ALT 0055</span>
+  </div>
+  <div id="drone-pov-frame" style="position:relative;width:280px;height:160px;border:1px solid var(--amber);border-top:none;background:transparent;overflow:hidden;">
+    <!-- Crosshair overlay -->
+    <div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:24px;height:24px;border:1px solid rgba(255,154,31,0.8);pointer-events:none;"></div>
+    <div style="position:absolute;left:50%;top:0;bottom:0;width:1px;background:rgba(255,154,31,0.2);"></div>
+    <div style="position:absolute;top:50%;left:0;right:0;height:1px;background:rgba(255,154,31,0.2);"></div>
+    <!-- Burn-in labels -->
+    <div style="position:absolute;left:6px;top:4px;font-size:8px;letter-spacing:2px;color:rgba(255,154,31,0.85);">RECON-1</div>
+    <div id="drone-pov-coords" style="position:absolute;right:6px;top:4px;font-size:8px;letter-spacing:2px;color:rgba(255,154,31,0.85);">+0000 / +0000</div>
+    <div style="position:absolute;left:6px;bottom:4px;font-size:8px;letter-spacing:2px;color:rgba(255,154,31,0.85);">CHANNEL 47</div>
+    <div id="drone-pov-bat" style="position:absolute;right:6px;bottom:4px;font-size:8px;letter-spacing:2px;color:rgba(255,154,31,0.85);">BAT 100%</div>
+    <!-- Scanlines -->
+    <div style="position:absolute;inset:0;background:repeating-linear-gradient(0deg,rgba(0,0,0,0)0,rgba(0,0,0,0)2px,rgba(0,0,0,0.18)3px,rgba(0,0,0,0)4px);pointer-events:none;"></div>
+  </div>
+</div>
+<div id="boot-sequence">
+  <div class="boot-title">▶ TITAN-7 // SYSTEM INITIALIZATION</div>
+  <div class="boot-lines" id="boot-lines"></div>
+  <div id="boot-final">WELCOME, PILOT <span class="blink">▍</span></div>
+</div>
+
+<!-- Photo mode overlay -->
+<div id="photo-overlay">
+  <div class="pframe tl"></div>
+  <div class="pframe tr"></div>
+  <div class="pframe bl"></div>
+  <div class="pframe br"></div>
+  <div class="pdot"></div>
+  <div class="ptag top" id="photo-tag-top">TITAN-7 // FIELD PHOTOGRAPHY</div>
+  <div class="ptag bl" id="photo-tag-bl">--:--</div>
+  <div class="ptag br" id="photo-tag-br">+0000 / +0000</div>
+</div>
+<div id="photo-controls">
+  <span style="color: var(--amber-dim);">PHOTO MODE</span>
+  <button class="photo-action" id="photo-shoot">CAPTURE [ENTER]</button>
+  <button class="photo-action" id="photo-exit">EXIT [P/ESC]</button>
+  <span style="color: var(--amber-dim);">USE ARROW KEYS TO AIM</span>
+</div>
+<div id="photo-gallery"></div>
 
 <!-- Mini-game modal (repair) -->
 <div id="minigame-modal">
@@ -2193,7 +2745,7 @@
 // =========================================================================
 
 const canvas = document.getElementById('scene');
-const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' });
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance', preserveDrawingBuffer: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 renderer.shadowMap.enabled = true;
@@ -2206,7 +2758,9 @@ const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x1a1410);
 scene.fog = new THREE.FogExp2(0x2a2018, 0.0055);
 
-const camera = new THREE.PerspectiveCamera(74, window.innerWidth / window.innerHeight, 0.1, 1200);
+const camera = new THREE.PerspectiveCamera(74, window.innerWidth / window.innerHeight, 0.1, 4000);
+// Second camera used to render the drone POV monitor as picture-in-picture.
+const droneCamera = new THREE.PerspectiveCamera(58, 280/160, 0.5, 4000);
 
 // ==================== LIGHTING ====================
 const ambient = new THREE.AmbientLight(0x5a4a3a, 0.4);
@@ -2247,25 +2801,222 @@ headlight.target = headlightTarget;
 const reactorGlow = new THREE.PointLight(0xff8a40, 0, 8, 1.5);
 scene.add(reactorGlow);
 
+// ==================== PLAYER MECH FEET ====================
+// The pilot's own mech feet, visible when the camera pitches down past
+// roughly -30 degrees. Two legs descend from the cockpit area into massive
+// stomping boots at ground level. They move/animate with the walking phase.
+const playerMech = (() => {
+  const g = new THREE.Group();
+  const armorMat = new THREE.MeshStandardMaterial({
+    color: 0x2a2a30, roughness: 0.7, metalness: 0.55,
+  });
+  const platingMat = new THREE.MeshStandardMaterial({
+    color: 0x3c3a44, roughness: 0.55, metalness: 0.7,
+  });
+  const accentMat = new THREE.MeshStandardMaterial({
+    color: 0xff9a1f, roughness: 0.5, metalness: 0.4,
+    emissive: 0x1a0c00, emissiveIntensity: 0.3,
+  });
+  const jointMat = new THREE.MeshStandardMaterial({
+    color: 0x1a1a20, roughness: 0.9, metalness: 0.3,
+  });
+
+  function buildLeg(side) {
+    // side = -1 (left) or +1 (right)
+    const leg = new THREE.Group();
+    // Hip socket (joint sphere where leg meets the chassis)
+    const hip = new THREE.Mesh(new THREE.SphereGeometry(0.9, 12, 12), jointMat);
+    hip.position.set(side * 1.6, 7.0, 0);
+    leg.add(hip);
+    // Upper leg (thigh): vertical cylinder + armor plate
+    const thigh = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.55, 0.7, 3.6, 10),
+      armorMat
+    );
+    thigh.position.set(side * 1.6, 5.0, 0);
+    leg.add(thigh);
+    // Thigh outer armor plate
+    const thighPlate = new THREE.Mesh(
+      new THREE.BoxGeometry(1.2, 3.0, 1.4),
+      platingMat
+    );
+    thighPlate.position.set(side * 1.85, 5.2, 0);
+    leg.add(thighPlate);
+    // Knee joint
+    const knee = new THREE.Mesh(new THREE.SphereGeometry(0.65, 12, 12), jointMat);
+    knee.position.set(side * 1.6, 3.0, 0);
+    leg.add(knee);
+    // Shin (lower leg): cylinder + armor plate
+    const shin = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.5, 0.6, 2.8, 10),
+      armorMat
+    );
+    shin.position.set(side * 1.6, 1.6, 0);
+    leg.add(shin);
+    const shinPlate = new THREE.Mesh(
+      new THREE.BoxGeometry(1.3, 2.2, 1.2),
+      platingMat
+    );
+    shinPlate.position.set(side * 1.6, 1.6, 0.3);
+    leg.add(shinPlate);
+    // Ankle joint
+    const ankle = new THREE.Mesh(new THREE.SphereGeometry(0.55, 10, 10), jointMat);
+    ankle.position.set(side * 1.6, 0.4, 0);
+    leg.add(ankle);
+    // Foot - massive armored boot
+    const foot = new THREE.Mesh(
+      new THREE.BoxGeometry(2.0, 0.8, 3.2),
+      platingMat
+    );
+    foot.position.set(side * 1.6, 0.4, 0.35);
+    leg.add(foot);
+    // Toe cap (slightly raised forward portion)
+    const toe = new THREE.Mesh(
+      new THREE.BoxGeometry(2.0, 0.5, 1.0),
+      armorMat
+    );
+    toe.position.set(side * 1.6, 0.55, 1.6);
+    leg.add(toe);
+    // Foot grip pads (orange stripes for visibility)
+    const grip1 = new THREE.Mesh(
+      new THREE.BoxGeometry(2.05, 0.06, 0.3),
+      accentMat
+    );
+    grip1.position.set(side * 1.6, 0.81, 0.0);
+    leg.add(grip1);
+    const grip2 = new THREE.Mesh(
+      new THREE.BoxGeometry(2.05, 0.06, 0.3),
+      accentMat
+    );
+    grip2.position.set(side * 1.6, 0.81, 1.0);
+    leg.add(grip2);
+    // Side accent stripe down the shin
+    const stripe = new THREE.Mesh(
+      new THREE.BoxGeometry(0.08, 2.0, 0.08),
+      accentMat
+    );
+    stripe.position.set(side * 2.15, 1.6, 0.2);
+    leg.add(stripe);
+    // Group sub-pieces for animation
+    leg.userData = { thigh, shin, foot, hip, knee, ankle, side };
+    return leg;
+  }
+
+  const left = buildLeg(-1);
+  const right = buildLeg(1);
+  g.add(left); g.add(right);
+
+  // A small slice of the cockpit underside visible above the legs (the chassis
+  // belly), so the legs visually connect to "something" overhead. This isn't
+  // the cockpit interior - it's the underside of the mech as seen by the pilot
+  // looking down past her own feet to the ground.
+  const belly = new THREE.Mesh(
+    new THREE.BoxGeometry(5.2, 1.0, 3.5),
+    platingMat
+  );
+  belly.position.set(0, 8.0, -0.2);
+  g.add(belly);
+  // Reactor housing in the belly center, with emissive vent
+  const reactor = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.9, 0.9, 0.4, 10),
+    new THREE.MeshStandardMaterial({
+      color: 0xff8a40, roughness: 0.4,
+      emissive: 0xff5008, emissiveIntensity: 1.2,
+    })
+  );
+  reactor.rotation.x = Math.PI / 2;
+  reactor.position.set(0, 7.45, 0.6);
+  g.add(reactor);
+  // Underside vent grilles (just diagonal panels for visual interest)
+  const vent = new THREE.Mesh(
+    new THREE.BoxGeometry(3.2, 0.05, 1.6),
+    accentMat
+  );
+  vent.position.set(0, 7.45, -0.8);
+  g.add(vent);
+
+  scene.add(g);
+  return { group: g, left, right, reactor };
+})();
+
+function updatePlayerMech(dt) {
+  // Only show the player's own mech body when looking down past ~-20°.
+  // Otherwise the belly chassis and legs bob into frame during walking,
+  // which is distracting. -0.35 rad ≈ -20°.
+  const showBody = player.pitch < -0.35 || kneel.t > 0.1;
+  playerMech.group.visible = showBody;
+  if (!showBody) return;
+  // Position the mech assembly so its origin is at the player's xz at ground level
+  playerMech.group.position.x = player.pos.x;
+  playerMech.group.position.z = player.pos.z;
+  // The mech rotates with player yaw so legs face the way the camera does
+  playerMech.group.rotation.y = player.yaw;
+  // Animate legs with walking phase: forward/back swing on the hip
+  const walking = player.isWalking;
+  const phase = player.walkPhase * Math.PI * 2;
+  const swing = walking ? Math.sin(phase) : 0;
+  const swingR = walking ? -Math.sin(phase) : 0;
+  playerMech.left.rotation.x  = swing  * 0.35;
+  playerMech.right.rotation.x = swingR * 0.35;
+  // Lift the lifted foot slightly so it looks like it's actually stepping
+  playerMech.left.position.y  = walking ? Math.max(0, Math.sin(phase)) * 0.3 : 0;
+  playerMech.right.position.y = walking ? Math.max(0, -Math.sin(phase)) * 0.3 : 0;
+  // Reactor vent pulses with heat
+  const heat = player.heat / player.heatMax;
+  playerMech.reactor.material.emissiveIntensity = 0.8 + heat * 1.6 +
+    Math.sin(performance.now() * 0.005) * 0.15;
+}
+
 // ==================== GROUND ====================
-const groundSize = 800;
-const groundGeo = new THREE.PlaneGeometry(groundSize, groundSize, 128, 128);
-// add gentle height noise
+// Large player-following ground plane with vertex-color variation so it
+// reads as terrain instead of a flat-painted disc.
+const groundSize = 1400;
+const groundGeo = new THREE.PlaneGeometry(groundSize, groundSize, 160, 160);
+// Per-vertex height noise AND per-vertex color variation
 {
   const pos = groundGeo.attributes.position;
+  const colors = new Float32Array(pos.count * 3);
   for (let i = 0; i < pos.count; i++) {
     const x = pos.getX(i), y = pos.getY(i);
     const d = Math.sqrt(x*x + y*y);
+    // Multi-octave height noise
     const h = Math.sin(x * 0.04) * Math.cos(y * 0.04) * 0.8
             + Math.sin(x * 0.11 + y * 0.07) * 0.35
-            + (d > 40 ? Math.random() * 0.3 : 0);
+            + Math.sin(x * 0.23 - y * 0.17) * 0.18
+            + (d > 40 ? (Math.random() - 0.5) * 0.4 : 0);
     pos.setZ(i, h);
+    // Color noise: base earth tone with patches of darker dirt, sparse moss,
+    // lighter dry grass, sometimes leaf litter.
+    const n1 = Math.sin(x * 0.013) * Math.cos(y * 0.011) * 0.5 + 0.5;
+    const n2 = Math.sin(x * 0.04 + y * 0.03) * 0.5 + 0.5;
+    const grit = Math.random() * 0.15;
+    let r, g, b;
+    if (n1 < 0.32) {
+      // damp earth / shadow patches
+      r = 0.12 + grit * 0.5; g = 0.10 + grit * 0.4; b = 0.07 + grit * 0.3;
+    } else if (n1 < 0.62) {
+      // mid earth tone, slight green tint
+      r = 0.22 + grit; g = 0.20 + grit; b = 0.12 + grit * 0.5;
+    } else if (n2 > 0.7) {
+      // mossy / grass patches
+      r = 0.18 + grit * 0.4; g = 0.28 + grit; b = 0.12 + grit * 0.4;
+    } else {
+      // dry / lighter patches
+      r = 0.34 + grit; g = 0.28 + grit; b = 0.18 + grit * 0.6;
+    }
+    // Subtle darken farther from center (vignette) so the horizon falls off
+    const distFade = Math.min(1, d / (groundSize * 0.4));
+    const darken = 1 - distFade * 0.25;
+    colors[i*3]     = r * darken;
+    colors[i*3 + 1] = g * darken;
+    colors[i*3 + 2] = b * darken;
   }
+  groundGeo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
   groundGeo.computeVertexNormals();
 }
 const groundMat = new THREE.MeshStandardMaterial({
-  color: 0x3a2e1e,
-  roughness: 0.98,
+  vertexColors: true,
+  roughness: 0.97,
   metalness: 0.02,
 });
 const ground = new THREE.Mesh(groundGeo, groundMat);
@@ -2273,10 +3024,10 @@ ground.rotation.x = -Math.PI / 2;
 ground.receiveShadow = true;
 scene.add(ground);
 
-// subtle recon grid overlay
-const grid = new THREE.GridHelper(groundSize, 40, 0xff9a1f, 0x3a2811);
+// Subtle recon grid overlay (smaller now relative to ground for less spam)
+const grid = new THREE.GridHelper(groundSize, 70, 0xff9a1f, 0x3a2811);
 grid.material.transparent = true;
-grid.material.opacity = 0.06;
+grid.material.opacity = 0.04;
 grid.position.y = 0.05;
 scene.add(grid);
 
@@ -3426,6 +4177,63 @@ function updateChunks(playerX, playerZ) {
 const skyGroup = new THREE.Group();
 scene.add(skyGroup);
 
+// ---- Sky dome ----
+// Inverted sphere with vertex-color gradient. Colors are tinted from the
+// time-of-day palette by updateSkyDome() so dawn/dusk/night look distinct.
+const skyDome = (() => {
+  const geo = new THREE.SphereGeometry(1900, 48, 32, 0, Math.PI * 2, 0, Math.PI / 2);
+  // Default vertex colors: simple top-to-horizon gradient (will be retinted)
+  const pos = geo.attributes.position;
+  const colors = new Float32Array(pos.count * 3);
+  for (let i = 0; i < pos.count; i++) {
+    const y = pos.getY(i);
+    const t = Math.max(0, Math.min(1, y / 1900));
+    colors[i*3]     = 0.05 + t * 0.05;
+    colors[i*3 + 1] = 0.08 + t * 0.05;
+    colors[i*3 + 2] = 0.18 + t * 0.05;
+  }
+  geo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+  const mat = new THREE.MeshBasicMaterial({
+    vertexColors: true,
+    side: THREE.BackSide,
+    fog: false,
+    depthWrite: false,
+  });
+  const mesh = new THREE.Mesh(geo, mat);
+  mesh.renderOrder = -100; // draw before everything else
+  skyGroup.add(mesh);
+  return mesh;
+})();
+
+// Retint the sky dome's vertex colors based on time of day and weather.
+// Called each frame from the time-of-day update.
+function updateSkyDome(zenithHex, horizonHex, accentHex, accentAmt) {
+  const pos = skyDome.geometry.attributes.position;
+  const col = skyDome.geometry.attributes.color;
+  const zenith  = new THREE.Color(zenithHex);
+  const horizon = new THREE.Color(horizonHex);
+  const accent  = new THREE.Color(accentHex);
+  for (let i = 0; i < pos.count; i++) {
+    const x = pos.getX(i), y = pos.getY(i), z = pos.getZ(i);
+    const r = Math.sqrt(x*x + y*y + z*z) || 1;
+    // 0 = horizon, 1 = zenith
+    const t = Math.pow(Math.max(0, Math.min(1, y / r)), 0.7);
+    // Mix horizon -> zenith
+    const cr = horizon.r * (1 - t) + zenith.r * t;
+    const cg = horizon.g * (1 - t) + zenith.g * t;
+    const cb = horizon.b * (1 - t) + zenith.b * t;
+    // Accent tint: add a directional warm/colorful band biased to one azimuth
+    // and a particular elevation band. Looks like a sunset glow during day phases
+    // and an aurora-like color cast at night.
+    const az = Math.atan2(x, z); // 0 at +z, varies -PI..PI
+    const azBand = Math.cos(az + 0.4) * 0.5 + 0.5; // peaks at one direction
+    const elBand = Math.exp(-Math.pow((t - 0.25) * 3.2, 2)); // band low in sky
+    const ac = accentAmt * azBand * elBand;
+    col.setXYZ(i, Math.min(1, cr + accent.r * ac), Math.min(1, cg + accent.g * ac), Math.min(1, cb + accent.b * ac));
+  }
+  col.needsUpdate = true;
+}
+
 // distant mountain silhouettes - Appalachian profile (more rounded, varied)
 {
   for (let i = 0; i < 28; i++) {
@@ -3491,35 +4299,47 @@ scene.add(skyGroup);
 // NIGHT SKY: stars, planets, moon, aurora
 // ============================================================
 
-// Starfield (3000 points on a hemisphere, vertex-colored)
+// Starfield: 6000 points covering the full upper hemisphere, with varied
+// brightness, color temperature, and per-frame twinkle.
 const stars = (() => {
   const starsGeo = new THREE.BufferGeometry();
-  const starCount = 3000;
+  const starCount = 6000;
   const starPos = new Float32Array(starCount * 3);
   const starCol = new Float32Array(starCount * 3);
+  const starBase = new Float32Array(starCount);
+  const starPhase = new Float32Array(starCount);
   for (let i = 0; i < starCount; i++) {
-    // upper hemisphere
+    // Full hemisphere using uniform sphere sampling so stars cover ALL azimuths
+    const u = Math.random();
+    const phi = Math.acos(u); // 0 (zenith) to PI/2 (horizon)
     const theta = Math.random() * Math.PI * 2;
-    const phi = Math.acos(0.05 + Math.random() * 0.95);
-    const r = 1800;
+    const r = 1700;
     starPos[i*3]   = r * Math.sin(phi) * Math.cos(theta);
     starPos[i*3+1] = r * Math.cos(phi);
     starPos[i*3+2] = r * Math.sin(phi) * Math.sin(theta);
-    // Color variation: mostly white, some blue and amber tints
+    // Color: mostly white, some blue, amber, red-shifted
     const t = Math.random();
     let cr, cg, cb;
-    if (t < 0.65)      { cr = 1.0; cg = 1.0; cb = 1.0; }
-    else if (t < 0.85) { cr = 0.7; cg = 0.8; cb = 1.0; }
-    else if (t < 0.95) { cr = 1.0; cg = 0.9; cb = 0.6; }
-    else               { cr = 1.0; cg = 0.55; cb = 0.45; }
-    // Slight brightness variation
-    const v = 0.55 + Math.random() * 0.45;
-    starCol[i*3] = cr * v; starCol[i*3+1] = cg * v; starCol[i*3+2] = cb * v;
+    if (t < 0.60)      { cr = 1.0; cg = 1.0; cb = 1.0; }
+    else if (t < 0.80) { cr = 0.65; cg = 0.78; cb = 1.0; }
+    else if (t < 0.92) { cr = 1.0; cg = 0.88; cb = 0.55; }
+    else               { cr = 1.0; cg = 0.5; cb = 0.4; }
+    // Magnitude distribution: most stars dim, a small fraction much brighter
+    let v;
+    const mag = Math.random();
+    if (mag < 0.7)      v = 0.35 + Math.random() * 0.25;
+    else if (mag < 0.95) v = 0.65 + Math.random() * 0.25;
+    else                 v = 0.95 + Math.random() * 0.5; // bright "named" stars
+    starBase[i] = v;
+    starPhase[i] = Math.random() * Math.PI * 2;
+    starCol[i*3]   = cr * v;
+    starCol[i*3+1] = cg * v;
+    starCol[i*3+2] = cb * v;
   }
   starsGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
   starsGeo.setAttribute('color', new THREE.BufferAttribute(starCol, 3));
   const starsMat = new THREE.PointsMaterial({
-    size: 3,
+    size: 2.2,
     vertexColors: true,
     transparent: true,
     opacity: 0,
@@ -3528,36 +4348,50 @@ const stars = (() => {
     fog: false,
   });
   const points = new THREE.Points(starsGeo, starsMat);
+  points.userData = { base: starBase, phase: starPhase };
   skyGroup.add(points);
   return points;
 })();
 
-// A denser band suggesting the Milky Way
+// Milky Way: dense band of small points + faint nebula glow color band
 const milkyway = (() => {
   const geo = new THREE.BufferGeometry();
-  const count = 1200;
+  const count = 3000;
   const pos = new Float32Array(count * 3);
   const col = new Float32Array(count * 3);
+  // Define the great circle by an axis vector; the band is points within a
+  // small angle of perpendicular to this axis.
+  const axis = new THREE.Vector3(0.3, 0.85, 0.4).normalize();
+  const right = new THREE.Vector3(1, 0, 0).cross(axis).normalize();
+  const up = new THREE.Vector3().crossVectors(axis, right).normalize();
+  const r = 1650;
   for (let i = 0; i < count; i++) {
-    // Band centered on a tilted great circle
     const t = Math.random() * Math.PI * 2;
-    const offset = (Math.random() - 0.5) * 0.4; // band width
-    const tilt = 0.5;
-    const r = 1700;
-    // Parametric tilted circle
-    const x = Math.cos(t);
-    const y = Math.sin(t) * Math.sin(tilt) + offset;
-    const z = Math.sin(t) * Math.cos(tilt) + offset * 0.4;
-    pos[i*3]   = x * r;
-    pos[i*3+1] = Math.max(0.05 * r, y * r);  // keep above horizon
-    pos[i*3+2] = z * r;
-    const v = 0.4 + Math.random() * 0.4;
-    col[i*3] = v * 0.85; col[i*3+1] = v * 0.85; col[i*3+2] = v;
+    const off = (Math.random() - 0.5) * 0.18; // band width
+    const drift = (Math.random() - 0.5) * 0.06;
+    // Point on the great circle perpendicular to axis
+    const v = new THREE.Vector3()
+      .addScaledVector(right, Math.cos(t))
+      .addScaledVector(up,    Math.sin(t))
+      .addScaledVector(axis,  off + drift);
+    v.normalize().multiplyScalar(r);
+    // Drop band points that fall below the horizon - they'd be hidden anyway
+    if (v.y < 0.05 * r) { i--; continue; }
+    pos[i*3]   = v.x;
+    pos[i*3+1] = v.y;
+    pos[i*3+2] = v.z;
+    // Color: warm cream center, fading toward edges
+    const closenessToBand = 1 - Math.abs(off) / 0.18;
+    const brightness = (0.3 + Math.random() * 0.5) * closenessToBand;
+    // Subtle hue: cream/yellow, pink near nebulae
+    const hue = 0.08 + Math.random() * 0.05;
+    const c = new THREE.Color().setHSL(hue, 0.25, brightness * 0.7);
+    col[i*3] = c.r; col[i*3+1] = c.g; col[i*3+2] = c.b;
   }
   geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
   geo.setAttribute('color', new THREE.BufferAttribute(col, 3));
   const mat = new THREE.PointsMaterial({
-    size: 2,
+    size: 1.8,
     vertexColors: true,
     transparent: true,
     opacity: 0,
@@ -3568,6 +4402,49 @@ const milkyway = (() => {
   const points = new THREE.Points(geo, mat);
   skyGroup.add(points);
   return points;
+})();
+
+// Nebula color clouds - large soft sprites that tint the sky with warm colors
+// where dust is dense (only visible during night/evening).
+const nebula = (() => {
+  const group = new THREE.Group();
+  // Generate a soft circular sprite texture once
+  const cv = document.createElement('canvas');
+  cv.width = 256; cv.height = 256;
+  const cx = cv.getContext('2d');
+  const grad = cx.createRadialGradient(128, 128, 0, 128, 128, 128);
+  grad.addColorStop(0,    'rgba(255,255,255,1)');
+  grad.addColorStop(0.5,  'rgba(255,255,255,0.45)');
+  grad.addColorStop(1,    'rgba(255,255,255,0)');
+  cx.fillStyle = grad;
+  cx.fillRect(0, 0, 256, 256);
+  const tex = new THREE.CanvasTexture(cv);
+  const clouds = [
+    { color: 0xc8488a, r: 1500, az: -1.6, el: 0.4, scale: 800 },
+    { color: 0x6080d8, r: 1500, az: -0.5, el: 0.5, scale: 700 },
+    { color: 0x8848c8, r: 1500, az:  0.8, el: 0.35, scale: 900 },
+    { color: 0xd06848, r: 1500, az:  2.0, el: 0.55, scale: 750 },
+    { color: 0x4880c8, r: 1500, az:  2.8, el: 0.3, scale: 650 },
+  ];
+  for (const c of clouds) {
+    const mat = new THREE.SpriteMaterial({
+      map: tex,
+      color: c.color,
+      transparent: true,
+      opacity: 0,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+      fog: false,
+    });
+    const spr = new THREE.Sprite(mat);
+    const y = Math.sin(c.el) * c.r;
+    const horiz = Math.cos(c.el) * c.r;
+    spr.position.set(Math.cos(c.az) * horiz, y, Math.sin(c.az) * horiz);
+    spr.scale.set(c.scale, c.scale, 1);
+    group.add(spr);
+  }
+  skyGroup.add(group);
+  return group;
 })();
 
 // A large gas-giant planet sitting low on the horizon
@@ -3615,14 +4492,59 @@ const moon = (() => {
   return m;
 })();
 
-// Aurora ribbons - 3 undulating planes during night
+// Aurora curtains - curved ribbon strips that wrap around the player like real
+// auroras, rather than a flat rectangle. Each band orbits a partial arc at
+// different altitude and azimuth, so the colors don't all stack on one side.
 const aurora = (() => {
   const group = new THREE.Group();
-  const colors = [0x40ff90, 0x70aaff, 0xff80cc];
-  for (let i = 0; i < 3; i++) {
-    const geo = new THREE.PlaneGeometry(1200, 240, 40, 1);
+  const colors = [0x30ff8a, 0x60a8ff, 0xff60d0, 0x80ffc0];
+  // Each band: arcSpan (radians), startAzimuth (radians), altitude, color
+  const bands = [
+    { color: 0x30ff8a, span: Math.PI * 0.9,  startAz: -Math.PI * 0.7, baseY: 520, height: 200, segs: 56 },
+    { color: 0x60a8ff, span: Math.PI * 0.7,  startAz: -Math.PI * 0.2, baseY: 460, height: 180, segs: 48 },
+    { color: 0xff60d0, span: Math.PI * 0.6,  startAz:  Math.PI * 0.3, baseY: 580, height: 160, segs: 40 },
+    { color: 0x80ffc0, span: Math.PI * 1.1,  startAz:  Math.PI * 0.6, baseY: 420, height: 240, segs: 64 },
+  ];
+  for (const b of bands) {
+    const segs = b.segs;
+    const geo = new THREE.BufferGeometry();
+    // Two rings (bottom and top) - 2*(segs+1) verts
+    const verts = new Float32Array((segs + 1) * 2 * 3);
+    const cols  = new Float32Array((segs + 1) * 2 * 3);
+    const idx   = [];
+    for (let s = 0; s <= segs; s++) {
+      const t = s / segs;
+      const az = b.startAz + b.span * t;
+      const r = 1500;
+      const x = Math.cos(az) * r;
+      const z = Math.sin(az) * r;
+      // Bottom vertex
+      verts[(s * 2)     * 3]     = x;
+      verts[(s * 2)     * 3 + 1] = b.baseY;
+      verts[(s * 2)     * 3 + 2] = z;
+      // Top vertex
+      verts[(s * 2 + 1) * 3]     = x;
+      verts[(s * 2 + 1) * 3 + 1] = b.baseY + b.height;
+      verts[(s * 2 + 1) * 3 + 2] = z;
+      // Color: fade at ends + brighter in middle
+      const fade = Math.sin(t * Math.PI);
+      const c = new THREE.Color(b.color);
+      cols[(s * 2)     * 3]     = c.r * fade * 1.2;
+      cols[(s * 2)     * 3 + 1] = c.g * fade * 1.2;
+      cols[(s * 2)     * 3 + 2] = c.b * fade * 1.2;
+      cols[(s * 2 + 1) * 3]     = c.r * fade * 0.2;
+      cols[(s * 2 + 1) * 3 + 1] = c.g * fade * 0.2;
+      cols[(s * 2 + 1) * 3 + 2] = c.b * fade * 0.2;
+      if (s < segs) {
+        const a = s * 2, b1 = s * 2 + 1, c1 = (s + 1) * 2, d = (s + 1) * 2 + 1;
+        idx.push(a, b1, c1, b1, d, c1);
+      }
+    }
+    geo.setAttribute('position', new THREE.BufferAttribute(verts, 3));
+    geo.setAttribute('color', new THREE.BufferAttribute(cols, 3));
+    geo.setIndex(idx);
     const mat = new THREE.MeshBasicMaterial({
-      color: colors[i],
+      vertexColors: true,
       transparent: true,
       opacity: 0,
       blending: THREE.AdditiveBlending,
@@ -3631,9 +4553,7 @@ const aurora = (() => {
       fog: false,
     });
     const mesh = new THREE.Mesh(geo, mat);
-    mesh.position.set(0, 360 + i * 40, -1100);
-    mesh.userData.phase = i * 0.7;
-    mesh.userData.baseY = 360 + i * 40;
+    mesh.userData = { band: b, segs, basePos: verts.slice(), phase: Math.random() * 10 };
     group.add(mesh);
   }
   skyGroup.add(group);
@@ -3706,21 +4626,31 @@ function updateMeteors(dt) {
 
 // Aurora animation (called from main loop)
 function updateAurora(dt, nightAmount) {
-  const now = performance.now() * 0.0003;
-  aurora.children.forEach((mesh, i) => {
-    mesh.material.opacity = 0.22 * nightAmount;
+  const now = performance.now() * 0.0004;
+  aurora.children.forEach((mesh) => {
+    mesh.material.opacity = 0.30 * nightAmount;
     if (nightAmount < 0.05) return;
+    const ud = mesh.userData;
     const pos = mesh.geometry.attributes.position;
-    const phase = mesh.userData.phase + now;
-    for (let v = 0; v < pos.count; v++) {
-      const x = pos.getX(v);
-      const y0 = pos.getY(v);
-      const sy = Math.sign(y0 || 1) || 1;
-      // Wave displacement: top edge undulates, bottom mostly flat
-      const wave = sy > 0
-        ? (Math.sin(x * 0.008 + phase) * 40 + Math.sin(x * 0.003 + phase * 1.7) * 20)
-        : 0;
-      pos.setY(v, sy * (120 + wave));
+    const base = ud.basePos;
+    const segs = ud.segs;
+    const phase = ud.phase + now;
+    // For each segment, displace the TOP vertex (odd index in each pair)
+    // along its azimuth direction and a bit upward, leaving the bottom anchored.
+    for (let s = 0; s <= segs; s++) {
+      const t = s / segs;
+      const wave = Math.sin(t * 8 + phase * 1.3) * 28
+                 + Math.sin(t * 3.5 + phase * 0.6) * 18;
+      // Bottom vertex - keep at base
+      const bi = s * 2 * 3;
+      pos.array[bi]     = base[bi];
+      pos.array[bi + 1] = base[bi + 1];
+      pos.array[bi + 2] = base[bi + 2];
+      // Top vertex - undulating up
+      const ti = (s * 2 + 1) * 3;
+      pos.array[ti]     = base[ti];
+      pos.array[ti + 1] = base[ti + 1] + wave;
+      pos.array[ti + 2] = base[ti + 2];
     }
     pos.needsUpdate = true;
   });
@@ -3759,7 +4689,8 @@ let discoveryBannerT = 0; // seconds remaining showing banner
 let chunkUpdateT = 0; // timer for chunk streaming
 
 // ----- Waypoint state -----
-let waypoint = null; // {x, z} or null
+let waypoint = null;          // current target (head of queue)
+let waypointQueue = [];       // remaining waypoints to visit
 let autoWalk = false; // auto-walk to waypoint
 let mapOpen = false;
 let mapZoom = 1.0;
@@ -3772,6 +4703,7 @@ const drone = {
   pos: new THREE.Vector3(),
   vel: new THREE.Vector3(),
   battery: 100,
+  batteryMax: 100,
   scanRange: 80, // discovery boost while up
   orbitAngle: 0,
   mesh: null,
@@ -3924,6 +4856,7 @@ function getAimDir() {
 
 function fireChaingun() {
   if (player.overheated) return;
+  sfxChaingun();
   for (const side of [-1, 1]) {
     const dir = getAimDir();
     // small spread
@@ -3971,6 +4904,7 @@ function fireChaingun() {
 function fireMissile() {
   if (player.missiles <= 0) return;
   player.missiles--;
+  sfxMissileLaunch();
 
   // pick best lock target: closest enemy to aim cone
   const aim = getAimDir();
@@ -4138,19 +5072,29 @@ document.addEventListener('keydown', (e) => {
   if (e.code === 'Escape') {
     e.preventDefault();
     // Closing any menu via ESC should NOT pause the game. Force-unpause to be safe.
+    if (photo.active)  { exitPhotoMode(); return; }
     if (mapOpen)      { closeMap();        paused = false; document.getElementById('paused').classList.remove('show'); return; }
     if (diagOpen)     { closeDiag();       paused = false; document.getElementById('paused').classList.remove('show'); return; }
     if (logbookOpen)  { closeLogbook();    paused = false; document.getElementById('paused').classList.remove('show'); return; }
+    if (journalOpen)  { closeJournal();    paused = false; document.getElementById('paused').classList.remove('show'); return; }
     if (document.getElementById('hail-menu').classList.contains('show')) { closeHailMenu(); return; }
     if (scanResult)   { closeScanResult(); return; }
     paused = !paused;
     document.getElementById('paused').classList.toggle('show', paused);
-  } else if (e.code === 'KeyM' && !diagOpen && !logbookOpen) {
+  } else if (e.code === 'KeyM' && !diagOpen && !logbookOpen && !journalOpen) {
     if (mapOpen) closeMap(); else openMap();
-  } else if (e.code === 'KeyT' && !mapOpen && !logbookOpen) {
+  } else if (e.code === 'KeyT' && !mapOpen && !logbookOpen && !journalOpen) {
     if (diagOpen) closeDiag(); else openDiag();
-  } else if (e.code === 'KeyL' && !mapOpen && !diagOpen) {
+  } else if (e.code === 'KeyL' && !mapOpen && !diagOpen && !journalOpen) {
     if (logbookOpen) closeLogbook(); else openLogbook();
+  } else if (e.code === 'KeyJ' && !mapOpen && !diagOpen && !logbookOpen) {
+    if (journalOpen) closeJournal(); else openJournal();
+  } else if (e.code === 'KeyP') {
+    if (!mapOpen && !diagOpen && !logbookOpen && !journalOpen) togglePhotoMode();
+  } else if (e.code === 'KeyZ') {
+    toggleKneel();
+  } else if (e.code === 'Enter') {
+    if (photo.active) { e.preventDefault(); capturePhoto(); }
   } else if (e.code === 'KeyQ') {
     if (!mapOpen && !diagOpen && !logbookOpen) deployDrone();
   } else if (e.code === 'KeyH') {
@@ -4265,10 +5209,12 @@ function update(dt) {
 
   // ---------- input -> movement ----------
   let mx = 0, mz = 0;
-  if (keys['KeyW']) mz -= 1;
-  if (keys['KeyS']) mz += 1;
-  if (keys['KeyA']) mx -= 1;
-  if (keys['KeyD']) mx += 1;
+  if (!kneel.active && kneel.t < 0.05) {
+    if (keys['KeyW']) mz -= 1;
+    if (keys['KeyS']) mz += 1;
+    if (keys['KeyA']) mx -= 1;
+    if (keys['KeyD']) mx += 1;
+  }
 
   const manualInput = (mx !== 0 || mz !== 0);
 
@@ -4278,10 +5224,17 @@ function update(dt) {
     const dz = waypoint.z - player.pos.z;
     const dist = Math.hypot(dx, dz);
     if (dist < 4) {
-      autoWalk = false;
-      waypoint = null;
-      addComm('TITAN-7', 'Waypoint reached.', true);
-      coralReact('excited', 4);
+      // Reached current waypoint - advance to next if route continues
+      if (waypointQueue.length > 0) {
+        waypoint = waypointQueue.shift();
+        addComm('TITAN-7', `Waypoint reached. ${waypointQueue.length + 1} remaining.`, true);
+        coralReact('excited', 2);
+      } else {
+        autoWalk = false;
+        waypoint = null;
+        addComm('TITAN-7', 'Route complete.', true);
+        coralReact('excited', 4);
+      }
     } else {
       // Target yaw: face the waypoint. World forward (-Z) at yaw=0.
       const targetYaw = Math.atan2(dx, -dz);
@@ -4335,16 +5288,19 @@ function update(dt) {
   }
 
   // Jet jump
+  player.isThrusting = false;
   if (keys['Space'] && player.jet > 5) {
     if (player.onGround) {
       player.vertVel = 22;
       player.onGround = false;
+      sfxJetIgnite();
     } else {
       // sustained thrust
       player.vertVel += dt * 18;
       if (player.vertVel > 12) player.vertVel = 12;
     }
     player.jet -= dt * 35;
+    player.isThrusting = true;
   } else {
     player.jet = Math.min(player.jetMax, player.jet + dt * 18);
   }
@@ -4392,26 +5348,40 @@ function update(dt) {
   player.pos.x = nx;
   player.pos.z = nz;
 
+  // Dynamic ground height: 8m standing, 2.6m kneeling, interpolated during animation
+  const e = easeInOut(kneel.t);
+  const groundY = kneel.baseY * (1 - e) + kneel.kneelY * e;
   player.pos.y += player.vertVel * dt;
-  if (player.pos.y <= 8) {
-    if (player.vertVel < -8) {
-      // Heavy landing thud - bigger shake than the existing falloff
-      trauma = Math.min(1, trauma + Math.abs(player.vertVel) * 0.04 + 0.15);
+  if (player.pos.y <= groundY) {
+    const wasInAir = !player.onGround;
+    const impactVel = -player.vertVel;
+    if (wasInAir && impactVel > 1.5) {
+      sfxLanding(impactVel);
+      if (impactVel > 8) {
+        // Heavy landing thud - bigger shake than the existing falloff
+        trauma = Math.min(1, trauma + impactVel * 0.04 + 0.15);
+      }
     }
-    player.pos.y = 8;
+    player.pos.y = groundY;
     player.vertVel = 0;
     player.onGround = true;
   }
 
   // walk bob + stomp shake
   if (player.isWalking) {
-    const stepRate = player.isBoosting ? 3.4 : 2.4;
+    // Giant mechs take long, deliberate strides. ~1.25 sec per step at walk,
+    // ~0.77 sec per step when boosting.
+    const stepRate = player.isBoosting ? 0.65 : 0.40;
     player.walkPhase += dt * stepRate;
     const stepIndex = Math.floor(player.walkPhase * 2);
     if (stepIndex !== player.lastStep) {
       player.lastStep = stepIndex;
       // heavier stomp = bigger thud impulse
       trauma = Math.min(1, trauma + 0.28);
+      sfxFootstep();
+      // Footprint in snow weather (alternating feet)
+      footprints.alternate = 1 - footprints.alternate;
+      spawnFootprint(player.pos.x, player.pos.z, player.yaw, footprints.alternate === 0);
     }
   }
   // idle breathing sway (always advances)
@@ -4466,7 +5436,11 @@ function update(dt) {
   // Intensity rises with night and dims again at full day. Tied to NVG too.
   const nA = tod.nightAmt || 0;
   headlight.intensity = nA * 3.2;
-  headlight.color.setHex(nvgState.active ? 0xc0ffe0 : 0xfff0d0);
+  headlight.color.setHex(
+    nvgState.mode === 'nvg' ? 0xc0ffe0 :
+    nvgState.mode === 'thermal' ? 0xff8848 :
+    0xfff0d0
+  );
   // Reactor glow under the cockpit, always-on but subtle
   reactorGlow.position.set(player.pos.x, player.pos.y - 1, player.pos.z);
   reactorGlow.intensity = 0.4 + (player.heat / player.heatMax) * 0.8;
@@ -4801,6 +5775,8 @@ function showDiscoveryBanner(poi) {
   coralReact('excited');
   // Logbook entry
   logEntry('discovery', `Surveyed ${poi.name} (${poi.type}) at ${bearingFromPlayer(poi.pos.x, poi.pos.z)}.`);
+  noteJournalEvent('discovery', poi.name);
+  sfxDiscovery();
   // Kailey occasionally reacts
   if (Math.random() < 0.6) {
     setTimeout(() => kaileyReact('discovery'), 1500 + Math.random() * 1500);
@@ -5037,7 +6013,9 @@ function drawRadar() {
   for (const poi of pois) {
     const dx = poi.pos.x - player.pos.x;
     const dz = poi.pos.z - player.pos.z;
-    const cosA = Math.cos(-player.yaw), sinA = Math.sin(-player.yaw);
+    // Rotate world-relative offset into player-relative frame.
+    // Forward maps to canvas -Y (up); right maps to canvas +X.
+    const cosA = Math.cos(player.yaw), sinA = Math.sin(player.yaw);
     const rx = dx * cosA - dz * sinA;
     const rz = dx * sinA + dz * cosA;
     const rad = Math.hypot(rx, rz);
@@ -5072,7 +6050,7 @@ function drawRadar() {
   for (const e of enemies) {
     const dx = e.mesh.position.x - player.pos.x;
     const dz = e.mesh.position.z - player.pos.z;
-    const cosA = Math.cos(-player.yaw), sinA = Math.sin(-player.yaw);
+    const cosA = Math.cos(player.yaw), sinA = Math.sin(player.yaw);
     const rx = dx * cosA - dz * sinA;
     const rz = dx * sinA + dz * cosA;
     const rad = Math.hypot(rx, rz);
@@ -5095,6 +6073,42 @@ function drawRadar() {
       rctx.fillStyle = 'rgba(255, 200, 120, 0.4)';
       rctx.beginPath();
       rctx.arc(px, py, 2, 0, Math.PI * 2);
+      rctx.fill();
+    }
+  }
+
+  // Drone marker - cyan triangle pointing in its direction of travel, with
+  // a small pulsing ring so it reads as a friendly tracked unit.
+  if (drone.active && drone.mesh) {
+    const dx = drone.pos.x - player.pos.x;
+    const dz = drone.pos.z - player.pos.z;
+    const cosA = Math.cos(player.yaw), sinA = Math.sin(player.yaw);
+    const rx = dx * cosA - dz * sinA;
+    const rz = dx * sinA + dz * cosA;
+    const rad = Math.hypot(rx, rz);
+    if (rad <= RADAR_RANGE) {
+      const px = cx + (rx / RADAR_RANGE) * (cy - 4);
+      const py = cy + (rz / RADAR_RANGE) * (cy - 4);
+      // Pulse ring
+      const pulse = (performance.now() / 500) % 1;
+      rctx.strokeStyle = `rgba(76, 207, 255, ${0.85 * (1 - pulse)})`;
+      rctx.lineWidth = 1.2;
+      rctx.beginPath();
+      rctx.arc(px, py, 3 + pulse * 8, 0, Math.PI * 2);
+      rctx.stroke();
+      // Triangle marker - the drone always travels in the player's forward
+      // direction (with a small lateral drift), so the radar triangle points up.
+      rctx.fillStyle = 'rgba(76, 207, 255, 0.95)';
+      rctx.beginPath();
+      rctx.moveTo(px, py - 4);
+      rctx.lineTo(px - 3, py + 3);
+      rctx.lineTo(px + 3, py + 3);
+      rctx.closePath();
+      rctx.fill();
+      // White center dot for contrast
+      rctx.fillStyle = '#ffffff';
+      rctx.beginPath();
+      rctx.arc(px, py, 0.8, 0, Math.PI * 2);
       rctx.fill();
     }
   }
@@ -5354,6 +6368,8 @@ function addComm(from, text, isYou = false, extraClass = '') {
   commsMessages.push({ from, text, isYou, extraClass, t: performance.now() });
   if (commsMessages.length > 9) commsMessages.shift();
   renderComms();
+  // Subtle chirp on inbound traffic (not when the player sends)
+  if (!isYou) sfxCommChirp();
 }
 
 function renderComms() {
@@ -5598,6 +6614,7 @@ function hailSpecificMech(mech) {
     addComm(mech.callsign, pick(HAIL_RESPONSES));
   }, 800 + Math.random() * 600);
   mech.lastHailT = performance.now();
+  noteJournalEvent('hail', mech.callsign);
 }
 
 // Initial mechs spawn after world is loaded
@@ -5612,39 +6629,132 @@ function initialMechSpawn() {
 // ============================================================
 function buildDrone() {
   const g = new THREE.Group();
-  const bodyGeo = new THREE.OctahedronGeometry(0.6, 0);
-  const bodyMat = new THREE.MeshStandardMaterial({ color: 0x222630, roughness: 0.4, metalness: 0.7 });
+  // Slightly larger body so it's visible at 100m+ range
+  const bodyGeo = new THREE.OctahedronGeometry(1.2, 0);
+  const bodyMat = new THREE.MeshStandardMaterial({ color: 0x1a1e28, roughness: 0.5, metalness: 0.7 });
   const body = new THREE.Mesh(bodyGeo, bodyMat);
   g.add(body);
-  // rotors as 4 cylinders
+  // Rotors as 4 cylinders, bigger
   for (let i = 0; i < 4; i++) {
     const arm = new THREE.Group();
     const a = (i / 4) * Math.PI * 2 + Math.PI / 4;
     const armBar = new THREE.Mesh(
-      new THREE.CylinderGeometry(0.05, 0.05, 1.2, 4),
+      new THREE.CylinderGeometry(0.1, 0.1, 2.0, 6),
       bodyMat
     );
-    armBar.position.x = 0.6; armBar.rotation.z = Math.PI / 2;
+    armBar.position.x = 1.0; armBar.rotation.z = Math.PI / 2;
     arm.add(armBar);
     const rotor = new THREE.Mesh(
-      new THREE.CylinderGeometry(0.5, 0.5, 0.05, 12),
-      new THREE.MeshBasicMaterial({ color: 0x4ccfff, transparent: true, opacity: 0.4 })
+      new THREE.CylinderGeometry(0.9, 0.9, 0.06, 16),
+      new THREE.MeshBasicMaterial({ color: 0x4ccfff, transparent: true, opacity: 0.45, fog: false })
     );
-    rotor.position.set(1.1, 0.15, 0);
+    rotor.position.set(1.85, 0.25, 0);
     arm.add(rotor);
     arm.rotation.y = a;
     g.add(arm);
   }
-  // eye light
+  // Eye light for ground illumination (existing)
   const eye = new THREE.PointLight(0x4ccfff, 1.5, 25);
   g.add(eye);
-  return g;
+
+  // ---- Aviation-style nav and strobe lights for high-altitude visibility ----
+  // Bright unfogged emissive spheres act as the "lights"; small point lights
+  // give them subtle local illumination too.
+  function navLight(color, x, y, z, size) {
+    const mat = new THREE.MeshBasicMaterial({ color, fog: false });
+    const m = new THREE.Mesh(new THREE.SphereGeometry(size, 8, 8), mat);
+    m.position.set(x, y, z);
+    return m;
+  }
+  // Left red, right green - the universal aviation port/starboard
+  const redLamp   = navLight(0xff2030, -1.95, 0.25, 0, 0.30);
+  const greenLamp = navLight(0x30ff60,  1.95, 0.25, 0, 0.30);
+  redLamp.userData.isNavLight = 'red';
+  greenLamp.userData.isNavLight = 'green';
+  g.add(redLamp); g.add(greenLamp);
+  // Top white strobe and bottom red anti-collision
+  const topStrobe = navLight(0xffffff, 0, 0.9, 0, 0.32);
+  topStrobe.userData.isStrobeTop = true;
+  const botStrobe = navLight(0xff5020, 0, -0.9, 0, 0.30);
+  botStrobe.userData.isStrobeBot = true;
+  g.add(topStrobe); g.add(botStrobe);
+
+  // ---- Downward scan beam: thin tapered cylinder pointing at ground ----
+  // From drone to its scan-radius circle below. Always visible while drone up.
+  const beamHeight = 55; // approximate altitude
+  const beam = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.4, 22, beamHeight, 16, 1, true),
+    new THREE.MeshBasicMaterial({
+      color: 0x4ccfff,
+      transparent: true,
+      opacity: 0.10,
+      side: THREE.DoubleSide,
+      depthWrite: false,
+      fog: false,
+    })
+  );
+  beam.position.y = -beamHeight / 2;
+  g.add(beam);
+
+  // Ring on the ground showing scan radius (rendered as separate top-level
+  // mesh so it sits flat on terrain, not relative to drone tilt)
+  return { group: g, body, redLamp, greenLamp, topStrobe, botStrobe, beam };
+}
+
+function renderDronePOV() {
+  // Position the drone camera at the drone, looking forward and slightly down
+  // (recon angle) so the POV shows terrain ahead with sky barely visible.
+  droneCamera.position.copy(drone.pos);
+  const fx = -Math.sin(player.yaw);
+  const fz = -Math.cos(player.yaw);
+  // Look-at target: 80m ahead and 18m below current drone altitude
+  const lookX = drone.pos.x + fx * 80;
+  const lookZ = drone.pos.z + fz * 80;
+  const lookY = drone.pos.y - 18;
+  droneCamera.lookAt(lookX, lookY, lookZ);
+
+  // Compute the on-canvas rectangle from the HTML frame's bounding box.
+  // THREE.js setViewport/setScissor take CSS pixels (renderer multiplies
+  // by pixel ratio internally). Y axis flips from top-origin DOM to
+  // bottom-origin GL.
+  const frame = document.getElementById('drone-pov-frame');
+  if (!frame) return;
+  const rect = frame.getBoundingClientRect();
+  const x = rect.left;
+  const y = window.innerHeight - rect.bottom;
+  const w = rect.width;
+  const h = rect.height;
+
+  // Update HUD labels for drone POV
+  const altEl = document.getElementById('drone-pov-alt');
+  const coordsEl = document.getElementById('drone-pov-coords');
+  const batEl = document.getElementById('drone-pov-bat');
+  if (altEl) altEl.textContent = 'ALT ' + String(Math.round(drone.pos.y)).padStart(4, '0');
+  if (coordsEl) {
+    const cx = (drone.pos.x >= 0 ? '+' : '-') + String(Math.abs(Math.round(drone.pos.x))).padStart(4, '0');
+    const cz = (drone.pos.z >= 0 ? '+' : '-') + String(Math.abs(Math.round(drone.pos.z))).padStart(4, '0');
+    coordsEl.textContent = cx + ' / ' + cz;
+  }
+  if (batEl) batEl.textContent = 'BAT ' + Math.round(drone.battery) + '%';
+
+  // Render the scene into the rect without clearing the main framebuffer
+  const prevAutoClear = renderer.autoClear;
+  renderer.autoClear = false;
+  renderer.setViewport(x, y, w, h);
+  renderer.setScissor(x, y, w, h);
+  renderer.setScissorTest(true);
+  renderer.render(scene, droneCamera);
+  // Reset for next main render
+  renderer.setScissorTest(false);
+  renderer.setViewport(0, 0, window.innerWidth, window.innerHeight);
+  renderer.autoClear = prevAutoClear;
 }
 
 function deployDrone() {
   if (drone.active) {
     // already up - recall (will fly home and re-dock)
     drone.active = false;
+    sfxDroneMotor(false);
     addComm('TITAN-7', 'Drone recall initiated.', true);
     return;
   }
@@ -5653,19 +6763,40 @@ function deployDrone() {
     return;
   }
   if (!drone.mesh) {
-    drone.mesh = buildDrone();
+    const built = buildDrone();
+    drone.mesh = built.group;
+    drone.parts = built;
     scene.add(drone.mesh);
+    // Ground scan ring sits independently so it stays flat on terrain
+    const ringGeo = new THREE.RingGeometry(drone.scanRange * 0.96, drone.scanRange, 48, 1);
+    const ringMat = new THREE.MeshBasicMaterial({
+      color: 0x4ccfff,
+      transparent: true,
+      opacity: 0.45,
+      side: THREE.DoubleSide,
+      depthWrite: false,
+      fog: false,
+    });
+    drone.scanRing = new THREE.Mesh(ringGeo, ringMat);
+    drone.scanRing.rotation.x = -Math.PI / 2;
+    drone.scanRing.visible = false;
+    scene.add(drone.scanRing);
   }
   drone.mesh.visible = true;
+  if (drone.scanRing) drone.scanRing.visible = true;
   drone.pos.set(player.pos.x, player.pos.y + 4, player.pos.z);
   drone.orbitAngle = player.yaw;
   drone.active = true;
-  addComm('TITAN-7', 'Drone deployed. Scanning radius 80m.', true);
+  sfxDroneMotor(true);
+  addComm('TITAN-7', 'Drone deployed. Flying ahead.', true);
   coralReact('alert', 3);
 }
 
 function updateDrone(dt) {
   if (!drone.mesh) return;
+  // Show or hide the POV monitor based on drone active state
+  const povEl = document.getElementById('drone-pov');
+  if (povEl) povEl.style.display = drone.active ? 'block' : 'none';
   if (drone.active) {
     drone.battery -= dt * 1.5;
     if (drone.battery <= 0) {
@@ -5673,19 +6804,61 @@ function updateDrone(dt) {
       drone.active = false;
       addComm('TITAN-7', 'Drone battery depleted. Auto-return.', true);
     }
-    // orbit player at radius 50 at altitude 55
-    drone.orbitAngle += dt * 0.4;
-    const radius = 50;
-    const targetX = player.pos.x + Math.cos(drone.orbitAngle) * radius;
-    const targetZ = player.pos.z + Math.sin(drone.orbitAngle) * radius;
-    const targetY = 55;
-    // ease toward target
-    drone.pos.x += (targetX - drone.pos.x) * Math.min(1, dt * 1.6);
-    drone.pos.y += (targetY - drone.pos.y) * Math.min(1, dt * 1.6);
-    drone.pos.z += (targetZ - drone.pos.z) * Math.min(1, dt * 1.6);
+    // Drone scouts AHEAD of player rather than orbiting. Position is the
+    // player's forward vector * leadDist, with a small lateral drift orbit
+    // so it isn't pinned in place, and a gentle altitude bob.
+    drone.orbitAngle += dt * 0.55;
+    const fx = -Math.sin(player.yaw);
+    const fz = -Math.cos(player.yaw);
+    const rx =  Math.cos(player.yaw);
+    const rz = -Math.sin(player.yaw);
+    const leadDist = 110;
+    const lateralOrbit = 12;
+    const targetX = player.pos.x + fx * leadDist + rx * Math.cos(drone.orbitAngle) * lateralOrbit;
+    const targetZ = player.pos.z + fz * leadDist + rz * Math.cos(drone.orbitAngle) * lateralOrbit;
+    const targetY = 55 + Math.sin(drone.orbitAngle * 1.3) * 4;
+    // ease toward target with smooth lag
+    drone.pos.x += (targetX - drone.pos.x) * Math.min(1, dt * 0.9);
+    drone.pos.y += (targetY - drone.pos.y) * Math.min(1, dt * 0.9);
+    drone.pos.z += (targetZ - drone.pos.z) * Math.min(1, dt * 0.9);
     drone.mesh.position.copy(drone.pos);
-    drone.mesh.lookAt(player.pos);
-    drone.mesh.rotation.z = Math.sin(performance.now() / 600) * 0.1;
+    // Point the drone forward in the direction of travel (not at the player)
+    const lookX = drone.pos.x + fx * 50;
+    const lookZ = drone.pos.z + fz * 50;
+    drone.mesh.lookAt(lookX, drone.pos.y, lookZ);
+    drone.mesh.rotation.z = Math.sin(performance.now() / 600) * 0.08;
+
+    // Animate strobe and nav lights
+    if (drone.parts) {
+      const now = performance.now();
+      // White top strobe: bright 60ms flash every 1.0s
+      const topPhase = (now % 1000);
+      const topOn = topPhase < 60;
+      if (drone.parts.topStrobe) {
+        drone.parts.topStrobe.material.color.setHex(topOn ? 0xffffff : 0x303040);
+        drone.parts.topStrobe.scale.setScalar(topOn ? 1.6 : 1.0);
+      }
+      // Red bottom anti-collision: slower blink, 100ms flash every 1.4s, offset
+      const botPhase = ((now + 350) % 1400);
+      const botOn = botPhase < 100;
+      if (drone.parts.botStrobe) {
+        drone.parts.botStrobe.material.color.setHex(botOn ? 0xff5020 : 0x401510);
+        drone.parts.botStrobe.scale.setScalar(botOn ? 1.4 : 1.0);
+      }
+      // Red and green nav lights: steady but pulse slightly
+      const navPulse = 0.85 + Math.sin(now / 300) * 0.15;
+      if (drone.parts.redLamp)   drone.parts.redLamp.scale.setScalar(navPulse);
+      if (drone.parts.greenLamp) drone.parts.greenLamp.scale.setScalar(navPulse);
+    }
+
+    // Position the scan ring under the drone on the ground
+    if (drone.scanRing) {
+      drone.scanRing.position.set(drone.pos.x, 0.08, drone.pos.z);
+      drone.scanRing.visible = true;
+      // Subtle pulse to draw the eye
+      const pulse = 0.32 + Math.sin(performance.now() / 380) * 0.13;
+      drone.scanRing.material.opacity = pulse;
+    }
 
     // Boost discovery: anything within scanRange auto-found
     for (const poi of pois) {
@@ -5713,6 +6886,7 @@ function updateDrone(dt) {
       const dist = Math.hypot(homeX - drone.pos.x, homeY - drone.pos.y, homeZ - drone.pos.z);
       drone.mesh.visible = dist > 0.5;
     }
+    if (drone.scanRing) drone.scanRing.visible = false;
   }
   // HUD
   document.getElementById('drone-state').textContent = drone.active ? 'AIRBORNE' : (drone.battery < 100 ? 'CHARGING' : 'DOCKED');
@@ -5734,7 +6908,7 @@ function openMap() {
   if (mapOpen) return;
   mapOpen = true;
   mapOverlay.classList.add('show');
-  
+  sfxMapAperture();
   // size canvas to fill container
   resizeMapCanvas();
 }
@@ -5844,27 +7018,46 @@ function drawMap() {
     mapCtx.stroke();
   }
 
-  // waypoint
+  // waypoints + route line
   if (waypoint) {
-    const pt = worldToMap(waypoint.x, waypoint.z);
-    mapCtx.strokeStyle = '#2eff9a';
-    mapCtx.lineWidth = 2;
-    mapCtx.beginPath();
-    mapCtx.arc(pt.x, pt.y, 10, 0, Math.PI * 2);
-    mapCtx.stroke();
-    mapCtx.beginPath();
-    mapCtx.moveTo(pt.x - 14, pt.y); mapCtx.lineTo(pt.x + 14, pt.y);
-    mapCtx.moveTo(pt.x, pt.y - 14); mapCtx.lineTo(pt.x, pt.y + 14);
-    mapCtx.stroke();
-    // line from player to waypoint
     const ppt = worldToMap(player.pos.x, player.pos.z);
-    mapCtx.strokeStyle = 'rgba(46, 255, 154, 0.4)';
+    // Connecting polyline player -> waypoint -> queue[0] -> queue[1] ...
+    mapCtx.strokeStyle = 'rgba(46, 255, 154, 0.45)';
     mapCtx.lineWidth = 1;
     mapCtx.setLineDash([6, 4]);
     mapCtx.beginPath();
-    mapCtx.moveTo(ppt.x, ppt.y); mapCtx.lineTo(pt.x, pt.y);
+    mapCtx.moveTo(ppt.x, ppt.y);
+    const first = worldToMap(waypoint.x, waypoint.z);
+    mapCtx.lineTo(first.x, first.y);
+    for (const w of waypointQueue) {
+      const p = worldToMap(w.x, w.z);
+      mapCtx.lineTo(p.x, p.y);
+    }
     mapCtx.stroke();
     mapCtx.setLineDash([]);
+    // Marker: current waypoint (filled green crosshair)
+    mapCtx.strokeStyle = '#2eff9a';
+    mapCtx.lineWidth = 2;
+    mapCtx.beginPath();
+    mapCtx.arc(first.x, first.y, 10, 0, Math.PI * 2);
+    mapCtx.stroke();
+    mapCtx.beginPath();
+    mapCtx.moveTo(first.x - 14, first.y); mapCtx.lineTo(first.x + 14, first.y);
+    mapCtx.moveTo(first.x, first.y - 14); mapCtx.lineTo(first.x, first.y + 14);
+    mapCtx.stroke();
+    // Queued waypoints (smaller, numbered)
+    mapCtx.fillStyle = 'rgba(46, 255, 154, 0.85)';
+    mapCtx.font = 'bold 10px "Share Tech Mono", monospace';
+    mapCtx.textAlign = 'center';
+    mapCtx.textBaseline = 'middle';
+    for (let i = 0; i < waypointQueue.length; i++) {
+      const w = waypointQueue[i];
+      const p = worldToMap(w.x, w.z);
+      mapCtx.beginPath();
+      mapCtx.arc(p.x, p.y, 7, 0, Math.PI * 2);
+      mapCtx.stroke();
+      mapCtx.fillText(String(i + 2), p.x, p.y);
+    }
   }
 
   // player marker (triangle pointed at yaw)
@@ -5904,18 +7097,26 @@ mapCanvas.addEventListener('click', (e) => {
   const scale = 0.5 * mapZoom;
   const wx = (mx - cx) / scale + mapCenter.x;
   const wz = (my - cy) / scale + mapCenter.z;
-  waypoint = { x: wx, z: wz };
-  autoWalk = true;
-  addComm('TITAN-7', `Waypoint set: ${wx >= 0 ? '+' : '-'}${Math.abs(Math.round(wx))} / ${wz >= 0 ? '+' : '-'}${Math.abs(Math.round(wz))}.`, true);
+  const point = { x: wx, z: wz };
+  if (!waypoint) {
+    waypoint = point;
+    autoWalk = true;
+    addComm('TITAN-7', `Waypoint set: ${wx >= 0 ? '+' : '-'}${Math.abs(Math.round(wx))} / ${wz >= 0 ? '+' : '-'}${Math.abs(Math.round(wz))}.`, true);
+  } else {
+    waypointQueue.push(point);
+    const total = waypointQueue.length + 1;
+    addComm('TITAN-7', `Waypoint ${total} added. Route length: ${total}.`, true);
+  }
 });
 
 mapCanvas.addEventListener('contextmenu', (e) => {
   e.preventDefault();
   if (!mapOpen) return;
-  if (waypoint) {
+  if (waypoint || waypointQueue.length > 0) {
     waypoint = null;
+    waypointQueue.length = 0;
     autoWalk = false;
-    addComm('TITAN-7', 'Waypoint cleared.', true);
+    addComm('TITAN-7', 'Route cleared.', true);
   }
 });
 
@@ -5934,7 +7135,7 @@ const diagSystems = document.getElementById('diag-systems');
 function openDiag() {
   diagOpen = true;
   diagOverlay.classList.add('show');
-  
+  sfxMapAperture();
   renderDiag();
 }
 function closeDiag() {
@@ -6189,7 +7390,18 @@ const KAILEY_CHATTER = {
 
 function kaileyEmit(category) {
   const pool = KAILEY_CHATTER[category] || KAILEY_CHATTER.status;
-  const line = pool[Math.floor(Math.random() * pool.length)];
+  let line = pool[Math.floor(Math.random() * pool.length)];
+  // Sprinkle the pilot's first name into about a third of lines naturally
+  const first = pilot.name.split(' ')[0];
+  if (first && first !== 'Pilot' && Math.random() < 0.35) {
+    // Address at the front for some lines
+    if (Math.random() < 0.5 && /^[A-Z]/.test(line)) {
+      line = first + ', ' + line.charAt(0).toLowerCase() + line.slice(1);
+    } else {
+      // tag at end
+      if (line.endsWith('.')) line = line.slice(0, -1) + ', ' + first + '.';
+    }
+  }
   addComm('KAILEY', line, false, 'kailey');
   logEntry('comms', `KAILEY: ${line}`);
   kailey.lastReactionT = performance.now();
@@ -6434,6 +7646,7 @@ function performScan() {
     closeScanResult();
     return;
   }
+  sfxScan();
   const result = identifyScanTarget(hit);
   if (!result) {
     flashStatus('SCAN INCONCLUSIVE');
@@ -6527,7 +7740,7 @@ function escapeHtml(s) {
 function openLogbook() {
   logbookOpen = true;
   logbookOverlay.classList.add('show');
-  
+  sfxPageFlip();
   renderLogbook();
 }
 function closeLogbook() {
@@ -6603,6 +7816,7 @@ function endMinigame(success, byKailey = false) {
   activeMinigame = null;
   if (success) {
     a.sys.integrity = 100;
+    sfxRepairSuccess();
     logEntry('maintenance', `${a.sys.name} restored to nominal${byKailey ? ' (Kailey remote-assisted)' : ''}.`);
     if (byKailey) {
       kaileyEmit('reaction_kailey_solve');
@@ -6941,15 +8155,15 @@ function setupPattern(a) {
 // WEATHER SYSTEM
 // ============================================================
 const WEATHERS = {
-  clear:       { label: 'CLEAR DAWN',         sub: 'visibility excellent',     fog: 0.008, light: 0xfff0d0, ambient: 0x6a4030, intensity: 0.7, precip: null,    biomeBoost: 1 },
-  golden:      { label: 'GOLDEN HOUR',        sub: 'low sun, long shadows',    fog: 0.010, light: 0xffcc88, ambient: 0x8a5040, intensity: 0.85,precip: null,    biomeBoost: 1 },
-  overcast:    { label: 'OVERCAST',           sub: 'flat light, soft contrast',fog: 0.014, light: 0xa8b0b8, ambient: 0x3a4048, intensity: 0.55,precip: null,    biomeBoost: 1 },
-  mist:        { label: 'HEAVY MIST',         sub: 'low visibility',           fog: 0.030, light: 0xc8d0d8, ambient: 0x4a5058, intensity: 0.45,precip: null,    biomeBoost: 1 },
-  rain:        { label: 'LIGHT RAIN',         sub: 'steady precipitation',     fog: 0.020, light: 0x9aa0a8, ambient: 0x2a3038, intensity: 0.5, precip: 'rain',  biomeBoost: 1 },
-  storm:       { label: 'PASSING STORM',      sub: 'heavy rain, low cloud',    fog: 0.028, light: 0x6a7080, ambient: 0x1a2028, intensity: 0.4, precip: 'rain',  biomeBoost: 1.5 },
-  snow:        { label: 'LIGHT SNOW',         sub: 'flurries, low wind',       fog: 0.022, light: 0xd0d8e0, ambient: 0x5a6068, intensity: 0.5, precip: 'snow',  biomeBoost: 1 },
-  dust:        { label: 'DUSTY HAZE',         sub: 'dry, low visibility',      fog: 0.025, light: 0xd8a868, ambient: 0x6a4828, intensity: 0.65,precip: null,    biomeBoost: 1 },
-  dusk:        { label: 'DUSK',               sub: 'purple horizon',           fog: 0.012, light: 0xc080c0, ambient: 0x402840, intensity: 0.55,precip: null,    biomeBoost: 1 },
+  clear:       { label: 'CLEAR',              sub: 'visibility excellent',     fog: 0.0055,light: 0xfff0d0, ambient: 0x8a7060, intensity: 0.85, precip: null,    biomeBoost: 1 },
+  golden:      { label: 'GOLDEN HOUR',        sub: 'low sun, long shadows',    fog: 0.0070,light: 0xffcc88, ambient: 0x9a6850, intensity: 0.95, precip: null,    biomeBoost: 1 },
+  overcast:    { label: 'OVERCAST',           sub: 'flat light, soft contrast',fog: 0.0090,light: 0xc8cdd2, ambient: 0x6a727a, intensity: 0.70, precip: null,    biomeBoost: 1 },
+  mist:        { label: 'HEAVY MIST',         sub: 'low visibility',           fog: 0.0200,light: 0xd0d6dc, ambient: 0x7a808a, intensity: 0.60, precip: null,    biomeBoost: 1 },
+  rain:        { label: 'LIGHT RAIN',         sub: 'steady precipitation',     fog: 0.0140,light: 0x9aa0a8, ambient: 0x404850, intensity: 0.60, precip: 'rain',  biomeBoost: 1 },
+  storm:       { label: 'PASSING STORM',      sub: 'heavy rain, low cloud',    fog: 0.0210,light: 0x707888, ambient: 0x2a3038, intensity: 0.45, precip: 'rain',  biomeBoost: 1.5 },
+  snow:        { label: 'LIGHT SNOW',         sub: 'flurries, low wind',       fog: 0.0150,light: 0xd0d8e0, ambient: 0x7a8088, intensity: 0.65, precip: 'snow',  biomeBoost: 1 },
+  dust:        { label: 'DUSTY HAZE',         sub: 'dry, low visibility',      fog: 0.0180,light: 0xd8a868, ambient: 0x7a5838, intensity: 0.70, precip: null,    biomeBoost: 1 },
+  dusk:        { label: 'DUSK',               sub: 'purple horizon',           fog: 0.0085,light: 0xc080c0, ambient: 0x503048, intensity: 0.55, precip: null,    biomeBoost: 1 },
 };
 const WEATHER_KEYS = Object.keys(WEATHERS);
 const WEATHER_TRANSITIONS = {
@@ -6966,11 +8180,19 @@ const WEATHER_TRANSITIONS = {
 
 const weather = {
   current: 'clear',
-  pending: null,
+  pending: null,        // next weather state (deterministic forecast)
   transitionT: 0,
   durationT: 60 + Math.random() * 120, // first weather change comes in 1-3 min
   precip: [], // DOM particles
 };
+
+// Pick the next weather state when called (after each change) so we have a
+// known forecast to display.
+function pickNextWeather() {
+  const transitions = WEATHER_TRANSITIONS[weather.current] || WEATHER_KEYS;
+  weather.pending = transitions[Math.floor(Math.random() * transitions.length)];
+}
+pickNextWeather();
 
 function applyWeather(name) {
   const w = WEATHERS[name];
@@ -7072,11 +8294,22 @@ function changeWeather(name) {
 function updateWeather(dt) {
   weather.durationT -= dt;
   if (weather.durationT <= 0) {
-    const transitions = WEATHER_TRANSITIONS[weather.current] || WEATHER_KEYS;
-    const next = transitions[Math.floor(Math.random() * transitions.length)];
+    // Use the forecast pick, then immediately pick the next one
+    const next = weather.pending || WEATHER_KEYS[Math.floor(Math.random() * WEATHER_KEYS.length)];
     changeWeather(next);
+    pickNextWeather();
   }
   if (weather.precip.length) updatePrecip(dt);
+  // Update forecast HUD
+  const fEl = document.getElementById('wx-forecast');
+  const fTime = document.getElementById('wx-forecast-time');
+  if (fEl && weather.pending) {
+    fEl.textContent = WEATHERS[weather.pending].label;
+    const secs = Math.max(0, Math.round(weather.durationT));
+    const m = Math.floor(secs / 60);
+    const s = secs % 60;
+    if (fTime) fTime.textContent = `T-${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  }
 }
 
 // ============================================================
@@ -7185,7 +8418,8 @@ document.querySelectorAll('#control-panel .cp-btn').forEach(btn => {
         hailNearestMech();
         break;
       case 'nvg':
-        toggleNVG();
+      case 'vision':
+        cycleVisionMode();
         break;
       case 'pause':
         if (mapOpen) { closeMap(); break; }
@@ -7801,13 +9035,19 @@ function todPhase(hour) {
 }
 
 const TOD_PALETTE = {
-  dawn:    { sky: 0xffc080, sun: 0xffd0a0, ambient: 0x705040, intensity: 0.65, fog: 0.0055 },
-  day:     { sky: 0xa8c0d8, sun: 0xfff0e0, ambient: 0x5a6068, intensity: 0.95, fog: 0.0040 },
-  dusk:    { sky: 0xd070a0, sun: 0xffa060, ambient: 0x60304a, intensity: 0.6,  fog: 0.0050 },
-  evening: { sky: 0x2a2848, sun: 0x806080, ambient: 0x2a2840, intensity: 0.3,  fog: 0.0065 },
-  night:   { sky: 0x06080f, sun: 0x303060, ambient: 0x0a1020, intensity: 0.12, fog: 0.0090 },
+  dawn:    { sky: 0xffc080, sun: 0xffd0a0, ambient: 0x806050, intensity: 0.7,  fog: 0.0050,
+             zenith: 0x2a3868, horizon: 0xff9a60, accent: 0xffd060, accentAmt: 0.7 },
+  day:     { sky: 0x8ab0d0, sun: 0xfff0e0, ambient: 0x707888, intensity: 1.05, fog: 0.0030,
+             zenith: 0x4878a8, horizon: 0xa8c8e0, accent: 0xffe8d0, accentAmt: 0.18 },
+  dusk:    { sky: 0xd060a0, sun: 0xffa060, ambient: 0x70304a, intensity: 0.65, fog: 0.0045,
+             zenith: 0x382860, horizon: 0xe85838, accent: 0xff8048, accentAmt: 0.75 },
+  evening: { sky: 0x1a1c38, sun: 0x806080, ambient: 0x2a2840, intensity: 0.32, fog: 0.0060,
+             zenith: 0x080820, horizon: 0x402858, accent: 0x8040a0, accentAmt: 0.55 },
+  night:   { sky: 0x04060c, sun: 0x303060, ambient: 0x101830, intensity: 0.14, fog: 0.0080,
+             zenith: 0x000004, horizon: 0x141838, accent: 0x4a30a8, accentAmt: 0.35 },
 };
 
+let lastSkyDomePhase = null;
 function applyTod() {
   const hour = (tod.t / DAY_LENGTH_SECONDS) * 24;
   const phase = todPhase(hour);
@@ -7832,9 +9072,15 @@ function applyTod() {
     // Multiply with weather fog
     const wfog = WEATHERS[weather.current] ? WEATHERS[weather.current].fog : 0.012;
     scene.fog.density = Math.max(wfog, pal.fog);
-    scene.fog.color = new THREE.Color(pal.sky);
+    scene.fog.color = new THREE.Color(pal.horizon);
   }
-  renderer.setClearColor(pal.sky, 1);
+  // Clear color falls back behind the sky dome but should match it at horizon
+  renderer.setClearColor(pal.horizon, 1);
+  // Repaint sky dome only when phase actually changes (expensive op)
+  if (phase !== lastSkyDomePhase) {
+    updateSkyDome(pal.zenith, pal.horizon, pal.accent, pal.accentAmt);
+    lastSkyDomePhase = phase;
+  }
 
   // Compute night intensity (0 = full day, 1 = deep night)
   // dawn ~ 5-7, day 7-17, dusk 17-19, evening 19-21, night 21-5
@@ -7847,8 +9093,9 @@ function applyTod() {
   tod.nightAmt = nightAmt;
 
   // Star and planet visibility
-  if (stars && stars.material)       stars.material.opacity     = nightAmt * 0.95;
-  if (milkyway && milkyway.material) milkyway.material.opacity  = nightAmt * 0.7;
+  if (stars && stars.material)       stars.material.opacity     = nightAmt * 1.0;
+  if (milkyway && milkyway.material) milkyway.material.opacity  = nightAmt * 0.95;
+  if (nebula) nebula.children.forEach(s => { s.material.opacity = nightAmt * 0.32; });
   if (moon && moon.material)         moon.material.opacity      = 0.3 + nightAmt * 0.7;
   if (moon && moon.material)         moon.material.transparent  = true;
   if (planet) {
@@ -7858,13 +9105,12 @@ function applyTod() {
     planet.userData.band.material.opacity = nightAmt * 0.4;
   }
 
-  // Auto-NVG: at night phase, suggest NVG
-  if (phase === 'night' && !nvgState.userToggled) {
-    nvgState.active = true;
-    setNVG(true);
-  } else if (phase !== 'night' && nvgState.active && !nvgState.userToggled) {
-    nvgState.active = false;
-    setNVG(false);
+  // Auto-NVG: at night phase, suggest NVG (only if user isn't actively
+  // using something else like thermal)
+  if (phase === 'night' && !nvgState.userToggled && nvgState.mode !== 'thermal') {
+    setVisionMode('nvg');
+  } else if (phase !== 'night' && nvgState.mode === 'nvg' && !nvgState.userToggled) {
+    setVisionMode('normal');
   }
   // HUD
   tod.phase = phase;
@@ -7885,6 +9131,7 @@ function updateTod(dt) {
   tod.t = (tod.t + dt) % DAY_LENGTH_SECONDS;
   applyTod();
   if (tod.phase !== lastTodAnnouncedPhase) {
+    const oldPhase = lastTodAnnouncedPhase;
     lastTodAnnouncedPhase = tod.phase;
     if (tod.phase === 'dawn') addComm('TITAN-7', 'First light. Coral is stirring.', true);
     else if (tod.phase === 'dusk') addComm('TITAN-7', 'Sun is going. Long shadows.', true);
@@ -7894,35 +9141,72 @@ function updateTod(dt) {
     } else if (tod.phase === 'day') {
       addComm('TITAN-7', 'Full daylight.', true);
     }
+    // Journal: write entry for the period that just ended
+    if (oldPhase) finishPeriodAndStartNew(tod.phase, tod.hour);
+    else startNewPeriod(tod.phase, tod.hour);
   }
 }
 
 // ============================================================
 // NIGHT VISION GOGGLES TOGGLE
 // ============================================================
+// Three vision modes: 'normal', 'nvg', 'thermal'. The N key (and the
+// VISION button) cycles through them. NVG auto-engages at night unless
+// the user has manually selected something else recently.
 const nvgState = {
-  active: false,
-  userToggled: false, // if true, user explicitly forced on or off
+  mode: 'normal',           // 'normal' | 'nvg' | 'thermal'
+  userToggled: false,       // true if user explicitly forced a mode
+  // legacy accessor used elsewhere in the code
+  get active() { return this.mode === 'nvg'; },
+  set active(on) { this.mode = on ? 'nvg' : 'normal'; },
 };
 
-function setNVG(on) {
-  if (on) document.body.classList.add('nvg');
-  else document.body.classList.remove('nvg');
-  document.getElementById('nvg-overlay').classList.toggle('active', on);
-  document.getElementById('nvg-noise').classList.toggle('active', on);
-  document.getElementById('nvg-vignette').classList.toggle('active', on);
+function applyVisionMode() {
+  // NVG classes
+  const isNvg = nvgState.mode === 'nvg';
+  if (isNvg) document.body.classList.add('nvg');
+  else       document.body.classList.remove('nvg');
+  document.getElementById('nvg-overlay').classList.toggle('active', isNvg);
+  document.getElementById('nvg-noise').classList.toggle('active', isNvg);
+  document.getElementById('nvg-vignette').classList.toggle('active', isNvg);
+  // Thermal classes
+  const isThm = nvgState.mode === 'thermal';
+  if (isThm) document.body.classList.add('thermal');
+  else       document.body.classList.remove('thermal');
+  document.getElementById('thermal-overlay').classList.toggle('active', isThm);
+  document.getElementById('thermal-noise').classList.toggle('active', isThm);
+  document.getElementById('thermal-vignette').classList.toggle('active', isThm);
 }
 
-function toggleNVG() {
-  nvgState.active = !nvgState.active;
+function setNVG(on) {
+  // Back-compat shim: turn NVG on or off without touching thermal
+  nvgState.mode = on ? 'nvg' : 'normal';
+  applyVisionMode();
+}
+
+function setVisionMode(mode) {
+  nvgState.mode = mode;
+  applyVisionMode();
+}
+
+function cycleVisionMode() {
+  const order = ['normal', 'nvg', 'thermal'];
+  const idx = order.indexOf(nvgState.mode);
+  const next = order[(idx + 1) % order.length];
+  nvgState.mode = next;
   nvgState.userToggled = true;
-  setNVG(nvgState.active);
-  addComm('TITAN-7', nvgState.active ? 'NVG engaged.' : 'NVG disengaged.', true);
-  logEntry('system', 'NVG ' + (nvgState.active ? 'on' : 'off') + ' (manual).');
-  // Reset user-toggle override after 2 minutes so auto NVG can resume
+  applyVisionMode();
+  sfxClick();
+  const labels = { normal: 'Optical view restored.', nvg: 'NVG engaged.', thermal: 'Thermal IR engaged.' };
+  addComm('TITAN-7', labels[next], true);
+  logEntry('system', 'Vision: ' + next.toUpperCase() + ' (manual).');
+  // Reset user-toggle override after 2 minutes so auto NVG can resume at night
   clearTimeout(nvgState._timer);
   nvgState._timer = setTimeout(() => { nvgState.userToggled = false; }, 120000);
 }
+
+// Legacy entry point referenced elsewhere in the code
+function toggleNVG() { cycleVisionMode(); }
 
 // ============================================================
 // RANDOM SYSTEM FAILURES
@@ -7963,6 +9247,7 @@ function triggerRandomFailure() {
   addComm('KAILEY', `${reason} ${sys.name} needs attention.`, false, 'kailey');
   addComm('TITAN-7', `⚠ ${sys.name} fault registered.`, true);
   logEntry('maintenance', `SYSTEM FAULT: ${sys.name} (${reason})`);
+  noteJournalEvent('failure', sys.name);
   // Coral worries a bit
   coralReact('worried', 5);
   // Auto-open diagnostics so the player sees it
@@ -8053,6 +9338,8 @@ const lightningEl = document.getElementById('lightning-flash');
 function triggerLightning() {
   lightning.flashLeft = 0.16;
   lightningEl.style.background = 'rgba(220, 235, 255, 0.78)';
+  // Thunder with perceived distance: shorter delays = closer feel
+  sfxThunder(0.1 + Math.random() * 0.85);
   // Boost the directional sun light briefly to simulate the actual strike lighting up the scene
   if (tod.sunLight) {
     tod.sunLight.userData._preStrikeI = tod.sunLight.intensity;
@@ -8190,6 +9477,1931 @@ function updateBirds(dt) {
 }
 
 // ============================================================
+// WIND - global atmospheric vector that drives smoke, rain, foliage
+// ============================================================
+const wind = {
+  dir: Math.random() * Math.PI * 2, // azimuth radians
+  strength: 0.4,                    // 0..1
+  // smoothed deltas applied to systems
+  vx: 0, vz: 0,
+  // schedule next change
+  changeIn: 60 + Math.random() * 120,
+};
+
+function updateWind(dt) {
+  wind.changeIn -= dt;
+  if (wind.changeIn <= 0) {
+    wind.dir += (Math.random() - 0.5) * 0.9;
+    wind.strength = 0.15 + Math.random() * 0.85;
+    wind.changeIn = 90 + Math.random() * 240;
+  }
+  // Storms blow harder
+  const stormy = document.body.classList.contains('weather-storm');
+  const effStrength = wind.strength * (stormy ? 1.6 : 1);
+  // Easing so wind doesn't snap on update
+  const tvx = Math.cos(wind.dir) * effStrength;
+  const tvz = Math.sin(wind.dir) * effStrength;
+  wind.vx += (tvx - wind.vx) * dt * 0.6;
+  wind.vz += (tvz - wind.vz) * dt * 0.6;
+  // Apply to rain CSS angle (gusts shear the canopy rain)
+  const angleDeg = Math.atan2(wind.vx, -wind.vz) * 180 / Math.PI;
+  const skew = Math.max(-22, Math.min(22, angleDeg * 0.6));
+  document.documentElement.style.setProperty('--rain-skew', skew + 'deg');
+  // HUD readout
+  const compass = ['N','NE','E','SE','S','SW','W','NW'];
+  // Wind direction = direction wind is coming FROM (meteorological)
+  const fromAng = Math.atan2(-wind.vx, wind.vz);
+  const dirIdx = Math.round(((fromAng + Math.PI * 2) % (Math.PI * 2)) / (Math.PI / 4)) % 8;
+  const dirEl = document.getElementById('wind-dir');
+  const sEl = document.getElementById('wind-strength');
+  if (dirEl) dirEl.textContent = compass[dirIdx];
+  if (sEl)   sEl.textContent = Math.round(effStrength * 28); // 0-28 kt scale
+}
+
+// ============================================================
+// DISTANT CAMPFIRES - flickering point lights at the night horizon,
+// implying unseen homesteads and other patrols. Visible only at night.
+// ============================================================
+const campfires = (() => {
+  const group = new THREE.Group();
+  const COUNT = 18;
+  for (let i = 0; i < COUNT; i++) {
+    const a = (i / COUNT) * Math.PI * 2 + (Math.random() - 0.5) * 0.18;
+    const r = 1300 + Math.random() * 280;
+    const flame = new THREE.Mesh(
+      new THREE.SphereGeometry(2.5 + Math.random() * 1.2, 6, 6),
+      new THREE.MeshBasicMaterial({
+        color: 0xff7028,
+        transparent: true, opacity: 0,
+        fog: false, depthWrite: false,
+      })
+    );
+    flame.position.set(Math.cos(a) * r, 1 + Math.random() * 2, Math.sin(a) * r);
+    // Soft halo
+    const halo = new THREE.Mesh(
+      new THREE.SphereGeometry(6 + Math.random() * 3, 8, 8),
+      new THREE.MeshBasicMaterial({
+        color: 0xff9040,
+        transparent: true, opacity: 0,
+        blending: THREE.AdditiveBlending,
+        fog: false, depthWrite: false,
+      })
+    );
+    halo.position.copy(flame.position);
+    flame.userData.phase = Math.random() * Math.PI * 2;
+    flame.userData.baseColor = 0xff7028;
+    flame.userData.halo = halo;
+    group.add(flame);
+    group.add(halo);
+  }
+  skyGroup.add(group);
+  return group;
+})();
+
+function updateCampfires(dt, nightAmt) {
+  const baseOp = nightAmt * 0.9;
+  if (baseOp < 0.02) {
+    campfires.children.forEach(m => { m.material.opacity = 0; });
+    return;
+  }
+  const t = performance.now() * 0.003;
+  campfires.children.forEach((m) => {
+    const phase = m.userData.phase || 0;
+    // Two-frequency flicker so it looks like fire, not a strobe
+    const flicker = 0.78 + Math.sin(t * 4.2 + phase) * 0.12 + Math.sin(t * 1.7 + phase * 2.3) * 0.08;
+    const halo = m.userData.halo;
+    m.material.opacity = baseOp * flicker;
+    if (halo) halo.material.opacity = baseOp * 0.45 * flicker;
+  });
+}
+
+// ============================================================
+// RADIO VOICE INTERCEPTS - one-sided fragments from unknown sources
+// ============================================================
+const INTERCEPT_FRAGMENTS = [
+  '...if you can hear this, the gate at Mile 14 is still...',
+  '...negative on the southbound. I say again, negative...',
+  '...Marcus, baby, when you get this, please come...',
+  '...mark for grid 18 west, copy on the smoke pillar at...',
+  '...third week now. Coffee is gone. The dog is fine...',
+  '...not military, repeat, not military. They had a child...',
+  '...lighthouse keeper says she saw a light moving along the...',
+  '...told them not to take the ridge road. Told them...',
+  '...Charleston is quiet tonight. Almost too quiet. Over...',
+  '...whoever is on Channel 47, the bridge at Cumberland is out...',
+  '...DHARMA channels are dead but somebody is still keeping...',
+  '...we are at the third station, the one with the broken antenna...',
+  '...four short bursts means come home. Two means hold. One means...',
+  '...if the numbers come up again do not respond. Repeat. Do not...',
+  '...beautiful sunset over Spring Gap. I wish you could see it...',
+  '...there is a man at the door. He is not...',
+  '...for anyone listening, I have a working radio and warm bread...',
+  '...the tower at New Vrindaban is back online for a few hours each...',
+  '...do not approach the convoy. They are not who they say they...',
+];
+
+const intercepts = { nextT: 240 + Math.random() * 180 };
+
+function updateIntercepts(dt) {
+  intercepts.nextT -= dt;
+  if (intercepts.nextT > 0) return;
+  intercepts.nextT = 240 + Math.random() * 300; // 4-9 minutes
+  const text = pick(INTERCEPT_FRAGMENTS);
+  addComm('UNKNOWN', text, false, 'intercept');
+}
+
+// ============================================================
+// WILDLIFE - text-only sightings logged as you walk
+// ============================================================
+const WILDLIFE = [
+  { name: 'whitetail deer',    text: 'A whitetail deer steps out of the brush, sees the mech, and freezes.' },
+  { name: 'whitetail deer',    text: 'Three deer at the forest edge. They watch you walk past.' },
+  { name: 'red fox',           text: 'A red fox crosses your path and disappears into the undergrowth.' },
+  { name: 'barred owl',        text: 'A barred owl glides between trees on silent wings.' },
+  { name: 'great blue heron',  text: 'Great blue heron stalks the shallows. Does not lift off.' },
+  { name: 'black bear',        text: 'A black bear pauses on a rise to look at you, then ambles on.' },
+  { name: 'red-tailed hawk',   text: 'Red-tailed hawk circles overhead, riding a thermal off the ridge.' },
+  { name: 'wild turkey',       text: 'A turkey hen leads three poults across an open patch.' },
+  { name: 'beaver',            text: 'A beaver slaps its tail and slides into the water.' },
+  { name: 'raccoon',           text: 'A raccoon watches you from a low branch, masked and unbothered.' },
+  { name: 'coyote',            text: 'A coyote on a far rise. It moves on before the optics resolve it.' },
+  { name: 'eastern box turtle',text: 'An eastern box turtle, halfway across the trail. You step around.' },
+  { name: 'pileated woodpecker',text:'A pileated woodpecker hammers a dead snag somewhere to the north.' },
+  { name: 'firefly cloud',     text: 'A cloud of fireflies hangs in the trees, blinking out of phase.' },
+  { name: 'glowing eyes',      text: 'Two pairs of eyes catch the NVG, far back among the trunks. Gone when you look again.' },
+  { name: 'opossum',           text: 'A possum trundles past, completely indifferent to a 30-ton mech.' },
+];
+
+const wildlife = { nextT: 80 + Math.random() * 160 };
+
+function updateWildlife(dt) {
+  wildlife.nextT -= dt;
+  if (wildlife.nextT > 0) return;
+  wildlife.nextT = 80 + Math.random() * 220; // 80-300 seconds
+  const ent = pick(WILDLIFE);
+  // Bias night-only sightings (fireflies/eyes) by phase
+  if ((ent.name === 'firefly cloud' || ent.name === 'glowing eyes') &&
+      (tod.nightAmt || 0) < 0.5) {
+    return updateWildlife(0); // try again
+  }
+  // Distance + bearing
+  const dist = Math.floor(40 + Math.random() * 240);
+  const compass = ['N','NE','E','SE','S','SW','W','NW'];
+  const bearing = compass[Math.floor(Math.random() * compass.length)];
+  addComm('WILDLIFE', ent.text + ` (${dist}m ${bearing})`, false, 'wildlife');
+  logEntry('discovery', `Wildlife: ${ent.name}, ${dist}m ${bearing}.`);
+  // Small chance Coral notices
+  if (Math.random() < 0.3) coralReact('alert', 4);
+}
+
+// ============================================================
+// CORAL EXTENDED - she notices things outside your sensor range
+// ============================================================
+const coralNotices = { nextT: 20 + Math.random() * 30, lastNote: 0 };
+
+const CORAL_NOTICES_RAIN = [
+  'Coral watches the rain run down the canopy.',
+  'Coral sighs at the rain. She does not like wet feet.',
+  'Coral presses her nose against the glass and leaves a smudge.',
+];
+const CORAL_NOTICES_STORM = [
+  'Coral flinches at the thunder.',
+  'Coral has tucked herself under your seat.',
+  'Coral whuffs softly at each rumble.',
+];
+const CORAL_NOTICES_ALLIED = [
+  'Coral lifts her head, ears forward toward something out there.',
+  'Coral wags once, twice. Maybe she hears the other mechs.',
+  'Coral stands up and looks out, then settles again.',
+];
+const CORAL_NOTICES_HOSTILE = [
+  'Coral has gone very still.',
+  'Low growl from Coral. Eyes on the south.',
+  'Coral is staring at something you cannot see.',
+];
+const CORAL_NOTICES_NIGHT = [
+  'Coral is watching the stars.',
+  'Coral yawns. She likes the dark.',
+  'Coral curls tighter against the cool air.',
+];
+
+function updateCoralNotices(dt) {
+  coralNotices.nextT -= dt;
+  if (coralNotices.nextT > 0) return;
+  coralNotices.nextT = 25 + Math.random() * 40;
+
+  // Priority order: hostile > allied > storm > rain > night > nothing
+  let table = null, state = null;
+  const sentinelClose = enemies.some(e =>
+    e.mesh && e.mesh.position.distanceTo(player.pos) < 300
+  );
+  const alliedClose = alliedMechs.some(m =>
+    m.pos && Math.hypot(m.pos.x - player.pos.x, m.pos.z - player.pos.z) < 500
+  );
+  if (sentinelClose) { table = CORAL_NOTICES_HOSTILE; state = 'worried'; }
+  else if (alliedClose) { table = CORAL_NOTICES_ALLIED; state = 'alert'; }
+  else if (document.body.classList.contains('weather-storm')) { table = CORAL_NOTICES_STORM; state = 'worried'; }
+  else if (document.body.classList.contains('weather-rain')) { table = CORAL_NOTICES_RAIN; state = 'settled'; }
+  else if ((tod.nightAmt || 0) > 0.6) { table = CORAL_NOTICES_NIGHT; state = 'settled'; }
+
+  if (!table) return;
+  const note = pick(table);
+  if (note === coralNotices.lastNote) return; // don't repeat back-to-back
+  coralNotices.lastNote = note;
+  if (state) coralReact(state, 8);
+  // Show in Coral's status panel
+  const statusEl = document.getElementById('coral-status');
+  if (statusEl) {
+    statusEl.textContent = note;
+    setTimeout(() => {
+      // Let updateCoral take over again
+      if (statusEl.textContent === note) statusEl.textContent = '';
+    }, 7500);
+  }
+}
+
+// ============================================================
+// CORAL CLICKABLE - click her portrait to give her a scritch
+// ============================================================
+(function setupCoralScritch() {
+  const frame = document.getElementById('coral-frame');
+  if (!frame) return;
+  frame.style.cursor = 'pointer';
+  frame.title = 'click for a scritch';
+  frame.addEventListener('click', () => {
+    coralReact('excited', 5);
+    sfxCoralHuff();
+    const lines = [
+      'Coral is being scritched.',
+      'Coral leans into your hand.',
+      'Coral makes a happy noise.',
+      'Coral closes her eyes.',
+      'Coral thumps her tail against the seat.',
+    ];
+    const statusEl = document.getElementById('coral-status');
+    if (statusEl) {
+      const t = pick(lines);
+      statusEl.textContent = t;
+      setTimeout(() => { if (statusEl.textContent === t) statusEl.textContent = ''; }, 4500);
+    }
+  });
+})();
+
+// ============================================================
+// FOOTPRINTS - mech leaves a fading trail in snow weather
+// ============================================================
+const footprints = {
+  pool: [],            // {mesh, t, life}
+  max: 80,
+  lastL: { x: 0, z: 0 }, lastR: { x: 0, z: 0 },
+  alternate: 0,        // which foot
+};
+
+const footprintGeo = new THREE.PlaneGeometry(1.4, 2.6);
+
+function spawnFootprint(x, z, yaw, isLeft) {
+  // Snow only
+  if (!document.body.classList.contains('weather-snow')) return;
+  const mat = new THREE.MeshBasicMaterial({
+    color: 0x2a3038,
+    transparent: true,
+    opacity: 0.7,
+    depthWrite: false,
+  });
+  const m = new THREE.Mesh(footprintGeo, mat);
+  // offset slightly to one side of the mech for L/R foot
+  const side = isLeft ? -1 : 1;
+  const sx = Math.cos(yaw) * 1.6 * side;
+  const sz = -Math.sin(yaw) * 1.6 * side;
+  m.position.set(x + sx, 0.12, z + sz);
+  m.rotation.x = -Math.PI / 2;
+  m.rotation.z = yaw;
+  scene.add(m);
+  footprints.pool.push({ mesh: m, t: 0, life: 240 }); // 4 minutes
+  if (footprints.pool.length > footprints.max) {
+    const old = footprints.pool.shift();
+    scene.remove(old.mesh);
+    old.mesh.material.dispose();
+  }
+}
+
+function updateFootprints(dt) {
+  for (let i = footprints.pool.length - 1; i >= 0; i--) {
+    const fp = footprints.pool[i];
+    fp.t += dt;
+    const p = fp.t / fp.life;
+    if (p >= 1) {
+      scene.remove(fp.mesh);
+      fp.mesh.material.dispose();
+      footprints.pool.splice(i, 1);
+      continue;
+    }
+    // Fade smoothly; bias toward visible for the first half, then fall off
+    fp.mesh.material.opacity = 0.7 * (1 - p) * (1 - p);
+  }
+}
+
+// ============================================================
+// JOURNAL - auto-generated diary entries at each phase transition
+// ============================================================
+const journal = {
+  entries: [],
+  period: null,   // current accumulating period
+};
+
+function startNewPeriod(phase, hour) {
+  journal.period = {
+    startPhase: phase,
+    startHour: hour,
+    startPos: { x: player.pos.x, z: player.pos.z },
+    startTime: performance.now(),
+    distanceWalked: 0,
+    discoveries: [],
+    hails: [],
+    weatherSeen: new Set(),
+    failures: [],
+    hostilesEngaged: 0,
+    scansPerformed: 0,
+    droneSorties: 0,
+    biomesVisited: new Set(),
+    fireFlies: false,
+  };
+}
+
+function trackJournalMovement(dt) {
+  if (!journal.period) return;
+  const vx = player.vel.x, vz = player.vel.z;
+  const speed = Math.sqrt(vx*vx + vz*vz);
+  journal.period.distanceWalked += speed * dt;
+  if (weather && weather.current) journal.period.weatherSeen.add(weather.current);
+  if (typeof currentBiome !== 'undefined' && currentBiome) journal.period.biomesVisited.add(currentBiome);
+}
+
+function noteJournalEvent(kind, detail) {
+  if (!journal.period) return;
+  if (kind === 'discovery')      journal.period.discoveries.push(detail);
+  else if (kind === 'hail')      journal.period.hails.push(detail);
+  else if (kind === 'failure')   journal.period.failures.push(detail);
+  else if (kind === 'hostile')   journal.period.hostilesEngaged++;
+  else if (kind === 'scan')      journal.period.scansPerformed++;
+  else if (kind === 'drone')     journal.period.droneSorties++;
+}
+
+function composeJournalEntry(period, endPhase, endHour) {
+  const distance = Math.round(period.distanceWalked);
+  const distKm = (distance / 1000).toFixed(2);
+  const phaseLabel = `${period.startPhase} → ${endPhase}`;
+  const startTime = String(Math.floor(period.startHour)).padStart(2, '0') + ':' +
+                    String(Math.floor((period.startHour % 1) * 60)).padStart(2, '0');
+  const lines = [];
+  // Opening line: distance + biome
+  const biomes = Array.from(period.biomesVisited);
+  if (distance < 50) {
+    lines.push(`Held position through the ${period.startPhase}.`);
+  } else if (biomes.length === 1) {
+    lines.push(`Walked ${distKm} km through ${humanBiome(biomes[0])}.`);
+  } else if (biomes.length >= 2) {
+    lines.push(`Walked ${distKm} km, crossing into ${humanBiome(biomes[biomes.length - 1])}.`);
+  } else {
+    lines.push(`Walked ${distKm} km.`);
+  }
+  // Discoveries
+  if (period.discoveries.length === 1) {
+    lines.push(`Surveyed one new site: ${period.discoveries[0]}.`);
+  } else if (period.discoveries.length > 1) {
+    const first = period.discoveries[0];
+    const rest = period.discoveries.length - 1;
+    lines.push(`Surveyed ${period.discoveries.length} sites including ${first}.`);
+  }
+  // Weather
+  const wxArr = Array.from(period.weatherSeen);
+  if (wxArr.length === 1) {
+    lines.push(`Weather: ${humanWeather(wxArr[0])}.`);
+  } else if (wxArr.length > 1) {
+    lines.push(`Weather shifted from ${humanWeather(wxArr[0])} through ${humanWeather(wxArr[wxArr.length - 1])}.`);
+  }
+  // Comms
+  if (period.hails.length > 0) {
+    lines.push(`Spoke with ${period.hails.join(', ')} on Channel 47.`);
+  }
+  // Failures / repairs
+  if (period.failures.length === 1) {
+    lines.push(`Subsystem fault: ${period.failures[0]}. Patched in the field.`);
+  } else if (period.failures.length > 1) {
+    lines.push(`Multiple subsystem faults this period (${period.failures.length}).`);
+  }
+  // Hostiles
+  if (period.hostilesEngaged > 0) {
+    lines.push(period.hostilesEngaged === 1
+      ? 'Brief sentinel contact. Resolved.'
+      : `Sentinel contact x${period.hostilesEngaged}.`);
+  }
+  // Coral
+  if (period.startPhase === 'night') lines.push('Coral mostly slept.');
+  else if (period.startPhase === 'dawn') lines.push('Coral was up before me.');
+  return {
+    phase: phaseLabel,
+    timeLabel: startTime,
+    text: lines.join(' '),
+  };
+}
+
+function humanBiome(b) {
+  const labels = {
+    pine: 'the pine forest', birch: 'the birch grove', marsh: 'the dead marsh',
+    meadow: 'open meadow', burned: 'the burned forest', highland: 'the rocky highland',
+    bamboo_grove: 'the bamboo grove',
+  };
+  return labels[b] || b;
+}
+function humanWeather(w) {
+  const labels = {
+    clear: 'clear skies', golden: 'golden hour', overcast: 'overcast',
+    mist: 'heavy mist', rain: 'light rain', storm: 'a passing storm',
+    snow: 'light snow', dust: 'dusty haze', dusk: 'dusk light',
+  };
+  return labels[w] || w;
+}
+
+function finishPeriodAndStartNew(newPhase, newHour) {
+  if (journal.period) {
+    const entry = composeJournalEntry(journal.period, newPhase, newHour);
+    journal.entries.unshift(entry);
+    if (journal.entries.length > 60) journal.entries.length = 60;
+    if (journalOpen) renderJournal();
+  }
+  startNewPeriod(newPhase, newHour);
+}
+
+let journalOpen = false;
+function openJournal() {
+  if (journalOpen) return;
+  journalOpen = true;
+  renderJournal();
+  document.getElementById('journal-overlay').classList.add('show');
+  sfxPageFlip();
+}
+function closeJournal() {
+  journalOpen = false;
+  document.getElementById('journal-overlay').classList.remove('show');
+}
+
+function renderJournal() {
+  const list = document.getElementById('journal-entries');
+  if (!list) return;
+  if (journal.entries.length === 0) {
+    list.innerHTML = '<div class="jrn-empty">No entries yet. Entries are written at each phase transition (dawn, day, dusk, evening, night).</div>';
+    return;
+  }
+  list.innerHTML = journal.entries.map(e =>
+    `<div class="jrn-entry">
+      <div class="jrn-head">
+        <span class="jrn-time">${e.timeLabel}</span>
+        <span class="jrn-phase">${e.phase}</span>
+      </div>
+      <div class="jrn-text">${e.text}</div>
+    </div>`
+  ).join('');
+}
+
+// ============================================================
+// PILOT IDENTITY
+// ============================================================
+// First-run prompt asks the player for their name and personal callsign.
+// Stored in localStorage so subsequent sessions remember.
+const pilot = (() => {
+  let stored = null;
+  try { stored = JSON.parse(localStorage.getItem('titan7_pilot') || 'null'); } catch (e) {}
+  return stored || { name: 'Pilot', callsign: 'TITAN-7' };
+})();
+
+function savePilot() {
+  try { localStorage.setItem('titan7_pilot', JSON.stringify(pilot)); } catch (e) {}
+}
+
+// Pre-populate the start-screen pilot inputs from saved/default state
+setTimeout(() => {
+  const nameEl = document.getElementById('ps-name');
+  const callsignEl = document.getElementById('ps-callsign');
+  if (nameEl && pilot.name && pilot.name !== 'Pilot') nameEl.value = pilot.name;
+  if (callsignEl && pilot.callsign && pilot.callsign !== 'TITAN-7') callsignEl.value = pilot.callsign;
+}, 0);
+
+// Replace {pilot}, {first}, {callsign} tokens in any string.
+function renderPilot(s) {
+  if (!s) return s;
+  const first = pilot.name.split(' ')[0];
+  return s
+    .replace(/\{pilot\}/g, pilot.name)
+    .replace(/\{first\}/g, first)
+    .replace(/\{callsign\}/g, pilot.callsign);
+}
+
+// ============================================================
+// PHOTO MODE
+// ============================================================
+const photo = {
+  active: false,
+  gallery: [],  // {dataUrl, ts, coords, biome}
+};
+
+function enterPhotoMode() {
+  if (photo.active) return;
+  if (mapOpen || diagOpen || logbookOpen || journalOpen) return;
+  photo.active = true;
+  // Pause everything except rendering & input
+  paused = true;
+  document.body.classList.add('photo-mode');
+  document.getElementById('photo-overlay').classList.add('show');
+  document.getElementById('photo-controls').classList.add('show');
+  document.getElementById('photo-controls').style.display = 'flex';
+  document.getElementById('photo-gallery').classList.add('show');
+  renderPhotoGallery();
+  updatePhotoLabels();
+  addComm('TITAN-7', 'Photo mode engaged. Time paused.', true);
+}
+
+function exitPhotoMode() {
+  if (!photo.active) return;
+  photo.active = false;
+  paused = false;
+  document.body.classList.remove('photo-mode');
+  document.getElementById('photo-overlay').classList.remove('show');
+  document.getElementById('photo-controls').classList.remove('show');
+  document.getElementById('photo-controls').style.display = 'none';
+  document.getElementById('photo-gallery').classList.remove('show');
+  document.getElementById('paused').classList.remove('show');
+}
+
+function togglePhotoMode() {
+  if (photo.active) exitPhotoMode();
+  else enterPhotoMode();
+}
+
+function updatePhotoLabels() {
+  if (!photo.active) return;
+  const hh = Math.floor(tod.hour);
+  const mm = Math.floor((tod.hour - hh) * 60);
+  const time = String(hh).padStart(2, '0') + ':' + String(mm).padStart(2, '0');
+  const x = (player.pos.x >= 0 ? '+' : '-') + String(Math.abs(Math.round(player.pos.x))).padStart(4, '0');
+  const z = (player.pos.z >= 0 ? '+' : '-') + String(Math.abs(Math.round(player.pos.z))).padStart(4, '0');
+  document.getElementById('photo-tag-bl').textContent = time;
+  document.getElementById('photo-tag-br').textContent = `${x} / ${z}`;
+}
+
+function capturePhoto() {
+  if (!photo.active) return;
+  sfxCameraShutter();
+  // Force-render a fresh frame just before capture so paused state doesn't show stale buffer
+  renderer.render(scene, camera);
+  // toDataURL on the WebGL canvas
+  const canvas = renderer.domElement;
+  let dataUrl;
+  try { dataUrl = canvas.toDataURL('image/jpeg', 0.85); }
+  catch (e) { console.warn('toDataURL failed:', e); return; }
+  const hh = Math.floor(tod.hour);
+  const mm = Math.floor((tod.hour - hh) * 60);
+  const time = String(hh).padStart(2, '0') + ':' + String(mm).padStart(2, '0');
+  photo.gallery.unshift({
+    dataUrl,
+    ts: time,
+    x: Math.round(player.pos.x),
+    z: Math.round(player.pos.z),
+    biome: currentBiome,
+  });
+  if (photo.gallery.length > 12) photo.gallery.length = 12;
+  renderPhotoGallery();
+  // Flash effect
+  const flash = document.createElement('div');
+  flash.style.cssText = 'position:fixed;inset:0;background:white;z-index:80;pointer-events:none;opacity:1;transition:opacity 0.3s';
+  document.body.appendChild(flash);
+  requestAnimationFrame(() => { flash.style.opacity = '0'; });
+  setTimeout(() => flash.remove(), 350);
+}
+
+function renderPhotoGallery() {
+  const g = document.getElementById('photo-gallery');
+  if (!g) return;
+  g.innerHTML = '';
+  for (const p of photo.gallery) {
+    const img = document.createElement('img');
+    img.src = p.dataUrl;
+    img.title = `${p.ts} // ${p.x >= 0 ? '+' : '-'}${Math.abs(p.x).toString().padStart(4, '0')} / ${p.z >= 0 ? '+' : '-'}${Math.abs(p.z).toString().padStart(4, '0')}`;
+    img.addEventListener('click', () => {
+      const a = document.createElement('a');
+      a.href = p.dataUrl;
+      a.download = `titan7_${p.ts.replace(':','')}_${p.x}_${p.z}.jpg`;
+      a.click();
+    });
+    g.appendChild(img);
+  }
+}
+
+// Wire photo button clicks
+setTimeout(() => {
+  const shootBtn = document.getElementById('photo-shoot');
+  const exitBtn = document.getElementById('photo-exit');
+  if (shootBtn) shootBtn.addEventListener('click', capturePhoto);
+  if (exitBtn) exitBtn.addEventListener('click', exitPhotoMode);
+}, 0);
+
+// ============================================================
+// TRADER CARAVANS - slow groups of friendly mechs hauling cargo
+// ============================================================
+const caravans = [];
+const caravanState = { nextSpawn: 240 + Math.random() * 360 }; // 4-10 min
+
+const CARAVAN_NAMES = [
+  'KETTLE & DAUGHTER', 'BLACKFORK FREIGHT', 'PEARL HAULING',
+  'IRON GAP TRADE CO', 'COPPERFIELD RUNNERS', 'MORGANTOWN LINE',
+  'CHANNEL 47 SUPPLY', 'DHARMA REMNANT', 'OAK & HOLLOW HAUL',
+];
+const CARAVAN_CHATTER = [
+  'Caravan passing southbound. Just routing through.',
+  'Smell of rain on the wind. Reckon we beat it.',
+  'Anyone heard from the lighthouse keeper?',
+  'Three days out from the depot. Two more to go.',
+  'Found a deer carcass at the last overlook. Bear country.',
+  'Got fresh bread and salt if you ever swing by Pearl.',
+  'Saw your tracks two days back. Big feet, that mech.',
+  'We took the long way around the marsh. Better road.',
+  'Old fellow at the gas station says hello.',
+  'Channel 47, this is just commerce. Don\'t fuss.',
+  'Hot coffee at the next switchback if you want.',
+  'Carrying lumber and salt. Nothing exciting.',
+  'My copilot says hi to your dog.',
+  'Watch the wash-out two clicks north.',
+];
+
+function spawnCaravan() {
+  const count = 3 + Math.floor(Math.random() * 3); // 3-5 mechs
+  const name = pick(CARAVAN_NAMES);
+  // Pick a path that crosses the player's vicinity. Two random points 600m
+  // apart, both roughly equidistant from the player.
+  const heading = Math.random() * Math.PI * 2;
+  const perp = heading + Math.PI / 2;
+  const offset = (Math.random() - 0.5) * 300; // perpendicular offset from player
+  const startDist = 500;
+  const startX = player.pos.x + Math.cos(heading) * (-startDist) + Math.cos(perp) * offset;
+  const startZ = player.pos.z + Math.sin(heading) * (-startDist) + Math.sin(perp) * offset;
+  const dirX = Math.cos(heading);
+  const dirZ = Math.sin(heading);
+  const speed = 4.5 + Math.random() * 1.5;
+  const mechs = [];
+  for (let i = 0; i < count; i++) {
+    const built = buildTraderMech(i === 0); // first one is the lead, has banner
+    // Stagger them in a line, with slight lateral jitter
+    const lateral = (i % 2 === 0 ? 1 : -1) * 4;
+    const back = i * 16;
+    const px = startX - dirX * back + Math.cos(perp) * lateral;
+    const pz = startZ - dirZ * back + Math.sin(perp) * lateral;
+    built.group.position.set(px, 0, pz);
+    // Face the direction of travel
+    built.group.rotation.y = Math.atan2(dirX, dirZ);
+    scene.add(built.group);
+    mechs.push({
+      mesh: built.group,
+      legs: built.legs,
+      walkPhase: Math.random() * Math.PI * 2,
+      idx: i,
+    });
+  }
+  const c = {
+    name,
+    mechs,
+    dirX, dirZ,
+    speed,
+    travelled: 0,
+    maxTravel: 1100,
+    chatterT: 5 + Math.random() * 8,
+    introduced: false,
+  };
+  caravans.push(c);
+  // Announce after a brief delay
+  setTimeout(() => {
+    if (c.mechs.length === 0) return;
+    addComm(name, pick(CARAVAN_CHATTER));
+    logEntry('comms', `Trader caravan ${name} crossing the area.`);
+    c.introduced = true;
+  }, 1200);
+}
+
+function buildTraderMech(isLead) {
+  const g = new THREE.Group();
+  const bodyMat = new THREE.MeshStandardMaterial({
+    color: 0x4a3820, roughness: 0.85, metalness: 0.3,
+  });
+  const cargoMat = new THREE.MeshStandardMaterial({
+    color: 0x8a6840, roughness: 0.95, metalness: 0.1,
+  });
+  // Legs - similar to allied mechs but stouter
+  const legs = [];
+  for (let side = -1; side <= 1; side += 2) {
+    const leg = new THREE.Group();
+    const thigh = new THREE.Mesh(new THREE.CylinderGeometry(0.4, 0.5, 3.4, 8), bodyMat);
+    thigh.position.set(side * 1.0, 4.3, 0);
+    leg.add(thigh);
+    const shin = new THREE.Mesh(new THREE.CylinderGeometry(0.35, 0.45, 2.6, 8), bodyMat);
+    shin.position.set(side * 1.0, 1.5, 0);
+    leg.add(shin);
+    const foot = new THREE.Mesh(new THREE.BoxGeometry(1.4, 0.5, 2.2), bodyMat);
+    foot.position.set(side * 1.0, 0.25, 0.3);
+    leg.add(foot);
+    legs.push(leg);
+    g.add(leg);
+  }
+  // Body / chassis
+  const body = new THREE.Mesh(new THREE.BoxGeometry(3.6, 2.6, 3.2), bodyMat);
+  body.position.set(0, 7.2, 0);
+  g.add(body);
+  // Eye (single cyclops)
+  const eye = new THREE.Mesh(
+    new THREE.CircleGeometry(0.32, 12),
+    new THREE.MeshBasicMaterial({ color: 0xffcc66, fog: false })
+  );
+  eye.position.set(0, 7.3, 1.61);
+  g.add(eye);
+  // Cargo stack on the back
+  const crates = 2 + Math.floor(Math.random() * 3);
+  for (let i = 0; i < crates; i++) {
+    const c = new THREE.Mesh(
+      new THREE.BoxGeometry(2.4 + Math.random() * 0.4, 1.4, 1.4),
+      cargoMat
+    );
+    c.position.set((Math.random() - 0.5) * 0.4, 8.8 + i * 1.5, -1.2);
+    c.rotation.y = (Math.random() - 0.5) * 0.15;
+    g.add(c);
+  }
+  // Lead mech: caravan banner (tall pole + cloth)
+  if (isLead) {
+    const pole = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.05, 0.05, 5, 6),
+      new THREE.MeshStandardMaterial({ color: 0x2a2018, roughness: 0.9 })
+    );
+    pole.position.set(0, 11.5, -1.8);
+    g.add(pole);
+    const flag = new THREE.Mesh(
+      new THREE.PlaneGeometry(2.2, 1.2),
+      new THREE.MeshStandardMaterial({
+        color: 0xff8030, roughness: 0.85, side: THREE.DoubleSide,
+      })
+    );
+    flag.position.set(1.1, 12.6, -1.8);
+    g.add(flag);
+  }
+  return { group: g, legs };
+}
+
+function updateCaravans(dt) {
+  // Spawn schedule
+  caravanState.nextSpawn -= dt;
+  if (caravanState.nextSpawn <= 0) {
+    caravanState.nextSpawn = 360 + Math.random() * 420; // 6-13 min between
+    spawnCaravan();
+  }
+
+  // Animate active caravans
+  for (let i = caravans.length - 1; i >= 0; i--) {
+    const c = caravans[i];
+    c.travelled += c.speed * dt;
+    c.chatterT -= dt;
+    if (c.travelled >= c.maxTravel) {
+      // Done - despawn
+      for (const m of c.mechs) {
+        scene.remove(m.mesh);
+        m.mesh.traverse(o => {
+          if (o.geometry) o.geometry.dispose();
+          if (o.material) {
+            if (Array.isArray(o.material)) o.material.forEach(mat => mat.dispose());
+            else o.material.dispose();
+          }
+        });
+      }
+      caravans.splice(i, 1);
+      continue;
+    }
+    // Move and animate each mech in the caravan
+    for (const m of c.mechs) {
+      m.walkPhase += dt * 1.8;
+      m.mesh.position.x += c.dirX * c.speed * dt;
+      m.mesh.position.z += c.dirZ * c.speed * dt;
+      // Subtle hip-swing on the legs
+      if (m.legs[0]) m.legs[0].rotation.x = Math.sin(m.walkPhase) * 0.28;
+      if (m.legs[1]) m.legs[1].rotation.x = -Math.sin(m.walkPhase) * 0.28;
+      // Vertical bob
+      const bob = Math.abs(Math.sin(m.walkPhase * 2)) * 0.15;
+      m.mesh.position.y = bob;
+    }
+    // Periodic chatter from the lead
+    if (c.chatterT <= 0 && c.introduced) {
+      c.chatterT = 16 + Math.random() * 30;
+      // Only emit if the lead is within audible range
+      const lead = c.mechs[0];
+      if (lead) {
+        const d = Math.hypot(lead.mesh.position.x - player.pos.x, lead.mesh.position.z - player.pos.z);
+        if (d < 800) addComm(c.name, pick(CARAVAN_CHATTER));
+      }
+    }
+  }
+}
+
+// ============================================================
+// AUDIO
+// ============================================================
+// Procedural audio using the Web Audio API. No external assets.
+// All sounds are generated from oscillators and filtered noise.
+const audio = {
+  ctx: null,
+  master: null,
+  enabled: true,
+  ambientMuted: false,   // if true, wind/rain/panel hum gains are forced to 0
+  // Per-source nodes
+  reactor: null,    // continuous low thrum
+  wind: null,       // continuous wind whoosh
+  rain: null,       // continuous rain hiss
+  // noise buffer cached so we don't recreate it each time
+  noiseBuf: null,
+};
+
+function initAudio() {
+  if (audio.ctx) return;
+  try {
+    const Ctx = window.AudioContext || window.webkitAudioContext;
+    audio.ctx = new Ctx();
+    audio.master = audio.ctx.createGain();
+    audio.master.gain.value = 0.7;
+    audio.master.connect(audio.ctx.destination);
+    // Pre-generate 2 seconds of white noise for reuse
+    const sr = audio.ctx.sampleRate;
+    const buf = audio.ctx.createBuffer(1, sr * 2, sr);
+    const data = buf.getChannelData(0);
+    for (let i = 0; i < data.length; i++) data[i] = Math.random() * 2 - 1;
+    audio.noiseBuf = buf;
+    // Build continuous sources
+    setupReactorThrum();
+    setupWindLoop();
+    setupRainLoop();
+    setupPanelHum();
+    setupYawServo();
+    setupPitchServo();
+    setupJetLoop();
+  } catch (e) {
+    console.warn('Audio init failed:', e);
+    audio.enabled = false;
+  }
+}
+
+function setupReactorThrum() {
+  // Two slightly detuned saws + low-pass = warm hum
+  const osc1 = audio.ctx.createOscillator();
+  const osc2 = audio.ctx.createOscillator();
+  osc1.type = 'sawtooth'; osc2.type = 'sawtooth';
+  osc1.frequency.value = 55;
+  osc2.frequency.value = 56.4;
+  const lp = audio.ctx.createBiquadFilter();
+  lp.type = 'lowpass';
+  lp.frequency.value = 220;
+  lp.Q.value = 0.8;
+  const gain = audio.ctx.createGain();
+  gain.gain.value = 0;
+  osc1.connect(lp); osc2.connect(lp);
+  lp.connect(gain);
+  gain.connect(audio.master);
+  osc1.start(); osc2.start();
+  audio.reactor = { gain, lp };
+}
+
+function setupWindLoop() {
+  // Wind = bandpassed noise loop
+  const src = audio.ctx.createBufferSource();
+  src.buffer = audio.noiseBuf;
+  src.loop = true;
+  const bp = audio.ctx.createBiquadFilter();
+  bp.type = 'bandpass';
+  bp.frequency.value = 600;
+  bp.Q.value = 0.4;
+  const gain = audio.ctx.createGain();
+  gain.gain.value = 0;
+  src.connect(bp); bp.connect(gain); gain.connect(audio.master);
+  src.start();
+  audio.wind = { gain, bp };
+}
+
+function setupRainLoop() {
+  // Rain = filtered noise + occasional drop accents
+  const src = audio.ctx.createBufferSource();
+  src.buffer = audio.noiseBuf;
+  src.loop = true;
+  const hp = audio.ctx.createBiquadFilter();
+  hp.type = 'highpass';
+  hp.frequency.value = 1200;
+  const lp = audio.ctx.createBiquadFilter();
+  lp.type = 'lowpass';
+  lp.frequency.value = 6000;
+  const gain = audio.ctx.createGain();
+  gain.gain.value = 0;
+  src.connect(hp); hp.connect(lp); lp.connect(gain); gain.connect(audio.master);
+  src.start();
+  audio.rain = { gain };
+}
+
+function setupYawServo() {
+  // Mechanical servo whine that engages when the chassis is rotating.
+  // Two detuned sawtooths through a lowpass and a peaking band give it
+  // a hydraulic-motor character with a slight tonal whine.
+  const osc1 = audio.ctx.createOscillator();
+  const osc2 = audio.ctx.createOscillator();
+  osc1.type = 'sawtooth';
+  osc2.type = 'sawtooth';
+  osc1.frequency.value = 78;
+  osc2.frequency.value = 81; // slight detune for chorus
+  const lp = audio.ctx.createBiquadFilter();
+  lp.type = 'lowpass';
+  lp.frequency.value = 520;
+  lp.Q.value = 1.2;
+  const peak = audio.ctx.createBiquadFilter();
+  peak.type = 'peaking';
+  peak.frequency.value = 240;
+  peak.gain.value = 6;
+  peak.Q.value = 1.4;
+  // Light LFO on frequency to add mechanical wobble (~3Hz)
+  const lfo = audio.ctx.createOscillator();
+  lfo.frequency.value = 3.2;
+  const lfoGain = audio.ctx.createGain();
+  lfoGain.gain.value = 1.8;
+  lfo.connect(lfoGain);
+  lfoGain.connect(osc1.frequency);
+  lfoGain.connect(osc2.frequency);
+  const gain = audio.ctx.createGain();
+  gain.gain.value = 0;
+  osc1.connect(lp); osc2.connect(lp);
+  lp.connect(peak); peak.connect(gain); gain.connect(audio.master);
+  osc1.start(); osc2.start(); lfo.start();
+  audio.yawServo = { gain, osc1, osc2, lp };
+}
+
+function setupPitchServo() {
+  // Smaller, slightly higher-pitched servo for the head/camera tilt mechanism.
+  // Differs from the yaw servo so the two can be distinguished when both
+  // are active (e.g. during auto-walk maneuvers).
+  const osc1 = audio.ctx.createOscillator();
+  const osc2 = audio.ctx.createOscillator();
+  osc1.type = 'sawtooth';
+  osc2.type = 'sawtooth';
+  osc1.frequency.value = 92;
+  osc2.frequency.value = 96;
+  const lp = audio.ctx.createBiquadFilter();
+  lp.type = 'lowpass';
+  lp.frequency.value = 460;
+  lp.Q.value = 1.3;
+  const peak = audio.ctx.createBiquadFilter();
+  peak.type = 'peaking';
+  peak.frequency.value = 320;
+  peak.gain.value = 5;
+  peak.Q.value = 1.6;
+  // Faster, lighter wobble than yaw (smaller mechanism, higher rev rate)
+  const lfo = audio.ctx.createOscillator();
+  lfo.frequency.value = 4.5;
+  const lfoGain = audio.ctx.createGain();
+  lfoGain.gain.value = 1.4;
+  lfo.connect(lfoGain);
+  lfoGain.connect(osc1.frequency);
+  lfoGain.connect(osc2.frequency);
+  const gain = audio.ctx.createGain();
+  gain.gain.value = 0;
+  osc1.connect(lp); osc2.connect(lp);
+  lp.connect(peak); peak.connect(gain); gain.connect(audio.master);
+  osc1.start(); osc2.start(); lfo.start();
+  audio.pitchServo = { gain, osc1, osc2, lp };
+}
+
+function sfxServoTick() {
+  if (!audio.ctx || !audio.enabled) return;
+  const t = audio.ctx.currentTime;
+
+  // Layer 1: Low body thump - the weight of metal striking metal.
+  // Big gain bump - low frequencies need substantially more amplitude
+  // to be perceived at the same loudness as midrange.
+  const body = audio.ctx.createBufferSource();
+  body.buffer = audio.noiseBuf;
+  const bodyBp = audio.ctx.createBiquadFilter();
+  bodyBp.type = 'bandpass';
+  bodyBp.frequency.value = 210 + Math.random() * 80;
+  bodyBp.Q.value = 4;
+  const bodyG = audio.ctx.createGain();
+  bodyG.gain.setValueAtTime(0.0001, t);
+  bodyG.gain.exponentialRampToValueAtTime(0.85, t + 0.001);
+  bodyG.gain.exponentialRampToValueAtTime(0.001, t + 0.11);
+  body.connect(bodyBp); bodyBp.connect(bodyG); bodyG.connect(audio.master);
+  body.start(t); body.stop(t + 0.12);
+
+  // Layer 2: Low-mid crack - clear definition without being shrill.
+  // Significantly louder than before so the tick reads as an impact, not a tap.
+  const crack = audio.ctx.createBufferSource();
+  crack.buffer = audio.noiseBuf;
+  const crackHp = audio.ctx.createBiquadFilter();
+  crackHp.type = 'highpass';
+  crackHp.frequency.value = 380;
+  const crackBp = audio.ctx.createBiquadFilter();
+  crackBp.type = 'bandpass';
+  crackBp.frequency.value = 820 + Math.random() * 220;
+  crackBp.Q.value = 6;
+  const crackG = audio.ctx.createGain();
+  crackG.gain.setValueAtTime(0.0001, t);
+  crackG.gain.exponentialRampToValueAtTime(0.50, t + 0.001);
+  crackG.gain.exponentialRampToValueAtTime(0.001, t + 0.10);
+  crack.connect(crackHp); crackHp.connect(crackBp); crackBp.connect(crackG); crackG.connect(audio.master);
+  crack.start(t); crack.stop(t + 0.11);
+
+  // Layer 3: Tail resonance - the cog ringing after impact.
+  // Stays in low-mid for the heavier feel, but loud enough to be heard.
+  const ring = audio.ctx.createOscillator();
+  const ringG = audio.ctx.createGain();
+  ring.type = 'triangle';
+  ring.frequency.value = 340 + Math.random() * 110;
+  ringG.gain.setValueAtTime(0.0001, t);
+  ringG.gain.exponentialRampToValueAtTime(0.28, t + 0.003);
+  ringG.gain.exponentialRampToValueAtTime(0.001, t + 0.22);
+  ring.connect(ringG); ringG.connect(audio.master);
+  ring.start(t); ring.stop(t + 0.23);
+}
+
+// One-shot sounds ===================================================
+
+function sfxClick() {
+  if (!audio.ctx || !audio.enabled) return;
+  const t = audio.ctx.currentTime;
+  const osc = audio.ctx.createOscillator();
+  const gain = audio.ctx.createGain();
+  osc.type = 'square';
+  osc.frequency.setValueAtTime(820, t);
+  osc.frequency.exponentialRampToValueAtTime(140, t + 0.05);
+  gain.gain.setValueAtTime(0.18, t);
+  gain.gain.exponentialRampToValueAtTime(0.001, t + 0.07);
+  osc.connect(gain); gain.connect(audio.master);
+  osc.start(t); osc.stop(t + 0.08);
+}
+
+function sfxCommChirp() {
+  if (!audio.ctx || !audio.enabled) return;
+  const t = audio.ctx.currentTime;
+  const osc = audio.ctx.createOscillator();
+  const gain = audio.ctx.createGain();
+  osc.type = 'sine';
+  osc.frequency.setValueAtTime(880, t);
+  osc.frequency.linearRampToValueAtTime(1320, t + 0.08);
+  gain.gain.setValueAtTime(0.10, t);
+  gain.gain.exponentialRampToValueAtTime(0.001, t + 0.12);
+  osc.connect(gain); gain.connect(audio.master);
+  osc.start(t); osc.stop(t + 0.13);
+}
+
+function sfxFootstep() {
+  if (!audio.ctx || !audio.enabled) return;
+  const t = audio.ctx.currentTime;
+
+  // Layer 1: Sub-bass thud. Very low sine that sweeps down to almost subsonic
+  // with a long exponential decay. This is the felt-in-your-chest impact.
+  const sub = audio.ctx.createOscillator();
+  const subGain = audio.ctx.createGain();
+  sub.type = 'sine';
+  sub.frequency.setValueAtTime(75, t);
+  sub.frequency.exponentialRampToValueAtTime(22, t + 0.6);
+  subGain.gain.setValueAtTime(0.0001, t);
+  subGain.gain.exponentialRampToValueAtTime(0.85, t + 0.015);
+  subGain.gain.exponentialRampToValueAtTime(0.001, t + 1.4);
+  sub.connect(subGain); subGain.connect(audio.master);
+  sub.start(t); sub.stop(t + 1.5);
+
+  // Layer 2: Low-mid body. Filtered noise burst, very low cutoff that sweeps
+  // even lower. This is the displaced earth, the body of the impact.
+  const body = audio.ctx.createBufferSource();
+  body.buffer = audio.noiseBuf;
+  const bodyLp = audio.ctx.createBiquadFilter();
+  bodyLp.type = 'lowpass';
+  bodyLp.frequency.setValueAtTime(260, t);
+  bodyLp.frequency.exponentialRampToValueAtTime(70, t + 0.5);
+  bodyLp.Q.value = 1.6;
+  const bodyGain = audio.ctx.createGain();
+  bodyGain.gain.setValueAtTime(0.42, t);
+  bodyGain.gain.exponentialRampToValueAtTime(0.001, t + 0.8);
+  body.connect(bodyLp); bodyLp.connect(bodyGain); bodyGain.connect(audio.master);
+  body.start(t); body.stop(t + 0.85);
+
+  // Layer 3: Ground-shake rumble. Very low filtered noise that lingers
+  // after the strike, like the ground still vibrating for a moment.
+  const rumble = audio.ctx.createBufferSource();
+  rumble.buffer = audio.noiseBuf;
+  const rumbleLp = audio.ctx.createBiquadFilter();
+  rumbleLp.type = 'lowpass';
+  rumbleLp.frequency.value = 85;
+  const rumbleGain = audio.ctx.createGain();
+  rumbleGain.gain.setValueAtTime(0.0001, t);
+  rumbleGain.gain.exponentialRampToValueAtTime(0.22, t + 0.08);
+  rumbleGain.gain.exponentialRampToValueAtTime(0.001, t + 1.7);
+  rumble.connect(rumbleLp); rumbleLp.connect(rumbleGain); rumbleGain.connect(audio.master);
+  rumble.start(t); rumble.stop(t + 1.9);
+}
+
+function sfxThunder(distance) {
+  if (!audio.ctx || !audio.enabled) return;
+  // distance: 0-1, 0=close 1=far. Delay sound by perceived distance.
+  const delayS = 0.3 + distance * 4.5;
+  setTimeout(() => {
+    if (!audio.ctx) return;
+    const t = audio.ctx.currentTime;
+    const src = audio.ctx.createBufferSource();
+    src.buffer = audio.noiseBuf;
+    const lp = audio.ctx.createBiquadFilter();
+    lp.type = 'lowpass';
+    lp.frequency.value = 250 + (1 - distance) * 400; // closer = more high-end
+    lp.Q.value = 0.8;
+    const gain = audio.ctx.createGain();
+    const peak = 0.5 * (1 - distance * 0.6);
+    gain.gain.setValueAtTime(0.001, t);
+    gain.gain.exponentialRampToValueAtTime(peak, t + 0.08);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + 1.8 + distance * 1.5);
+    src.connect(lp); lp.connect(gain); gain.connect(audio.master);
+    src.start(t); src.stop(t + 3.5);
+  }, delayS * 1000);
+}
+
+function sfxDiscovery() {
+  if (!audio.ctx || !audio.enabled) return;
+  const t = audio.ctx.currentTime;
+  // Three-tone ascending chime
+  const notes = [523, 659, 880];
+  notes.forEach((freq, i) => {
+    const osc = audio.ctx.createOscillator();
+    const gain = audio.ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.value = freq;
+    gain.gain.setValueAtTime(0.0001, t + i * 0.09);
+    gain.gain.exponentialRampToValueAtTime(0.12, t + i * 0.09 + 0.02);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + i * 0.09 + 0.35);
+    osc.connect(gain); gain.connect(audio.master);
+    osc.start(t + i * 0.09); osc.stop(t + i * 0.09 + 0.4);
+  });
+}
+
+function sfxScan() {
+  if (!audio.ctx || !audio.enabled) return;
+  const t = audio.ctx.currentTime;
+  const osc = audio.ctx.createOscillator();
+  const gain = audio.ctx.createGain();
+  osc.type = 'triangle';
+  osc.frequency.setValueAtTime(440, t);
+  osc.frequency.exponentialRampToValueAtTime(1320, t + 0.18);
+  gain.gain.setValueAtTime(0.08, t);
+  gain.gain.exponentialRampToValueAtTime(0.001, t + 0.2);
+  osc.connect(gain); gain.connect(audio.master);
+  osc.start(t); osc.stop(t + 0.22);
+}
+
+function sfxCameraShutter() {
+  if (!audio.ctx || !audio.enabled) return;
+  const t = audio.ctx.currentTime;
+  // Two clicks: open + close
+  for (let i = 0; i < 2; i++) {
+    const src = audio.ctx.createBufferSource();
+    src.buffer = audio.noiseBuf;
+    const bp = audio.ctx.createBiquadFilter();
+    bp.type = 'bandpass';
+    bp.frequency.value = 3000;
+    bp.Q.value = 4;
+    const gain = audio.ctx.createGain();
+    const tt = t + i * 0.06;
+    gain.gain.setValueAtTime(0.2, tt);
+    gain.gain.exponentialRampToValueAtTime(0.001, tt + 0.04);
+    src.connect(bp); bp.connect(gain); gain.connect(audio.master);
+    src.start(tt); src.stop(tt + 0.05);
+  }
+}
+
+function sfxChaingun() {
+  if (!audio.ctx || !audio.enabled) return;
+  const t = audio.ctx.currentTime;
+  // Two stereo barrels firing in quick succession; each = short pitched burst
+  // with bandpassed noise for the metallic crack.
+  for (let i = 0; i < 2; i++) {
+    const tt = t + i * 0.012;
+    // Body: sharp punchy sine-thump (gunshot fundamental)
+    const osc = audio.ctx.createOscillator();
+    const oscG = audio.ctx.createGain();
+    osc.type = 'square';
+    osc.frequency.setValueAtTime(180, tt);
+    osc.frequency.exponentialRampToValueAtTime(60, tt + 0.06);
+    oscG.gain.setValueAtTime(0.001, tt);
+    oscG.gain.exponentialRampToValueAtTime(0.32, tt + 0.005);
+    oscG.gain.exponentialRampToValueAtTime(0.001, tt + 0.08);
+    osc.connect(oscG); oscG.connect(audio.master);
+    osc.start(tt); osc.stop(tt + 0.1);
+    // Crack: bandpassed noise burst for metallic edge
+    const n = audio.ctx.createBufferSource();
+    n.buffer = audio.noiseBuf;
+    const bp = audio.ctx.createBiquadFilter();
+    bp.type = 'bandpass';
+    bp.frequency.value = 1400;
+    bp.Q.value = 3;
+    const nG = audio.ctx.createGain();
+    nG.gain.setValueAtTime(0.001, tt);
+    nG.gain.exponentialRampToValueAtTime(0.18, tt + 0.003);
+    nG.gain.exponentialRampToValueAtTime(0.001, tt + 0.05);
+    n.connect(bp); bp.connect(nG); nG.connect(audio.master);
+    n.start(tt); n.stop(tt + 0.06);
+  }
+}
+
+function sfxMissileLaunch() {
+  if (!audio.ctx || !audio.enabled) return;
+  const t = audio.ctx.currentTime;
+  // Three-stage launch sound: a low whump (ignition), a hissing
+  // rocket-exhaust roar that sweeps up in pitch, and a tail fading away.
+
+  // 1. Ignition: low sine punch, very brief
+  const ig = audio.ctx.createOscillator();
+  const igG = audio.ctx.createGain();
+  ig.type = 'sine';
+  ig.frequency.setValueAtTime(60, t);
+  ig.frequency.exponentialRampToValueAtTime(28, t + 0.18);
+  igG.gain.setValueAtTime(0.001, t);
+  igG.gain.exponentialRampToValueAtTime(0.6, t + 0.01);
+  igG.gain.exponentialRampToValueAtTime(0.001, t + 0.25);
+  ig.connect(igG); igG.connect(audio.master);
+  ig.start(t); ig.stop(t + 0.28);
+
+  // 2. Rocket roar: filtered noise with sweeping filter (rising pitch)
+  const roar = audio.ctx.createBufferSource();
+  roar.buffer = audio.noiseBuf;
+  const roarLp = audio.ctx.createBiquadFilter();
+  roarLp.type = 'lowpass';
+  roarLp.frequency.setValueAtTime(800, t);
+  roarLp.frequency.exponentialRampToValueAtTime(2400, t + 0.5);
+  roarLp.Q.value = 1.5;
+  const roarHp = audio.ctx.createBiquadFilter();
+  roarHp.type = 'highpass';
+  roarHp.frequency.value = 200;
+  const roarG = audio.ctx.createGain();
+  roarG.gain.setValueAtTime(0.001, t);
+  roarG.gain.exponentialRampToValueAtTime(0.32, t + 0.04);
+  roarG.gain.exponentialRampToValueAtTime(0.08, t + 0.6);
+  roarG.gain.exponentialRampToValueAtTime(0.001, t + 1.4);
+  roar.connect(roarHp); roarHp.connect(roarLp); roarLp.connect(roarG); roarG.connect(audio.master);
+  roar.start(t); roar.stop(t + 1.5);
+
+  // 3. Brief mechanical clack at launch (the tube release)
+  const cl = audio.ctx.createBufferSource();
+  cl.buffer = audio.noiseBuf;
+  const clBp = audio.ctx.createBiquadFilter();
+  clBp.type = 'bandpass';
+  clBp.frequency.value = 2200;
+  clBp.Q.value = 5;
+  const clG = audio.ctx.createGain();
+  clG.gain.setValueAtTime(0.22, t);
+  clG.gain.exponentialRampToValueAtTime(0.001, t + 0.04);
+  cl.connect(clBp); clBp.connect(clG); clG.connect(audio.master);
+  cl.start(t); cl.stop(t + 0.05);
+}
+
+function sfxJetIgnite() {
+  if (!audio.ctx || !audio.enabled) return;
+  const t = audio.ctx.currentTime;
+  // Sharp ignition: low whump + sweeping noise burst.
+  // The whump is heavier than a missile (the whole mech is launching).
+  const ig = audio.ctx.createOscillator();
+  const igG = audio.ctx.createGain();
+  ig.type = 'sine';
+  ig.frequency.setValueAtTime(90, t);
+  ig.frequency.exponentialRampToValueAtTime(35, t + 0.22);
+  igG.gain.setValueAtTime(0.001, t);
+  igG.gain.exponentialRampToValueAtTime(0.7, t + 0.008);
+  igG.gain.exponentialRampToValueAtTime(0.001, t + 0.32);
+  ig.connect(igG); igG.connect(audio.master);
+  ig.start(t); ig.stop(t + 0.35);
+
+  // Initial exhaust thrust burst
+  const burst = audio.ctx.createBufferSource();
+  burst.buffer = audio.noiseBuf;
+  const burstLp = audio.ctx.createBiquadFilter();
+  burstLp.type = 'lowpass';
+  burstLp.frequency.setValueAtTime(500, t);
+  burstLp.frequency.exponentialRampToValueAtTime(2000, t + 0.4);
+  burstLp.Q.value = 1.2;
+  const burstHp = audio.ctx.createBiquadFilter();
+  burstHp.type = 'highpass';
+  burstHp.frequency.value = 250;
+  const burstG = audio.ctx.createGain();
+  burstG.gain.setValueAtTime(0.001, t);
+  burstG.gain.exponentialRampToValueAtTime(0.35, t + 0.04);
+  burstG.gain.exponentialRampToValueAtTime(0.001, t + 0.45);
+  burst.connect(burstHp); burstHp.connect(burstLp); burstLp.connect(burstG); burstG.connect(audio.master);
+  burst.start(t); burst.stop(t + 0.5);
+}
+
+function sfxLanding(impactVel) {
+  if (!audio.ctx || !audio.enabled) return;
+  const t = audio.ctx.currentTime;
+  // Scale loudness with impact velocity. Clamped so a tiny drop doesn't
+  // sound like an artillery strike.
+  const v = Math.min(28, Math.max(2, impactVel));
+  const intensity = (v - 2) / 26;  // 0..1
+  const heavy = 0.6 + intensity * 0.7; // 0.6..1.3 multiplier
+
+  // 1. Sub-bass mega thud (heavier than a footstep)
+  const sub = audio.ctx.createOscillator();
+  const subG = audio.ctx.createGain();
+  sub.type = 'sine';
+  sub.frequency.setValueAtTime(70, t);
+  sub.frequency.exponentialRampToValueAtTime(18, t + 0.8);
+  subG.gain.setValueAtTime(0.001, t);
+  subG.gain.exponentialRampToValueAtTime(0.95 * heavy, t + 0.015);
+  subG.gain.exponentialRampToValueAtTime(0.001, t + 2.0);
+  sub.connect(subG); subG.connect(audio.master);
+  sub.start(t); sub.stop(t + 2.1);
+
+  // 2. Crash body: filtered noise, big initial bandwidth then collapses
+  const crash = audio.ctx.createBufferSource();
+  crash.buffer = audio.noiseBuf;
+  const crashLp = audio.ctx.createBiquadFilter();
+  crashLp.type = 'lowpass';
+  crashLp.frequency.setValueAtTime(380, t);
+  crashLp.frequency.exponentialRampToValueAtTime(80, t + 0.7);
+  crashLp.Q.value = 1.8;
+  const crashG = audio.ctx.createGain();
+  crashG.gain.setValueAtTime(0.55 * heavy, t);
+  crashG.gain.exponentialRampToValueAtTime(0.001, t + 1.1);
+  crash.connect(crashLp); crashLp.connect(crashG); crashG.connect(audio.master);
+  crash.start(t); crash.stop(t + 1.15);
+
+  // 3. Debris/dirt scatter: brief high-band noise burst
+  const debris = audio.ctx.createBufferSource();
+  debris.buffer = audio.noiseBuf;
+  const debrisBp = audio.ctx.createBiquadFilter();
+  debrisBp.type = 'bandpass';
+  debrisBp.frequency.value = 1800;
+  debrisBp.Q.value = 1.4;
+  const debrisG = audio.ctx.createGain();
+  debrisG.gain.setValueAtTime(0.001, t);
+  debrisG.gain.exponentialRampToValueAtTime(0.20 * heavy, t + 0.02);
+  debrisG.gain.exponentialRampToValueAtTime(0.001, t + 0.35);
+  debris.connect(debrisBp); debrisBp.connect(debrisG); debrisG.connect(audio.master);
+  debris.start(t); debris.stop(t + 0.4);
+
+  // 4. Long ground rumble aftermath
+  const rumble = audio.ctx.createBufferSource();
+  rumble.buffer = audio.noiseBuf;
+  const rumbleLp = audio.ctx.createBiquadFilter();
+  rumbleLp.type = 'lowpass';
+  rumbleLp.frequency.value = 75;
+  const rumbleG = audio.ctx.createGain();
+  rumbleG.gain.setValueAtTime(0.001, t);
+  rumbleG.gain.exponentialRampToValueAtTime(0.30 * heavy, t + 0.1);
+  rumbleG.gain.exponentialRampToValueAtTime(0.001, t + 2.4);
+  rumble.connect(rumbleLp); rumbleLp.connect(rumbleG); rumbleG.connect(audio.master);
+  rumble.start(t); rumble.stop(t + 2.5);
+}
+
+function setupJetLoop() {
+  // Sustained jet thrust roar. Driven by player.isThrusting from the loop.
+  // Bandpassed noise with a low-mid bias, more body than rain or wind.
+  const src = audio.ctx.createBufferSource();
+  src.buffer = audio.noiseBuf;
+  src.loop = true;
+  const hp = audio.ctx.createBiquadFilter();
+  hp.type = 'highpass';
+  hp.frequency.value = 220;
+  const lp = audio.ctx.createBiquadFilter();
+  lp.type = 'lowpass';
+  lp.frequency.value = 1800;
+  lp.Q.value = 1.2;
+  const peak = audio.ctx.createBiquadFilter();
+  peak.type = 'peaking';
+  peak.frequency.value = 480;
+  peak.gain.value = 5;
+  peak.Q.value = 1.4;
+  const gain = audio.ctx.createGain();
+  gain.gain.value = 0;
+  src.connect(hp); hp.connect(peak); peak.connect(lp); lp.connect(gain); gain.connect(audio.master);
+  src.start();
+  audio.jet = { gain };
+}
+
+function sfxCoralHuff() {
+  if (!audio.ctx || !audio.enabled) return;
+  const t = audio.ctx.currentTime;
+  // Filtered noise burst, low and breathy
+  const src = audio.ctx.createBufferSource();
+  src.buffer = audio.noiseBuf;
+  const bp = audio.ctx.createBiquadFilter();
+  bp.type = 'bandpass';
+  bp.frequency.setValueAtTime(550, t);
+  bp.frequency.exponentialRampToValueAtTime(300, t + 0.25);
+  bp.Q.value = 2;
+  const gain = audio.ctx.createGain();
+  gain.gain.setValueAtTime(0.001, t);
+  gain.gain.exponentialRampToValueAtTime(0.18, t + 0.05);
+  gain.gain.exponentialRampToValueAtTime(0.001, t + 0.3);
+  src.connect(bp); bp.connect(gain); gain.connect(audio.master);
+  src.start(t); src.stop(t + 0.35);
+}
+
+function sfxRepairSuccess() {
+  if (!audio.ctx || !audio.enabled) return;
+  const t = audio.ctx.currentTime;
+  // Confident two-tone resolve
+  const notes = [659, 988]; // E5, B5
+  notes.forEach((freq, i) => {
+    const osc = audio.ctx.createOscillator();
+    const gain = audio.ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.value = freq;
+    const tt = t + i * 0.08;
+    gain.gain.setValueAtTime(0.001, tt);
+    gain.gain.exponentialRampToValueAtTime(0.15, tt + 0.02);
+    gain.gain.exponentialRampToValueAtTime(0.001, tt + 0.55);
+    osc.connect(gain); gain.connect(audio.master);
+    osc.start(tt); osc.stop(tt + 0.6);
+  });
+}
+
+function sfxMapAperture() {
+  if (!audio.ctx || !audio.enabled) return;
+  const t = audio.ctx.currentTime;
+  // Sharp click + brief mechanical whirr (descending pitch)
+  // Click
+  const click = audio.ctx.createBufferSource();
+  click.buffer = audio.noiseBuf;
+  const cbp = audio.ctx.createBiquadFilter();
+  cbp.type = 'bandpass';
+  cbp.frequency.value = 2400;
+  cbp.Q.value = 6;
+  const cgain = audio.ctx.createGain();
+  cgain.gain.setValueAtTime(0.25, t);
+  cgain.gain.exponentialRampToValueAtTime(0.001, t + 0.04);
+  click.connect(cbp); cbp.connect(cgain); cgain.connect(audio.master);
+  click.start(t); click.stop(t + 0.06);
+  // Whirr
+  const osc = audio.ctx.createOscillator();
+  osc.type = 'sawtooth';
+  osc.frequency.setValueAtTime(420, t + 0.04);
+  osc.frequency.exponentialRampToValueAtTime(140, t + 0.22);
+  const olp = audio.ctx.createBiquadFilter();
+  olp.type = 'lowpass';
+  olp.frequency.value = 800;
+  const ogain = audio.ctx.createGain();
+  ogain.gain.setValueAtTime(0.05, t + 0.04);
+  ogain.gain.exponentialRampToValueAtTime(0.001, t + 0.25);
+  osc.connect(olp); olp.connect(ogain); ogain.connect(audio.master);
+  osc.start(t + 0.04); osc.stop(t + 0.26);
+}
+
+function sfxPageFlip() {
+  if (!audio.ctx || !audio.enabled) return;
+  const t = audio.ctx.currentTime;
+  // Quick paper rustle: short high-frequency noise sweep
+  const src = audio.ctx.createBufferSource();
+  src.buffer = audio.noiseBuf;
+  const hp = audio.ctx.createBiquadFilter();
+  hp.type = 'highpass';
+  hp.frequency.setValueAtTime(800, t);
+  hp.frequency.linearRampToValueAtTime(3500, t + 0.18);
+  const gain = audio.ctx.createGain();
+  gain.gain.setValueAtTime(0.001, t);
+  gain.gain.exponentialRampToValueAtTime(0.07, t + 0.03);
+  gain.gain.exponentialRampToValueAtTime(0.001, t + 0.2);
+  src.connect(hp); hp.connect(gain); gain.connect(audio.master);
+  src.start(t); src.stop(t + 0.22);
+}
+
+function sfxDroneMotor(ascending) {
+  if (!audio.ctx || !audio.enabled) return;
+  const t = audio.ctx.currentTime;
+  const osc = audio.ctx.createOscillator();
+  osc.type = 'sawtooth';
+  if (ascending) {
+    osc.frequency.setValueAtTime(180, t);
+    osc.frequency.exponentialRampToValueAtTime(620, t + 0.6);
+  } else {
+    osc.frequency.setValueAtTime(620, t);
+    osc.frequency.exponentialRampToValueAtTime(180, t + 0.6);
+  }
+  const lp = audio.ctx.createBiquadFilter();
+  lp.type = 'lowpass';
+  lp.frequency.value = 1400;
+  const gain = audio.ctx.createGain();
+  gain.gain.setValueAtTime(0.001, t);
+  gain.gain.exponentialRampToValueAtTime(0.08, t + 0.05);
+  gain.gain.linearRampToValueAtTime(0.08, t + 0.5);
+  gain.gain.exponentialRampToValueAtTime(0.001, t + 0.7);
+  osc.connect(lp); lp.connect(gain); gain.connect(audio.master);
+  osc.start(t); osc.stop(t + 0.72);
+}
+
+// Panel hum: continuous source that fades in when any data panel is open
+function setupPanelHum() {
+  if (!audio.ctx) return;
+  const osc = audio.ctx.createOscillator();
+  osc.type = 'sine';
+  osc.frequency.value = 60;
+  const lfo = audio.ctx.createOscillator();
+  lfo.frequency.value = 6;
+  const lfoGain = audio.ctx.createGain();
+  lfoGain.gain.value = 8;
+  lfo.connect(lfoGain);
+  lfoGain.connect(osc.frequency);
+  const gain = audio.ctx.createGain();
+  gain.gain.value = 0;
+  osc.connect(gain); gain.connect(audio.master);
+  osc.start(); lfo.start();
+  audio.panelHum = gain;
+}
+
+// Continuous sound updates ==========================================
+
+function updateAudio(dt) {
+  if (!audio.ctx) return;
+  // Reactor: gain rises with heat (0..1). Always plays (diegetic to the mech).
+  const heat = player.heat / player.heatMax;
+  const baseLevel = 0.04;
+  const heatLevel = 0.04 + heat * 0.16;
+  const reactorTarget = baseLevel + heatLevel;
+  audio.reactor.gain.gain.value += (reactorTarget - audio.reactor.gain.gain.value) * dt * 1.5;
+  audio.reactor.lp.frequency.value = 200 + heat * 240;
+
+  // Yaw servo: driven by rotation rate. Diegetic mech sound, not gated by ambient mute.
+  if (audio.yawServo) {
+    if (audio._lastYaw === undefined) audio._lastYaw = player.yaw;
+    let dy = player.yaw - audio._lastYaw;
+    // wrap to [-PI, PI]
+    while (dy > Math.PI)  dy -= Math.PI * 2;
+    while (dy < -Math.PI) dy += Math.PI * 2;
+    const yawRate = Math.abs(dy) / Math.max(dt, 0.001); // rad/sec
+    audio._lastYaw = player.yaw;
+    // Map rate ~0..1.6 rad/s -> gain target ~0..0.14
+    const yt = Math.min(1, yawRate / 1.6);
+    const servoTarget = yt * 0.14;
+    audio.yawServo.gain.gain.value += (servoTarget - audio.yawServo.gain.gain.value) * dt * 8;
+    // Slight pitch shift up when turning faster
+    const f1 = 78 + yt * 22;
+    const f2 = 81 + yt * 22;
+    audio.yawServo.osc1.frequency.value += (f1 - audio.yawServo.osc1.frequency.value) * dt * 6;
+    audio.yawServo.osc2.frequency.value += (f2 - audio.yawServo.osc2.frequency.value) * dt * 6;
+    audio.yawServo.lp.frequency.value = 520 + yt * 200;
+  }
+
+  // Pitch servo: same idea for the head/camera tilt, plus a periodic
+  // metallic ratchet tick every ~0.12 rad of accumulated pitch movement.
+  if (audio.pitchServo) {
+    if (audio._lastPitch === undefined) audio._lastPitch = player.pitch;
+    if (audio._pitchAccum === undefined) audio._pitchAccum = 0;
+    const dp = player.pitch - audio._lastPitch;
+    const pitchRate = Math.abs(dp) / Math.max(dt, 0.001);
+    audio._lastPitch = player.pitch;
+    // Continuous servo whine
+    const pt = Math.min(1, pitchRate / 1.0);
+    const target = pt * 0.13;
+    audio.pitchServo.gain.gain.value += (target - audio.pitchServo.gain.gain.value) * dt * 8;
+    const f1 = 92 + pt * 18;
+    const f2 = 96 + pt * 18;
+    audio.pitchServo.osc1.frequency.value += (f1 - audio.pitchServo.osc1.frequency.value) * dt * 6;
+    audio.pitchServo.osc2.frequency.value += (f2 - audio.pitchServo.osc2.frequency.value) * dt * 6;
+    audio.pitchServo.lp.frequency.value = 460 + pt * 160;
+    // Accumulate movement and fire a ratchet tick at threshold.
+    // Heavy industrial gear teeth - spaced widely apart.
+    audio._pitchAccum += Math.abs(dp);
+    while (audio._pitchAccum > 0.22) {
+      audio._pitchAccum -= 0.22;
+      sfxServoTick();
+    }
+    // Decay accumulator a bit if no movement, so a tiny twitch later doesn't
+    // accidentally cross threshold and click out of context
+    if (pitchRate < 0.05) audio._pitchAccum = Math.max(0, audio._pitchAccum - dt * 0.2);
+  }
+
+  // Ambient sources: wind, rain, panel hum. All zeroed when muted.
+  const ambientGate = audio.ambientMuted ? 0 : 1;
+
+  // Wind: gain rises with strength
+  const windTarget = (0.02 + wind.strength * 0.14) * ambientGate;
+  audio.wind.gain.gain.value += (windTarget - audio.wind.gain.gain.value) * dt * 1.5;
+  audio.wind.bp.frequency.value = 400 + wind.strength * 1200;
+
+  // Rain: based on current weather
+  let rainTarget = 0;
+  if (document.body.classList.contains('weather-rain'))  rainTarget = 0.10;
+  else if (document.body.classList.contains('weather-storm')) rainTarget = 0.22;
+  rainTarget *= ambientGate;
+  audio.rain.gain.gain.value += (rainTarget - audio.rain.gain.gain.value) * dt * 0.8;
+
+  // Panel hum: subtle electrical buzz when a data overlay is open
+  if (audio.panelHum) {
+    const anyOpen = diagOpen || mapOpen || logbookOpen || journalOpen;
+    const hTarget = (anyOpen ? 0.025 : 0) * ambientGate;
+    audio.panelHum.gain.value += (hTarget - audio.panelHum.gain.value) * dt * 2.5;
+  }
+
+  // Jet thrust roar: only while actively thrusting. Diegetic (not ambient-muted).
+  if (audio.jet) {
+    const jetTarget = player.isThrusting ? 0.22 : 0;
+    // Fast attack, slower release so it doesn't cut off abruptly
+    const rate = player.isThrusting ? 14 : 4;
+    audio.jet.gain.gain.value += (jetTarget - audio.jet.gain.gain.value) * dt * rate;
+  }
+}
+
+// ============================================================
+// KNEEL / SIT - Z key drops the mech into a crouched pose
+// ============================================================
+const kneel = {
+  active: false,        // currently kneeling
+  t: 0,                 // animation progress 0..1
+  target: 0,            // 0 = stand, 1 = kneel
+  duration: 2.4,        // seconds to transition
+  // base camera height (stored once we know player.pos.y standing)
+  baseY: 8,
+  kneelY: 2.6,
+};
+
+function toggleKneel() {
+  if (!gameStarted || player.dead || paused) return;
+  // Can't kneel while jet-jumping
+  if (!player.onGround) return;
+  kneel.active = !kneel.active;
+  kneel.target = kneel.active ? 1 : 0;
+  if (kneel.active) {
+    addComm('TITAN-7', 'Kneeling. Reactor to idle.', true);
+    coralReact('settled', 6);
+  } else {
+    addComm('TITAN-7', 'Standing up.', true);
+  }
+  sfxClick();
+}
+
+function updateKneel(dt) {
+  // Ease t toward target
+  const diff = kneel.target - kneel.t;
+  if (Math.abs(diff) > 0.001) {
+    const speed = (1 / kneel.duration);
+    const step = Math.sign(diff) * speed * dt;
+    if (Math.abs(step) >= Math.abs(diff)) kneel.t = kneel.target;
+    else kneel.t += step;
+  }
+  // Force walking disabled while kneeling
+  if (kneel.t > 0.05) {
+    player.vel.x = 0; player.vel.z = 0;
+    player.isWalking = false;
+  }
+  // Drive the player's y to the eased kneel height. The ground clamp in
+  // update() will respect this because it computes its groundY from the
+  // same eased value. Skip when in the air (jet jump) so we don't fight
+  // gravity.
+  if (player.onGround && !player.dead) {
+    const e = easeInOut(kneel.t);
+    const targetY = kneel.baseY * (1 - e) + kneel.kneelY * e;
+    player.pos.y = targetY;
+    player.vertVel = 0;
+  }
+}
+
+function easeInOut(t) {
+  return t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+}
+
+// Animate the player mech itself - bend legs as we kneel
+function applyKneelToMech() {
+  if (!playerMech) return;
+  const e = easeInOut(kneel.t);
+  // Bend each leg's thigh forward and shin backward to fold them
+  if (playerMech.left && playerMech.left.userData) {
+    const left = playerMech.left;
+    const right = playerMech.right;
+    // Animate parent leg group as fallback
+    left.rotation.x  = left.userData._baseRotX || 0;
+    right.rotation.x = right.userData._baseRotX || 0;
+    // Fold thighs forward, shins backward
+    [left, right].forEach((leg) => {
+      const ud = leg.userData;
+      if (ud.thigh) ud.thigh.rotation.x = e * 0.95;
+      if (ud.shin)  ud.shin.rotation.x = -e * 1.3;
+      if (ud.foot)  ud.foot.rotation.x = e * 0.65;
+      // Also drop the upper leg's pivot to compensate for the bend
+      // (the cylinders are placed at static y positions, but rotating them
+      // doesn't translate them. The legs will look "right" enough for a
+      // simple kneel pose.)
+    });
+  }
+}
+
+// ============================================================
+// NOON RESUPPLY - daily crate drop at game-noon
+// ============================================================
+// Once per game day (at hour 12.00), a crate parachutes in at a marked
+// coordinate near the player. Walking within pickup range tops up drone
+// battery and patches the worst-damaged subsystem.
+const resupply = {
+  lastDay: -1,       // last day on which we triggered/announced
+  announcedDay: -1,  // last day Kailey's pre-warning went out
+  pendingPoint: null,// {x, z} where the crate will land
+  crate: null,       // active crate object {mesh, x, z, t (falling), landed, expiresT}
+};
+
+function updateResupply(dt) {
+  const day = Math.floor(tod.t / DAY_LENGTH_SECONDS) +
+              Math.floor((tod.hour < 12 ? 0 : 1));
+  const dayKey = Math.floor(tod.t / DAY_LENGTH_SECONDS);
+
+  // Announce the drop ~45 game minutes early (15 real seconds at 8min/day)
+  if (resupply.announcedDay !== dayKey && tod.hour >= 11.25 && tod.hour < 12.0) {
+    resupply.announcedDay = dayKey;
+    // Pick a coordinate ~250m from player in a random direction
+    const a = Math.random() * Math.PI * 2;
+    const d = 180 + Math.random() * 140;
+    resupply.pendingPoint = {
+      x: player.pos.x + Math.cos(a) * d,
+      z: player.pos.z + Math.sin(a) * d,
+    };
+    const bearing = bearingFromPlayer(resupply.pendingPoint.x, resupply.pendingPoint.z);
+    setTimeout(() => {
+      const first = pilot.name.split(' ')[0];
+      addComm('KAILEY',
+        `Heads up${first && first !== 'Pilot' ? ', ' + first : ''}. Resupply crate inbound for noon drop, ${Math.round(d)}m ${bearing}. Marked on your map.`,
+        false, 'kailey');
+      logEntry('system', `Noon resupply pending at ${bearing} (${Math.round(d)}m).`);
+    }, 400);
+  }
+
+  // Spawn the crate at noon
+  if (resupply.lastDay !== dayKey && tod.hour >= 12.0 && resupply.pendingPoint) {
+    resupply.lastDay = dayKey;
+    spawnResupplyCrate(resupply.pendingPoint.x, resupply.pendingPoint.z);
+    resupply.pendingPoint = null;
+  }
+
+  // Animate active crate
+  if (resupply.crate) {
+    const c = resupply.crate;
+    if (!c.landed) {
+      // Parachute descent
+      c.t += dt;
+      const fallTime = 8;
+      const p = Math.min(1, c.t / fallTime);
+      const startY = 120;
+      const groundY = 0.5;
+      const ease = 1 - Math.pow(1 - p, 2); // ease-out
+      c.mesh.position.y = startY + (groundY - startY) * ease;
+      // Slight sway from wind
+      c.mesh.rotation.z = Math.sin(c.t * 1.5) * 0.08;
+      if (p >= 1) {
+        c.landed = true;
+        c.expiresT = 240; // crate persists 4 minutes
+        addComm('KAILEY', 'Crate touched down. Walk to it whenever you can.', false, 'kailey');
+        // Remove the parachute child
+        if (c.parachute) {
+          c.mesh.remove(c.parachute);
+          c.parachute.traverse(o => {
+            if (o.geometry) o.geometry.dispose();
+            if (o.material) o.material.dispose();
+          });
+          c.parachute = null;
+        }
+      }
+    } else {
+      // Pickup check
+      const dx = c.x - player.pos.x;
+      const dz = c.z - player.pos.z;
+      const dist = Math.hypot(dx, dz);
+      if (dist < 12) {
+        collectResupply();
+        return;
+      }
+      // Expiration
+      c.expiresT -= dt;
+      if (c.expiresT <= 0) {
+        scene.remove(c.mesh);
+        c.mesh.traverse(o => {
+          if (o.geometry) o.geometry.dispose();
+          if (o.material) o.material.dispose();
+        });
+        resupply.crate = null;
+        addComm('KAILEY', 'Resupply window closed. Maintenance team will retrieve.', false, 'kailey');
+      }
+    }
+  }
+}
+
+function spawnResupplyCrate(x, z) {
+  const group = new THREE.Group();
+  // Crate body - orange and tan, military supply
+  const crate = new THREE.Mesh(
+    new THREE.BoxGeometry(2.4, 1.8, 2.4),
+    new THREE.MeshStandardMaterial({ color: 0xc88040, roughness: 0.85 })
+  );
+  crate.castShadow = true;
+  group.add(crate);
+  // Bright orange marker strip around the middle
+  const stripe = new THREE.Mesh(
+    new THREE.BoxGeometry(2.45, 0.3, 2.45),
+    new THREE.MeshBasicMaterial({ color: 0xff9020 })
+  );
+  group.add(stripe);
+  // Flashing strobe on top
+  const strobe = new THREE.Mesh(
+    new THREE.SphereGeometry(0.18, 8, 8),
+    new THREE.MeshBasicMaterial({ color: 0xffeecc })
+  );
+  strobe.position.y = 1.05;
+  strobe.userData.isResupplyStrobe = true;
+  group.add(strobe);
+  // Parachute (removed on landing)
+  const parachute = new THREE.Group();
+  const canopy = new THREE.Mesh(
+    new THREE.SphereGeometry(3.2, 12, 8, 0, Math.PI * 2, 0, Math.PI / 2),
+    new THREE.MeshStandardMaterial({ color: 0xeae2d0, side: THREE.DoubleSide, roughness: 0.95 })
+  );
+  canopy.position.y = 5;
+  parachute.add(canopy);
+  // Lines from canopy to crate corners
+  const lineMat = new THREE.LineBasicMaterial({ color: 0x806840 });
+  for (const [cx, cz] of [[-1.2, -1.2],[1.2,-1.2],[1.2,1.2],[-1.2,1.2]]) {
+    const geo = new THREE.BufferGeometry().setFromPoints([
+      new THREE.Vector3(cx, 1.0, cz),
+      new THREE.Vector3(0,   5.0, 0),
+    ]);
+    parachute.add(new THREE.Line(geo, lineMat));
+  }
+  group.add(parachute);
+  group.position.set(x, 120, z);
+  scene.add(group);
+  resupply.crate = {
+    mesh: group, x, z,
+    t: 0, landed: false, expiresT: 0,
+    parachute, strobe,
+  };
+  addComm('KAILEY', 'Resupply chute is open. Inbound now.', false, 'kailey');
+  // Mark a waypoint on the map automatically
+  if (!waypoint) {
+    waypoint = { x, z };
+    autoWalk = false; // don't auto-walk, just mark it
+  }
+}
+
+function collectResupply() {
+  if (!resupply.crate) return;
+  const c = resupply.crate;
+  scene.remove(c.mesh);
+  c.mesh.traverse(o => {
+    if (o.geometry) o.geometry.dispose();
+    if (o.material) o.material.dispose();
+  });
+  resupply.crate = null;
+  // Restore drone battery and patch the worst-damaged subsystem
+  drone.battery = drone.batteryMax;
+  let worst = null;
+  for (const s of subsystems) {
+    if (!worst || s.integrity < worst.integrity) worst = s;
+  }
+  if (worst && worst.integrity < 90) {
+    worst.integrity = Math.min(100, worst.integrity + 60);
+    logEntry('maintenance', `Resupply: ${worst.name} patched to ${Math.round(worst.integrity)}%.`);
+  } else {
+    logEntry('maintenance', 'Resupply: all subsystems already nominal. Drone battery topped up.');
+  }
+  sfxRepairSuccess();
+  addComm('TITAN-7', 'Resupply collected. Drone battery topped, worst system patched.', true);
+  setTimeout(() => addComm('KAILEY', 'Nice. That should hold you for a while.', false, 'kailey'), 800);
+  coralReact('excited', 5);
+}
+
+function toggleAmbientAudio() {
+  audio.ambientMuted = !audio.ambientMuted;
+  const el = document.getElementById('ambient-toggle');
+  if (el) {
+    el.textContent = audio.ambientMuted ? '✕' : '♪';
+    el.style.color = audio.ambientMuted ? 'var(--amber-dim)' : 'var(--amber)';
+    el.style.textDecoration = audio.ambientMuted ? 'line-through' : 'none';
+    el.title = audio.ambientMuted ? 'Ambient noise muted (click to restore)' : 'Toggle ambient noise (wind, rain, hum)';
+  }
+  // Save preference across sessions
+  try { localStorage.setItem('titan7_ambient_muted', audio.ambientMuted ? '1' : '0'); } catch (e) {}
+}
+
+// Wire click handler and load saved preference on first frame
+setTimeout(() => {
+  const el = document.getElementById('ambient-toggle');
+  if (el) el.addEventListener('click', toggleAmbientAudio);
+  try {
+    if (localStorage.getItem('titan7_ambient_muted') === '1') {
+      audio.ambientMuted = true;
+      if (el) {
+        el.textContent = '✕';
+        el.style.color = 'var(--amber-dim)';
+        el.style.textDecoration = 'line-through';
+      }
+    }
+  } catch (e) {}
+}, 0);
+
+// ============================================================
 // MAIN LOOP
 // ============================================================
 function loop() {
@@ -8206,15 +11418,47 @@ function loop() {
     fpsFrames = 0; fpsAccum = 0;
   }
 
+  // Kneel must run BEFORE update() so the new pos.y feeds into the
+  // physics ground-clamp and the camera positioning on the same frame.
+  updateKneel(dt);
+  applyKneelToMech();
+
+  // Photo mode: allow camera aim and label updates even though game is paused
+  if (photo.active) {
+    let turn = 0;
+    if (keys['ArrowLeft']) turn -= 1;
+    if (keys['ArrowRight']) turn += 1;
+    if (turn !== 0) player.yaw -= turn * dt * 1.0;
+    let pitchInput = 0;
+    if (keys['ArrowUp']) pitchInput -= 1;
+    if (keys['ArrowDown']) pitchInput += 1;
+    if (pitchInput !== 0) {
+      player.pitch -= pitchInput * dt * 0.8;
+      const lim = Math.PI / 2.2;
+      player.pitch = Math.max(-lim, Math.min(lim, player.pitch));
+    }
+    // Apply transform to camera without the bob/shake/sway noise
+    camera.position.set(player.pos.x, player.pos.y, player.pos.z);
+    camera.rotation.order = 'YXZ';
+    camera.rotation.y = player.yaw;
+    camera.rotation.x = player.pitch;
+    camera.rotation.z = 0;
+    updatePhotoLabels();
+  }
+
   update(dt);
 
   // ambient animation: smoke pillar drift + tower blinks
   if (window.smokePillar) {
     const t = now / 1000;
+    const wDriftX = wind.vx * 18;
+    const wDriftZ = wind.vz * 18;
     window.smokePillar.children.forEach((puff, i) => {
       const s = puff.userData.driftSeed || i;
-      puff.position.x = Math.sin(t * 0.3 + s) * 4 + (i % 3 - 1) * 2;
-      puff.position.z = Math.cos(t * 0.25 + s) * 3;
+      // Higher puffs drift further in the wind (column shear)
+      const heightFactor = puff.position.y / 130;
+      puff.position.x = Math.sin(t * 0.3 + s) * 4 + (i % 3 - 1) * 2 + wDriftX * heightFactor;
+      puff.position.z = Math.cos(t * 0.25 + s) * 3 + wDriftZ * heightFactor;
       puff.position.y = (puff.position.y + dt * 1.2) % 130 + (puff.position.y > 130 ? 5 : 0);
       puff.scale.setScalar(1 + Math.sin(t * 0.5 + s) * 0.1);
     });
@@ -8224,6 +11468,10 @@ function loop() {
     if (obj.userData && obj.userData.isBlink) {
       const on = Math.floor(now / 700) % 2 === 0;
       obj.material.color.setHex(on ? 0xff3030 : 0x2a0808);
+    }
+    if (obj.userData && obj.userData.isResupplyStrobe) {
+      const on = Math.floor(now / 350) % 2 === 0;
+      obj.material.color.setHex(on ? 0xffeecc : 0x402810);
     }
   });
 
@@ -8240,13 +11488,30 @@ function loop() {
     updateTod(dt);
     updateRandomFailures(dt);
     updateLedStrip();
+    updateWind(dt);
+    updateIntercepts(dt);
+    updateWildlife(dt);
+    updateCoralNotices(dt);
+    updateFootprints(dt);
+    trackJournalMovement(dt);
+    updatePlayerMech(dt);
+    updateCaravans(dt);
+    updateAudio(dt);
+    updateResupply(dt);
 
     // Keep sky-distance features anchored to the player on x/z so they
     // never run out and never feel "close"
     skyGroup.position.x = player.pos.x;
     skyGroup.position.z = player.pos.z;
+    // Ground and recon grid follow the player so terrain never ends.
+    // Snap grid in 5m steps so it doesn't crawl as the player moves.
+    ground.position.x = Math.floor(player.pos.x / 5) * 5;
+    ground.position.z = Math.floor(player.pos.z / 5) * 5;
+    grid.position.x = ground.position.x;
+    grid.position.z = ground.position.z;
     updateMeteors(dt);
     updateAurora(dt, tod.nightAmt || 0);
+    updateCampfires(dt, tod.nightAmt || 0);
     updateLightning(dt);
     updateBirds(dt);
     // Coral aggro detection
@@ -8263,6 +11528,13 @@ function loop() {
   }
 
   renderer.render(scene, camera);
+
+  // Drone POV: render scene a second time into the small rect occupied by
+  // the drone-pov-frame element in the HUD. The HTML decorations (border,
+  // crosshair, labels, scanlines) sit on top of the canvas pixels.
+  if (drone.active && drone.parts) {
+    renderDronePOV();
+  }
 
   if (gameStarted) {
     updateHud();
@@ -8285,14 +11557,25 @@ window.addEventListener('resize', () => {
 
 // ==================== START / RESTART ====================
 document.getElementById('start-btn').addEventListener('click', () => {
-  // Request pointer lock immediately while user gesture is active
-  
+  // Capture pilot identity from the inputs
+  const nameEl = document.getElementById('ps-name');
+  const callsignEl = document.getElementById('ps-callsign');
+  const nameVal = (nameEl && nameEl.value || '').trim();
+  const callsignVal = (callsignEl && callsignEl.value || '').trim().toUpperCase();
+  if (nameVal) pilot.name = nameVal;
+  if (callsignVal) pilot.callsign = callsignVal;
+  savePilot();
+  // Initialize audio context (user gesture is required for autoplay)
+  initAudio();
+  sfxClick();
   document.body.classList.add('playing');
   document.getElementById('start-screen').classList.add('fade');
   // Pre-load initial chunks now that all prop-builders are declared (this used to
   // run inline at script-eval time, but that hit a temporal dead zone on the props).
   updateChunks(0, 0);
   ensureSpawnIsSafe();
+  // Run the boot sequence overlay before starting the game
+  runBootSequence();
   setTimeout(() => {
     document.getElementById('start-screen').style.display = 'none';
     gameStarted = true;
@@ -8314,12 +11597,77 @@ document.getElementById('start-btn').addEventListener('click', () => {
     // Opening comms chatter
     setTimeout(() => addComm('CHANNEL 47', 'Welcome to recon. Coral is comfortable. Step easy.'), 1500);
     setTimeout(() => {
-      addComm('KAILEY', 'Reading you clean on my end. Coral looks settled. Have a good walk.', false, 'kailey');
+      addComm('KAILEY', `Reading you clean on my end, ${pilot.name.split(' ')[0]}. Coral looks settled. Have a good walk.`, false, 'kailey');
       logEntry('comms', 'KAILEY: Welcome message received.');
     }, 4000);
     setTimeout(() => coralEmit(), 6500);
   }, 600);
 });
+
+function runBootSequence() {
+  const overlay = document.getElementById('boot-sequence');
+  const lines = document.getElementById('boot-lines');
+  const final = document.getElementById('boot-final');
+  lines.innerHTML = '';
+  final.classList.remove('show');
+  overlay.classList.add('show');
+
+  // Each line: { name, state, cls, delayMs }
+  const items = [
+    { n: 'REACTOR PRIMER',        s: 'WARM-UP',  c: 'warm',    d: 80 },
+    { n: 'REACTOR PRIMER',        s: 'HOT',      c: 'warm',    d: 380 },
+    { n: 'REACTOR PRIMER',        s: 'STABLE',   c: 'ok',      d: 280 },
+    { n: 'COOLANT LOOP',          s: 'PURGE',    c: 'standby', d: 180 },
+    { n: 'COOLANT LOOP',          s: 'NOMINAL',  c: 'ok',      d: 220 },
+    { n: 'NEURAL LINK',           s: 'HANDSHAKE',c: 'warm',    d: 320 },
+    { n: 'NEURAL LINK',           s: 'SYNCED',   c: 'ok',      d: 200 },
+    { n: 'GYRO STABILIZATION',    s: 'CALIBRATE',c: 'standby', d: 240 },
+    { n: 'GYRO STABILIZATION',    s: 'LOCKED',   c: 'ok',      d: 220 },
+    { n: 'SENSOR ARRAY',          s: 'SCAN',     c: 'warm',    d: 200 },
+    { n: 'SENSOR ARRAY',          s: 'CLEAR',    c: 'ok',      d: 200 },
+    { n: 'WEAPONS COLD STORAGE',  s: 'ENABLED',  c: 'ok',      d: 180 },
+    { n: 'COMMS CHANNEL 47',      s: 'OPEN',     c: 'ok',      d: 220 },
+    { n: 'K9 LIFE SUPPORT',       s: 'GREEN',    c: 'ok',      d: 280 },
+    { n: 'EXTERIOR PLATING',      s: 'INTACT',   c: 'ok',      d: 200 },
+    { n: 'TELEMETRY UPLINK',      s: 'BOUND',    c: 'ok',      d: 200 },
+    { n: 'NAVIGATION',            s: 'AWARE',    c: 'ok',      d: 240 },
+    { n: 'CHASSIS NO. 4815',      s: 'CONFIRM',  c: 'ok',      d: 320 },
+  ];
+
+  let elapsed = 0;
+  const lineEls = new Map();
+  items.forEach((it) => {
+    elapsed += it.d;
+    setTimeout(() => {
+      // If a line for this subsystem already exists, replace its right side.
+      const existing = lineEls.get(it.n);
+      if (existing) {
+        const stateEl = existing.querySelector('.b-state');
+        stateEl.textContent = it.s;
+        stateEl.className = 'b-state ' + it.c;
+        return;
+      }
+      const row = document.createElement('div');
+      row.className = 'boot-line';
+      row.innerHTML = `<span class="b-name">▸ ${it.n}</span><span class="b-state ${it.c}">${it.s}<span class="b-cursor">▍</span></span>`;
+      lines.appendChild(row);
+      lineEls.set(it.n, row);
+    }, elapsed);
+  });
+
+  // Final "WELCOME, PILOT" then hide the overlay
+  const finalDelay = elapsed + 600;
+  setTimeout(() => { final.classList.add('show'); }, finalDelay);
+  setTimeout(() => {
+    overlay.style.transition = 'opacity 0.6s ease-out';
+    overlay.style.opacity = '0';
+    setTimeout(() => {
+      overlay.classList.remove('show');
+      overlay.style.opacity = '';
+      overlay.style.transition = '';
+    }, 700);
+  }, finalDelay + 2200);
+}
 
 document.getElementById('restart-btn').addEventListener('click', () => {
   // reset sentinels, projectiles, effects
@@ -8365,6 +11713,7 @@ document.getElementById('restart-btn').addEventListener('click', () => {
   commsMessages.length = 0;
   renderComms();
   waypoint = null;
+  waypointQueue.length = 0;
   autoWalk = false;
   coral.state = 'settled';
   coral.stateT = 0;
@@ -8381,9 +11730,9 @@ document.getElementById('restart-btn').addEventListener('click', () => {
   newswire.nextT = 120 + Math.random() * 90;
   tod.t = 6 * (DAY_LENGTH_SECONDS / 24);
   applyTod();
-  nvgState.active = false;
+  nvgState.mode = 'normal';
   nvgState.userToggled = false;
-  setNVG(false);
+  applyVisionMode();
   lastTodAnnouncedPhase = null;
   failures.nextT = 18 * 60 + Math.random() * 6 * 60;
   failures.active = null;
