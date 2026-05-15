@@ -18805,30 +18805,6 @@ const greenroom = {
       }));
     } catch (e) {}
   },
-  // Phase 6: clear all GREENROOM-related persistent data (handle, posts, mail,
-  // rep, replies, mods seen, etc.). Firmware installs persist separately and
-  // are cleared by their own key.
-  resetAll() {
-    try { localStorage.removeItem('greenroom'); } catch (e) {}
-    try { localStorage.removeItem('firmware'); } catch (e) {}
-    this.handle = null;
-    this.readPostIds = new Set();
-    this.reputation = {};
-    this.playerReplies = {};
-    this.threadFollowups = {};
-    this.mail = [];
-    this.verifiedShown = false;
-    this.vaultEntered = false;
-    this.dynamicPosts = { GENERAL: [], 'TECH/MODS': [], ENCOUNTERS: [], LORE: [], TRADE: [] };
-    this.spawnedTrojanFor = [];
-    this.knownNodes = [];
-    // Reset firmware too
-    if (typeof firmware !== 'undefined') {
-      firmware.installed = new Map();
-      firmware.seenInLibrary = new Set();
-      firmware.recompute();
-    }
-  },
   getRep(handle) { return this.reputation[handle] || 0; },
   adjustRep(handle, delta) {
     const cur = this.reputation[handle] || 0;
@@ -19770,7 +19746,6 @@ function showGreenroomMenu() {
 </div>
 <div class="gr-main-menu-footer-row">
   <a class="gr-menu-item" data-action="disconnect">[Q] DISCONNECT</a>
-  <a class="gr-menu-item" data-action="reset" style="color:rgba(78,255,126,0.5);font-size:11px;">[!] RESET LOCAL DATA</a>
 </div>
 <div class="gr-divider">─────────────────────────────────────────────────────</div>
 <div class="gr-prompt-line">sysop> NIGHTOWL says: "Storms tonight. Watch the gain."</div>
@@ -19793,83 +19768,6 @@ function handleGreenroomMenuAction(action) {
   else if (action === 'about') showGreenroomAbout();
   else if (action === 'vault') showGreenroomVault();
   else if (action === 'disconnect') disconnectGreenroom();
-  else if (action === 'reset') showGreenroomResetConfirm();
-}
-
-function showGreenroomResetConfirm() {
-  greenroom.state = 'reset_confirm';
-  const html = `
-<div class="gr-ascii" style="color:#ff8060;">GREENROOM // RESET LOCAL DATA</div>
-<div class="gr-divider">─────────────────────────────────────────────────────</div>
-<div class="gr-patch-detail">
-  <div class="gr-patch-name" style="color:#ff8060;">This will permanently erase the following:</div>
-  <div style="margin:14px 0 14px 12px;line-height:1.7;">
-    • Your registered handle (${escapeHtml(greenroom.handle || '(none)')})
-    • All read-post markers (${greenroom.readPostIds.size} threads)
-    • All your replies and any follow-ups they triggered
-    • Your private mail inbox (${greenroom.mail.length} messages)
-    • All rapport with regulars
-    • All firmware patch installations and library "seen" markers
-    • The verified-tier and Vault-entered flags
-    • Discovered node addresses (${greenroom.knownNodes.length} extras; loopback remains)
-    • Trojan-spawned community posts
-  </div>
-  <div style="color:#ff8060;margin-bottom:14px;">
-    This action cannot be undone. The network will not remember you.
-  </div>
-  <div style="margin-top:18px;">
-    <a class="gr-action-btn" data-action="confirm-reset" style="border-color:#ff8060;color:#ff8060;">[Y] CONFIRM RESET</a>
-    <a class="gr-action-btn" data-action="cancel-reset">[N] CANCEL</a>
-  </div>
-</div>
-`;
-  document.getElementById('gr-body').innerHTML = html;
-  document.querySelectorAll('#gr-body .gr-action-btn').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      e.preventDefault();
-      const action = btn.getAttribute('data-action');
-      grSfxMenuMove();
-      if (action === 'confirm-reset') performGreenroomReset();
-      else if (action === 'cancel-reset') showGreenroomMenu();
-    });
-  });
-}
-
-async function performGreenroomReset() {
-  greenroom.state = 'resetting';
-  // Show a brief "wiping" animation
-  const body = document.getElementById('gr-body');
-  body.innerHTML = `
-<div class="gr-ascii" style="color:#ff8060;">GREENROOM // RESET IN PROGRESS</div>
-<div class="gr-divider">─────────────────────────────────────────────────────</div>
-<div id="gr-reset-feed" style="white-space:pre-wrap;line-height:1.6;"></div>
-`;
-  const feed = document.getElementById('gr-reset-feed');
-  const steps = [
-    'Closing carrier...',
-    'Purging local handle registration.',
-    'Wiping read-post markers.',
-    'Wiping reply history.',
-    'Wiping mail inbox.',
-    'Wiping rapport tables.',
-    'Wiping firmware installations.',
-    'Wiping discovered nodes.',
-    'Local cache cleared.',
-    '',
-    'You are no one here now.',
-  ];
-  for (const s of steps) {
-    if (feed) {
-      feed.textContent += s + '\n';
-    }
-    grSfxKeyPress();
-    await grSleep(220);
-  }
-  // Actually perform the reset
-  greenroom.resetAll();
-  await grSleep(900);
-  // Force disconnect
-  disconnectGreenroom();
 }
 
 function showGreenroomBoardsList() {
@@ -20642,21 +20540,9 @@ document.addEventListener('keydown', (e) => {
     else if (greenroom.state === 'mail_message') showGreenroomMail();
     else if (greenroom.state === 'vault_doc') showGreenroomVault();
     else if (greenroom.state === 'board') showGreenroomBoardsList();
-    else if (greenroom.state === 'reset_confirm') showGreenroomMenu();
     else if (greenroom.state === 'boards' || greenroom.state === 'users' || greenroom.state === 'about' || greenroom.state === 'files' || greenroom.state === 'mail' || greenroom.state === 'vault') showGreenroomMenu();
     else if (greenroom.state === 'main') disconnectGreenroom();
     return;
-  }
-  // Reset confirmation: Y or N
-  if (greenroom.state === 'reset_confirm') {
-    if (e.key === 'y' || e.key === 'Y') {
-      const btn = document.querySelector('#gr-body .gr-action-btn[data-action="confirm-reset"]');
-      if (btn) { btn.click(); e.preventDefault(); return; }
-    }
-    if (e.key === 'n' || e.key === 'N') {
-      const btn = document.querySelector('#gr-body .gr-action-btn[data-action="cancel-reset"]');
-      if (btn) { btn.click(); e.preventDefault(); return; }
-    }
   }
   // 'b' to go back from a sub-screen
   if (e.key === 'b' || e.key === 'B') {
