@@ -4368,6 +4368,352 @@
     font-family: 'Black Ops One', monospace;
   }
   #paused.show { display: flex; }
+
+  /* ============================================================
+     SETTINGS OVERLAY
+     ============================================================ */
+  #settings-overlay {
+    position: fixed; inset: 0; z-index: 250;
+    display: none;
+    align-items: center; justify-content: safe center;
+    background: rgba(0, 0, 0, 0.88);
+    color: var(--amber);
+    font-family: 'Share Tech Mono', monospace;
+    overflow-y: auto;
+    padding: 40px 20px;
+    box-sizing: border-box;
+    cursor: default;
+  }
+  #settings-overlay.show { display: flex; }
+  .settings-box {
+    width: 100%;
+    max-width: 720px;
+    background: rgba(8, 6, 4, 0.96);
+    border: 1px solid var(--amber-dim);
+    box-shadow:
+      0 0 40px rgba(255, 154, 31, 0.18),
+      inset 0 0 80px rgba(255, 154, 31, 0.04);
+    padding: 28px 36px 24px;
+    position: relative;
+  }
+  .settings-box::before, .settings-box::after {
+    content: '';
+    position: absolute;
+    width: 18px; height: 18px;
+    border: 2px solid var(--amber);
+  }
+  .settings-box::before {
+    top: -8px; left: -8px;
+    border-right: none; border-bottom: none;
+  }
+  .settings-box::after {
+    bottom: -8px; right: -8px;
+    border-left: none; border-top: none;
+  }
+  .settings-title {
+    font-family: 'Black Ops One', monospace;
+    font-size: 22px;
+    letter-spacing: 8px;
+    text-align: center;
+    color: var(--amber);
+    text-shadow: 0 0 10px rgba(255, 154, 31, 0.5);
+    margin-bottom: 4px;
+  }
+  .settings-subtitle {
+    text-align: center;
+    color: var(--amber-dim);
+    font-size: 11px;
+    letter-spacing: 4px;
+    margin-bottom: 22px;
+  }
+  .settings-section {
+    margin-bottom: 22px;
+  }
+  .settings-section-title {
+    color: var(--amber);
+    font-size: 12px;
+    letter-spacing: 5px;
+    padding-bottom: 6px;
+    margin-bottom: 12px;
+    border-bottom: 1px dashed rgba(255, 154, 31, 0.3);
+  }
+  .settings-row {
+    display: grid;
+    grid-template-columns: 200px 1fr 60px;
+    align-items: center;
+    gap: 16px;
+    padding: 7px 0;
+    font-size: 12px;
+    letter-spacing: 1px;
+  }
+  .settings-row .s-label {
+    color: var(--amber-dim);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+  }
+  .settings-row .s-value {
+    color: var(--amber);
+    text-align: right;
+    font-size: 11px;
+    letter-spacing: 2px;
+  }
+  /* Slider */
+  .s-slider {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 4px;
+    background: rgba(255, 154, 31, 0.18);
+    border: 1px solid rgba(255, 154, 31, 0.35);
+    outline: none;
+    cursor: pointer;
+  }
+  .s-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 14px; height: 18px;
+    background: var(--amber);
+    border: 1px solid #ffc060;
+    box-shadow: 0 0 6px rgba(255, 154, 31, 0.7);
+    cursor: pointer;
+  }
+  .s-slider::-moz-range-thumb {
+    width: 14px; height: 18px;
+    background: var(--amber);
+    border: 1px solid #ffc060;
+    box-shadow: 0 0 6px rgba(255, 154, 31, 0.7);
+    cursor: pointer;
+  }
+  /* Toggle button (acts like a switch) */
+  .s-toggle {
+    background: rgba(20, 14, 6, 0.8);
+    border: 1px solid var(--amber-dim);
+    color: var(--amber-dim);
+    font-family: inherit;
+    font-size: 11px;
+    letter-spacing: 3px;
+    padding: 6px 18px;
+    cursor: pointer;
+    transition: all 0.15s;
+    width: 100%;
+    text-align: center;
+  }
+  .s-toggle.on {
+    background: rgba(255, 154, 31, 0.18);
+    border-color: var(--amber);
+    color: var(--amber);
+    box-shadow: 0 0 6px rgba(255, 154, 31, 0.4), inset 0 0 6px rgba(255, 154, 31, 0.15);
+  }
+  .s-toggle:hover { color: var(--amber); border-color: var(--amber); }
+  /* Multi-option button group */
+  .s-options {
+    display: flex;
+    gap: 0;
+    width: 100%;
+  }
+  .s-options button {
+    flex: 1;
+    background: rgba(20, 14, 6, 0.8);
+    border: 1px solid var(--amber-dim);
+    color: var(--amber-dim);
+    font-family: inherit;
+    font-size: 11px;
+    letter-spacing: 3px;
+    padding: 6px 10px;
+    cursor: pointer;
+    transition: all 0.15s;
+    margin-left: -1px;
+  }
+  .s-options button:first-child { margin-left: 0; }
+  .s-options button.active {
+    background: rgba(255, 154, 31, 0.2);
+    border-color: var(--amber);
+    color: var(--amber);
+    z-index: 1;
+    box-shadow: 0 0 6px rgba(255, 154, 31, 0.4), inset 0 0 6px rgba(255, 154, 31, 0.15);
+  }
+  .s-options button:hover { color: var(--amber); border-color: var(--amber); }
+  .settings-footer {
+    margin-top: 16px;
+    padding-top: 14px;
+    border-top: 1px dashed rgba(255, 154, 31, 0.3);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: var(--amber-faint);
+    font-size: 10px;
+    letter-spacing: 2px;
+  }
+  .settings-close {
+    background: rgba(20, 14, 6, 0.8);
+    border: 1px solid var(--amber);
+    color: var(--amber);
+    font-family: inherit;
+    font-size: 12px;
+    letter-spacing: 4px;
+    padding: 10px 30px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .settings-close:hover {
+    background: rgba(255, 154, 31, 0.15);
+    box-shadow: 0 0 8px rgba(255, 154, 31, 0.4);
+  }
+  .settings-hint {
+    color: var(--amber-faint);
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-align: center;
+    margin-top: 12px;
+  }
+  /* Reduced-motion override (when toggled on, disables jitter and glitch effects) */
+  body.reduced-motion #hud > * { animation: none !important; }
+  body.reduced-motion .gr-spike-jitter { animation: none !important; }
+  body.reduced-motion #greenroom-overlay { animation: none !important; }
+  /* HUD scale variants */
+  body.hud-large #hud, body.hud-large #cockpit, body.hud-large #stats-bar { font-size: 113%; }
+
+  /* ============================================================
+     NPC INTERACTION
+     ============================================================ */
+  #npc-prompt {
+    position: fixed;
+    left: 50%; bottom: 12%;
+    transform: translateX(-50%);
+    display: none;
+    background: rgba(8, 6, 4, 0.88);
+    border: 1px solid var(--amber);
+    color: var(--amber);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 3px;
+    padding: 10px 18px;
+    pointer-events: none;
+    z-index: 70;
+    box-shadow:
+      0 0 12px rgba(255, 154, 31, 0.35),
+      inset 0 0 8px rgba(255, 154, 31, 0.08);
+    text-shadow: 0 0 4px rgba(255, 154, 31, 0.6);
+    animation: npc-prompt-pulse 1.6s ease-in-out infinite;
+  }
+  #npc-prompt.show { display: block; }
+  #npc-prompt .npc-prompt-key {
+    background: var(--amber);
+    color: #08080b;
+    padding: 2px 8px;
+    margin-right: 10px;
+    font-weight: bold;
+    letter-spacing: 2px;
+    text-shadow: none;
+  }
+  #npc-prompt .npc-prompt-role {
+    color: var(--amber-dim);
+    font-size: 10px;
+    margin-left: 10px;
+    text-transform: uppercase;
+  }
+  @keyframes npc-prompt-pulse {
+    0%, 100% { box-shadow: 0 0 12px rgba(255, 154, 31, 0.35), inset 0 0 8px rgba(255, 154, 31, 0.08); }
+    50%      { box-shadow: 0 0 20px rgba(255, 154, 31, 0.6), inset 0 0 14px rgba(255, 154, 31, 0.18); }
+  }
+
+  #npc-dialog {
+    position: fixed; inset: 0; z-index: 240;
+    display: none;
+    align-items: flex-end; justify-content: center;
+    background: rgba(0, 0, 0, 0.55);
+    color: var(--amber);
+    font-family: 'Share Tech Mono', monospace;
+    padding: 0 0 40px 0;
+  }
+  #npc-dialog.show { display: flex; }
+  .npc-dialog-box {
+    width: 100%;
+    max-width: 780px;
+    background: rgba(8, 6, 4, 0.94);
+    border: 1px solid var(--amber-dim);
+    box-shadow:
+      0 0 30px rgba(255, 154, 31, 0.18),
+      inset 0 0 60px rgba(255, 154, 31, 0.04);
+    padding: 18px 26px 20px;
+    position: relative;
+    pointer-events: auto;
+  }
+  .npc-dialog-box::before, .npc-dialog-box::after {
+    content: '';
+    position: absolute;
+    width: 14px; height: 14px;
+    border: 2px solid var(--amber);
+  }
+  .npc-dialog-box::before {
+    top: -6px; left: -6px;
+    border-right: none; border-bottom: none;
+  }
+  .npc-dialog-box::after {
+    bottom: -6px; right: -6px;
+    border-left: none; border-top: none;
+  }
+  .npc-dialog-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding-bottom: 8px;
+    margin-bottom: 12px;
+    border-bottom: 1px dashed rgba(255, 154, 31, 0.3);
+  }
+  .npc-dialog-speaker {
+    font-family: 'Black Ops One', monospace;
+    font-size: 18px;
+    letter-spacing: 6px;
+    color: var(--amber);
+    text-shadow: 0 0 8px rgba(255, 154, 31, 0.4);
+  }
+  .npc-dialog-close {
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--amber-faint);
+  }
+  .npc-intro {
+    color: var(--amber-faint);
+    font-size: 11px;
+    line-height: 1.6;
+    font-style: italic;
+    padding: 6px 10px;
+    margin-bottom: 12px;
+    border-left: 2px solid var(--amber-dim);
+    background: rgba(255, 154, 31, 0.03);
+  }
+  .npc-dialog-text {
+    color: var(--amber);
+    font-size: 13px;
+    line-height: 1.7;
+    margin-bottom: 16px;
+    white-space: pre-wrap;
+    min-height: 60px;
+  }
+  .npc-options {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .npc-opt {
+    background: rgba(20, 14, 6, 0.7);
+    border: 1px solid var(--amber-dim);
+    color: var(--amber-dim);
+    font-family: inherit;
+    font-size: 12px;
+    letter-spacing: 1px;
+    padding: 8px 14px;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.15s;
+  }
+  .npc-opt:hover {
+    background: rgba(255, 154, 31, 0.12);
+    border-color: var(--amber);
+    color: var(--amber);
+    box-shadow: inset 0 0 6px rgba(255, 154, 31, 0.15);
+  }
 </style>
 </head>
 <body>
@@ -4793,6 +5139,9 @@
   <div class="byline">
     a sim by <a href="https://michaelbparks.com" target="_blank" rel="noopener">M.B. Parks</a>
   </div>
+  <div class="start-reset-row" style="margin-top: 18px;">
+    <a id="start-settings-link" class="start-reset-link" style="color: var(--amber); border-color: var(--amber); background: rgba(255, 154, 31, 0.08);">[settings]</a>
+  </div>
   <div class="start-reset-row">
     <a id="start-reset-link" class="start-reset-link">[reset all saved data]</a>
   </div>
@@ -4816,6 +5165,100 @@
       <button id="reset-cancel">CANCEL</button>
       <button id="reset-confirm-btn" class="danger">YES, ERASE EVERYTHING</button>
     </div>
+  </div>
+</div>
+
+<!-- NPC interaction prompt (small banner on HUD) -->
+<div id="npc-prompt">
+  <span class="npc-prompt-key">[E]</span>
+  <span class="npc-prompt-text">talk to <span id="npc-prompt-name">SOMEONE</span></span>
+  <span class="npc-prompt-role" id="npc-prompt-role"></span>
+</div>
+
+<!-- NPC dialog overlay (modal) -->
+<div id="npc-dialog">
+  <div class="npc-dialog-box">
+    <div class="npc-dialog-head">
+      <span class="npc-dialog-speaker" id="npc-speaker">SPEAKER</span>
+      <span class="npc-dialog-close" id="npc-dialog-close">[ESC] close</span>
+    </div>
+    <div class="npc-intro" id="npc-intro"></div>
+    <div class="npc-dialog-text" id="npc-text"></div>
+    <div class="npc-options" id="npc-options"></div>
+  </div>
+</div>
+
+<!-- Settings overlay -->
+<div id="settings-overlay">
+  <div class="settings-box">
+    <div class="settings-title">SETTINGS</div>
+    <div class="settings-subtitle">TITAN-7 SYSTEM CONFIGURATION</div>
+
+    <div class="settings-section">
+      <div class="settings-section-title">▶ AUDIO</div>
+      <div class="settings-row">
+        <span class="s-label">Master Volume</span>
+        <input id="s-volume" class="s-slider" type="range" min="0" max="100" step="1" value="70">
+        <span class="s-value" id="s-volume-val">70%</span>
+      </div>
+      <div class="settings-row">
+        <span class="s-label">Ambient Sounds</span>
+        <button id="s-ambient" class="s-toggle on">ON</button>
+        <span class="s-value">&nbsp;</span>
+      </div>
+      <div class="settings-row">
+        <span class="s-label">Muffled Footsteps</span>
+        <button id="s-footstep" class="s-toggle">OFF</button>
+        <span class="s-value">&nbsp;</span>
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <div class="settings-section-title">▶ GRAPHICS</div>
+      <div class="settings-row">
+        <span class="s-label">Render Distance</span>
+        <div class="s-options" id="s-render-distance">
+          <button data-value="1">LOW</button>
+          <button data-value="2" class="active">MED</button>
+          <button data-value="3">HIGH</button>
+        </div>
+        <span class="s-value">&nbsp;</span>
+      </div>
+      <div class="settings-row">
+        <span class="s-label">Shadows</span>
+        <button id="s-shadows" class="s-toggle on">ON</button>
+        <span class="s-value">&nbsp;</span>
+      </div>
+      <div class="settings-row">
+        <span class="s-label">Field of View</span>
+        <input id="s-fov" class="s-slider" type="range" min="60" max="95" step="1" value="74">
+        <span class="s-value" id="s-fov-val">74°</span>
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <div class="settings-section-title">▶ ACCESSIBILITY</div>
+      <div class="settings-row">
+        <span class="s-label">Reduced Motion</span>
+        <button id="s-reduced-motion" class="s-toggle">OFF</button>
+        <span class="s-value">&nbsp;</span>
+      </div>
+      <div class="settings-row">
+        <span class="s-label">HUD Scale</span>
+        <div class="s-options" id="s-hud-scale">
+          <button data-value="normal" class="active">NORMAL</button>
+          <button data-value="large">LARGE</button>
+        </div>
+        <span class="s-value">&nbsp;</span>
+      </div>
+    </div>
+
+    <div class="settings-footer">
+      <span>changes save automatically</span>
+      <button class="settings-close" id="settings-close-btn">▸ CLOSE</button>
+      <span style="text-align:right;">[O] or [ESC] to toggle</span>
+    </div>
+    <div class="settings-hint">tip: render distance is the biggest performance lever on weaker hardware.</div>
   </div>
 </div>
 
@@ -6348,7 +6791,7 @@ const POI_TYPES = ['hatch', 'wreck', 'vault', 'tower', 'lighthouse', 'station', 
 
 // World data
 const CHUNK_SIZE = 240;
-const CHUNK_RADIUS = 2; // (2*R+1)^2 chunks loaded => 25 chunks
+let CHUNK_RADIUS = 2; // (2*R+1)^2 chunks loaded => 25 chunks. Adjustable via settings.
 const loadedChunks = new Map(); // "cx,cz" -> { group, cx, cz, obstacleIndices: [] }
 
 function chunkKey(cx, cz) { return cx + ',' + cz; }
@@ -6725,6 +7168,8 @@ function loadChunk(cx, cz) {
 
   scene.add(group);
   loadedChunks.set(key, { group, cx, cz, biome, obstacleStart: chunkObstacleStart });
+  // Passphrase NPCs: assign or build NPC meshes for this chunk's POIs
+  if (typeof npcsOnChunkLoaded === 'function') npcsOnChunkLoaded(key, group);
 }
 
 function unloadChunk(cx, cz) {
@@ -6756,6 +7201,8 @@ function unloadChunk(cx, cz) {
   for (const poi of pois) {
     if (poi.chunkKey === key) poi.mesh = null;
   }
+  // Passphrase NPCs: hide their meshes if their chunk just unloaded
+  if (typeof npcsOnChunkUnloaded === 'function') npcsOnChunkUnloaded(key);
   loadedChunks.delete(key);
 }
 
@@ -10236,6 +10683,19 @@ document.addEventListener('keydown', (e) => {
     if (invOpen) closeInventory(); else openInventory();
   } else if (e.code === 'KeyK' && !mapOpen && !diagOpen && !logbookOpen && !journalOpen && !invOpen) {
     if (codexOpen) closeCodex(); else openCodex();
+  } else if (e.code === 'KeyE') {
+    // Passphrase NPC interaction (Phase 6 follow-up)
+    if (!mapOpen && !diagOpen && !logbookOpen && !journalOpen && !invOpen && !codexOpen) {
+      const promptEl = document.getElementById('npc-prompt');
+      const dialogEl = document.getElementById('npc-dialog');
+      if (dialogEl && dialogEl.classList.contains('show')) {
+        // Already in a dialog, ignore (close via ESC or option button)
+      } else if (promptEl && promptEl.classList.contains('show')) {
+        const id = promptEl.dataset.npcId;
+        if (id && typeof npcOpenDialog === 'function') npcOpenDialog(id);
+        e.preventDefault();
+      }
+    }
   } else if (e.code === 'KeyH') {
     if (!mapOpen && !diagOpen && !logbookOpen) {
       // Priority: if a caravan is halted within range, open barter directly.
@@ -20596,7 +21056,618 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
-// ----- LIVE CARRIER LOCK + CLOCK UPDATER -----
+// ============================================================
+// PASSPHRASE NPCs (Phase 6 follow-up)
+// ============================================================
+// Five wanderers placed at specific POI types in the world. Each can have a
+// short conversation. Each recognizes the GREENROOM passphrase
+// ("mind your handles" / "and mind your gain") and offers a small reward to
+// any pilot who knows it.
+//
+// Persistence: each NPC's placement is saved the first time a matching POI
+// is discovered. After that, the same POI hosts them across reloads.
+// Conversations remembered in npcs.state[npcId].
+
+const NPC_DEFS = {
+  hollis: {
+    name: 'HOLLIS',
+    role: 'beekeeper',
+    poiTypes: ['trailers'],
+    color: 0xd4a45e,
+    intro: "He looks up as you approach. There are bee crates stacked beside him. He has a knife in one hand and an apple in the other, and his hands are perfectly steady.",
+    dialog: {
+      start: {
+        speaker: 'HOLLIS',
+        text: "Pilot. Big walker for a small road. You hungry? I have an apple I can spare.",
+        options: [
+          { label: "Who are you?",                                next: 'about' },
+          { label: '"Mind your handles."',                        next: 'passphrase_check', passphrase: true },
+          { label: "Why bees out here?",                          next: 'bees' },
+          { label: "I'll move on.",                               next: '__end__' },
+        ],
+      },
+      about: {
+        speaker: 'HOLLIS',
+        text: "Name's Hollis. I keep bees and walk where the bees lead. Right now they like this stretch of road. Could be worse work.",
+        options: [
+          { label: "How long have you been walking?",  next: 'about_more' },
+          { label: '"Mind your handles."',              next: 'passphrase_check', passphrase: true },
+          { label: "I'll move on.",                    next: '__end__' },
+        ],
+      },
+      about_more: {
+        speaker: 'HOLLIS',
+        text: "Since before the war ended. The bees do not mind it. Neither do I.",
+        options: [
+          { label: '"Mind your handles."',              next: 'passphrase_check', passphrase: true },
+          { label: "I'll move on.",                    next: '__end__' },
+        ],
+      },
+      bees: {
+        speaker: 'HOLLIS',
+        text: "Because there are still flowers. As long as there are flowers, there's honey. As long as there is honey, there are reasons to walk.",
+        options: [
+          { label: '"Mind your handles."',              next: 'passphrase_check', passphrase: true },
+          { label: "I'll move on.",                    next: '__end__' },
+        ],
+      },
+      passphrase_check: {
+        speaker: 'HOLLIS',
+        text: "(He looks at you for a long second.)\n\n\"...and mind your gain. Hadn't heard that in a while. Here. Take this. The bees made it and I have more than I need.\"",
+        reward: { caps: 80, item: 'honey_jar', count: 1 },
+        options: [
+          { label: "Thank you.", next: '__end__' },
+        ],
+      },
+    },
+    afterReward: {
+      speaker: 'HOLLIS',
+      text: "Take care of yourself out there. The bees will be here a while.",
+      options: [
+        { label: "You too, Hollis.", next: '__end__' },
+      ],
+    },
+  },
+
+  watchman: {
+    name: 'THE WATCHMAN',
+    role: 'tower keeper',
+    poiTypes: ['tower'],
+    color: 0x6a7a6e,
+    intro: "A man sits at the base of the tower, watching the road east. He does not stand when you approach. He nods.",
+    dialog: {
+      start: {
+        speaker: 'WATCHMAN',
+        text: "Pilot.",
+        options: [
+          { label: "Who are you?",                       next: 'about' },
+          { label: "What are you watching for?",         next: 'watching' },
+          { label: '"Mind your handles."',                next: 'passphrase_check', passphrase: true },
+          { label: "I'll keep walking.",                 next: '__end__' },
+        ],
+      },
+      about: {
+        speaker: 'WATCHMAN',
+        text: "No one in particular. I climbed the tower one day eight years ago. Liked the view. Came down only for water and to bury people.",
+        options: [
+          { label: "What do you see from up there?",     next: 'watching' },
+          { label: '"Mind your handles."',                next: 'passphrase_check', passphrase: true },
+          { label: "I'll keep walking.",                 next: '__end__' },
+        ],
+      },
+      watching: {
+        speaker: 'WATCHMAN',
+        text: "Things on the eastern road. Things that should not be on the eastern road. I am still trying to decide if I am supposed to write them down.",
+        options: [
+          { label: '"Mind your handles."',                next: 'passphrase_check', passphrase: true },
+          { label: "I'll keep walking.",                 next: '__end__' },
+        ],
+      },
+      passphrase_check: {
+        speaker: 'WATCHMAN',
+        text: "(He smiles, very slightly, and looks at you for the first time.)\n\n\"And mind your gain. Glad to know there are still some of us. Here. A node I picked up listening that you can use. Tell whoever you talk to that the tower man says hello.\"",
+        reward: { nodeAddress: '19-CICADA-0044', caps: 0 },
+        options: [
+          { label: "I will. Thank you.", next: '__end__' },
+        ],
+      },
+    },
+    afterReward: {
+      speaker: 'WATCHMAN',
+      text: "The tower is here. So am I. Come back if you find anything I should write down.",
+      options: [
+        { label: "Take care.", next: '__end__' },
+      ],
+    },
+  },
+
+  maggs: {
+    name: 'MAGGS',
+    role: 'old trader',
+    poiTypes: ['station'],
+    color: 0x9a6a3a,
+    intro: "A wiry old woman is sorting a pile of scavenged electronics on the cracked station forecourt. She looks up sharply.",
+    dialog: {
+      start: {
+        speaker: 'MAGGS',
+        text: "Don't step on my piles, pilot. I'm sorting.",
+        options: [
+          { label: "Sorting what?",                      next: 'sorting' },
+          { label: "Are you a trader?",                   next: 'about' },
+          { label: '"Mind your handles."',                next: 'passphrase_check', passphrase: true },
+          { label: "I'll move along.",                    next: '__end__' },
+        ],
+      },
+      about: {
+        speaker: 'MAGGS',
+        text: "Used to be. Used to run patches up and down this road for a quiet little outfit that does not exist anymore, officially speaking. Now I trade scrap, mostly. Pays slower, troubles less.",
+        options: [
+          { label: "Quiet little outfit?",                 next: 'outfit' },
+          { label: '"Mind your handles."',                  next: 'passphrase_check', passphrase: true },
+          { label: "I'll move along.",                      next: '__end__' },
+        ],
+      },
+      sorting: {
+        speaker: 'MAGGS',
+        text: "Anything I can. Most of it is junk. Some of it isn't. I leave the some-of-it-isn't for people who need it more than I do. Helps me sleep.",
+        options: [
+          { label: '"Mind your handles."',                  next: 'passphrase_check', passphrase: true },
+          { label: "I'll move along.",                      next: '__end__' },
+        ],
+      },
+      outfit: {
+        speaker: 'MAGGS',
+        text: "Won't name it. Don't have to.",
+        options: [
+          { label: '"Mind your handles."',                  next: 'passphrase_check', passphrase: true },
+          { label: "I'll move along.",                      next: '__end__' },
+        ],
+      },
+      passphrase_check: {
+        speaker: 'MAGGS',
+        text: "(She straightens up, wipes her hands on her apron, looks you over once.)\n\n\"And mind your gain. Knew it when I saw you. Take these. Came off something I parted out yesterday. Should help someone who's running their own walker.\"",
+        reward: { caps: 0, item: 'circuit_board', count: 1, item2: 'data_fragment', count2: 1 },
+        options: [
+          { label: "Thanks, Maggs.", next: '__end__' },
+        ],
+      },
+    },
+    afterReward: {
+      speaker: 'MAGGS',
+      text: "Don't step on the piles on your way out.",
+      options: [
+        { label: "Wouldn't dream of it.", next: '__end__' },
+      ],
+    },
+  },
+
+  eileen: {
+    name: 'EILEEN',
+    role: 'lighthouse keeper',
+    poiTypes: ['lighthouse'],
+    color: 0xc8c4b8,
+    intro: "An older woman is sitting on a folding chair at the base of the lighthouse, reading a paperback book. She closes it without marking her page.",
+    dialog: {
+      start: {
+        speaker: 'EILEEN',
+        text: "Hello, pilot. Don't worry, the light still works. Nobody's coming for it.",
+        options: [
+          { label: "Who are you?",                          next: 'about' },
+          { label: "Does anyone live nearby?",              next: 'neighbors' },
+          { label: '"Mind your handles."',                   next: 'passphrase_check', passphrase: true },
+          { label: "I'll keep going.",                       next: '__end__' },
+        ],
+      },
+      about: {
+        speaker: 'EILEEN',
+        text: "Eileen. I look after the light. It belonged to my mother before me. I am told it belonged to a friend of hers before that. I don't keep it lit for anyone in particular. I keep it lit because that's what it's for.",
+        options: [
+          { label: '"Mind your handles."',                   next: 'passphrase_check', passphrase: true },
+          { label: "I'll keep going.",                       next: '__end__' },
+        ],
+      },
+      neighbors: {
+        speaker: 'EILEEN',
+        text: "Not really. There used to be a man who came through with a kettle and would sit and read with me. Gus Pearson. He stopped coming a few years back. I hear his name on the wind sometimes.",
+        options: [
+          { label: "OLD_KETTLE.",                            next: 'recognition' },
+          { label: '"Mind your handles."',                   next: 'passphrase_check', passphrase: true },
+          { label: "I'm sorry. I'll keep going.",            next: '__end__' },
+        ],
+      },
+      recognition: {
+        speaker: 'EILEEN',
+        text: "(She is quiet a long moment.)\n\n\"You knew him. Or you know who he was. That tells me what I needed to know.\"",
+        options: [
+          { label: '"Mind your handles."',                   next: 'passphrase_check', passphrase: true },
+          { label: "I should go.",                           next: '__end__' },
+        ],
+      },
+      passphrase_check: {
+        speaker: 'EILEEN',
+        text: "(She nods, slow.)\n\n\"And mind your gain. He used to say it as a goodbye, you know. So I'll say it the same way. Here is something he left for me to pass on if the right person ever found their way back. He always thought someone would.\"",
+        reward: { codex: 'eileen_kettle_memorial', caps: 0 },
+        options: [
+          { label: "I'll carry it carefully.", next: '__end__' },
+        ],
+      },
+    },
+    afterReward: {
+      speaker: 'EILEEN',
+      text: "The light's on. It will be on tomorrow too. Come back if you want to read.",
+      options: [
+        { label: "Maybe I will.", next: '__end__' },
+      ],
+    },
+  },
+
+  the_figure: {
+    name: 'A FIGURE',
+    role: 'unknown',
+    poiTypes: ['overlook'],
+    color: 0x4a4a4a,
+    intro: "Someone is standing at the overlook with their back to you. They do not turn when you approach. You can hear them breathing.",
+    dialog: {
+      start: {
+        speaker: 'A FIGURE',
+        text: "I knew someone would come up here eventually. I didn't know when. Stand with me a moment if you like. Don't ask for my name.",
+        options: [
+          { label: "Why are you up here?",                  next: 'why' },
+          { label: "What are you looking at?",              next: 'looking' },
+          { label: '"Mind your handles."',                   next: 'passphrase_check', passphrase: true },
+          { label: "I'll leave you alone.",                  next: '__end__' },
+        ],
+      },
+      why: {
+        speaker: 'A FIGURE',
+        text: "Because I am waiting for something. Not for someone. Just for something. I will know it when it happens.",
+        options: [
+          { label: "What kind of something?",                next: 'something' },
+          { label: '"Mind your handles."',                   next: 'passphrase_check', passphrase: true },
+          { label: "I'll leave you alone.",                  next: '__end__' },
+        ],
+      },
+      looking: {
+        speaker: 'A FIGURE',
+        text: "East. Where the maps are wrong. I have walked it once. I will not walk it again. I am here so that when whatever is going to happen happens, someone will have seen it from this distance.",
+        options: [
+          { label: '"Mind your handles."',                   next: 'passphrase_check', passphrase: true },
+          { label: "I should go.",                            next: '__end__' },
+        ],
+      },
+      something: {
+        speaker: 'A FIGURE',
+        text: "(They do not answer for a long time.)\n\n\"You'll know it when you see it too.\"",
+        options: [
+          { label: '"Mind your handles."',                   next: 'passphrase_check', passphrase: true },
+          { label: "I should go.",                            next: '__end__' },
+        ],
+      },
+      passphrase_check: {
+        speaker: 'A FIGURE',
+        text: "(They turn, very slowly, and look at you with eyes that are tired in a way no clinic could fix.)\n\n\"And mind your gain. There is a vault for which the key is a phrase a friend of mine wrote a long time ago. If you have found it, look for what they left there. Tell them, when you find them, that the watcher at the overlook is still watching.\"\n\n(They turn back to the east.)",
+        reward: { fragment: 'decrypt_vault_key', caps: 0 },
+        options: [
+          { label: "I'll tell them.", next: '__end__' },
+        ],
+      },
+    },
+    afterReward: {
+      speaker: 'A FIGURE',
+      text: "(They do not turn.)\n\n\"Mind your handles, pilot.\"",
+      options: [
+        { label: "And mind your gain.", next: '__end__' },
+      ],
+    },
+  },
+};
+
+const npcs = {
+  // Assignment of each NPC to a chunk + position (chunkKey, x, z)
+  assignments: {},          // npcId -> { chunkKey, x, z, name }
+  spokenTo: new Set(),      // npcs the player has greeted at least once
+  rewarded: new Set(),      // npcs that have given their passphrase reward
+  meshes: new Map(),        // live npcId -> THREE.Group
+  currentNpc: null,         // npcId of active dialog target
+  currentNode: null,        // dialog node id
+  load() {
+    try {
+      const j = localStorage.getItem('titan7_npcs');
+      if (!j) return;
+      const data = JSON.parse(j);
+      if (data.assignments) this.assignments = data.assignments;
+      if (Array.isArray(data.spokenTo)) this.spokenTo = new Set(data.spokenTo);
+      if (Array.isArray(data.rewarded)) this.rewarded = new Set(data.rewarded);
+    } catch (e) {}
+  },
+  save() {
+    try {
+      localStorage.setItem('titan7_npcs', JSON.stringify({
+        assignments: this.assignments,
+        spokenTo: Array.from(this.spokenTo),
+        rewarded: Array.from(this.rewarded),
+      }));
+    } catch (e) {}
+  },
+};
+npcs.load();
+
+// Build a simple humanoid figure for an NPC. Static; no animation. Sized for
+// a mech-scale world (about 2.4m tall so they're visible but small).
+function buildNpcMesh(color) {
+  const g = new THREE.Group();
+  // Body
+  const bodyMat = new THREE.MeshLambertMaterial({ color });
+  const body = new THREE.Mesh(new THREE.CylinderGeometry(0.34, 0.42, 1.1, 8), bodyMat);
+  body.position.y = 1.05;
+  body.castShadow = true;
+  g.add(body);
+  // Head
+  const headMat = new THREE.MeshLambertMaterial({ color: 0xd2b48c });
+  const head = new THREE.Mesh(new THREE.SphereGeometry(0.22, 10, 8), headMat);
+  head.position.y = 1.78;
+  head.castShadow = true;
+  g.add(head);
+  // Legs
+  const legMat = new THREE.MeshLambertMaterial({ color: 0x3a2a1c });
+  const legL = new THREE.Mesh(new THREE.CylinderGeometry(0.13, 0.13, 0.95, 6), legMat);
+  legL.position.set(-0.16, 0.48, 0);
+  legL.castShadow = true;
+  g.add(legL);
+  const legR = legL.clone();
+  legR.position.set(0.16, 0.48, 0);
+  g.add(legR);
+  // A glowing marker pole behind the NPC so the player can spot them at distance
+  const poleMat = new THREE.MeshBasicMaterial({ color: 0xffc060 });
+  const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 4, 6), poleMat);
+  pole.position.set(0.7, 2.0, -0.3);
+  g.add(pole);
+  // A small point-light tip on the pole
+  const tipMat = new THREE.MeshBasicMaterial({ color: 0xffe0a0 });
+  const tip = new THREE.Mesh(new THREE.SphereGeometry(0.12, 8, 6), tipMat);
+  tip.position.set(0.7, 4.1, -0.3);
+  g.add(tip);
+  g.userData.skipScan = true;
+  g.userData.isNpc = true;
+  return g;
+}
+
+// Hook: after a chunk is loaded, assign NPCs to matching POIs and build their meshes.
+function npcsOnChunkLoaded(chunkKey, group) {
+  // Pass 1: assign any unassigned NPCs to a matching POI in this chunk
+  for (const npcId of Object.keys(NPC_DEFS)) {
+    if (npcs.assignments[npcId]) continue;
+    const def = NPC_DEFS[npcId];
+    for (const poi of pois) {
+      if (poi.chunkKey !== chunkKey) continue;
+      if (!def.poiTypes.includes(poi.type)) continue;
+      // Offset slightly to the side of the POI so the NPC isn't inside the structure
+      const offsetX = 6;
+      const offsetZ = 6;
+      npcs.assignments[npcId] = {
+        chunkKey,
+        x: poi.pos.x + offsetX,
+        z: poi.pos.z + offsetZ,
+      };
+      npcs.save();
+      break;
+    }
+  }
+  // Pass 2: for any NPC assigned to this chunk and not yet visible, build the mesh
+  for (const npcId of Object.keys(npcs.assignments)) {
+    const ass = npcs.assignments[npcId];
+    if (ass.chunkKey !== chunkKey) continue;
+    if (npcs.meshes.has(npcId)) continue;
+    const def = NPC_DEFS[npcId];
+    if (!def) continue;
+    const mesh = buildNpcMesh(def.color);
+    // chunk group is in world coords (since loadChunk's group is positioned at chunk origin)
+    // We need NPC at world position. Since group has no offset, attach directly to scene.
+    mesh.position.set(ass.x, 0, ass.z);
+    scene.add(mesh);
+    npcs.meshes.set(npcId, mesh);
+  }
+}
+
+function npcsOnChunkUnloaded(chunkKey) {
+  for (const [npcId, mesh] of Array.from(npcs.meshes.entries())) {
+    const ass = npcs.assignments[npcId];
+    if (!ass || ass.chunkKey !== chunkKey) continue;
+    scene.remove(mesh);
+    mesh.traverse(o => {
+      if (o.geometry) o.geometry.dispose();
+      if (o.material) {
+        if (Array.isArray(o.material)) o.material.forEach(m => m.dispose());
+        else o.material.dispose();
+      }
+    });
+    npcs.meshes.delete(npcId);
+  }
+}
+
+// Find the nearest visible NPC within interaction range. Returns { npcId, dist } or null.
+function findNearestInteractableNpc() {
+  if (!player || !player.pos) return null;
+  let best = null;
+  let bestDist = 14;  // interaction range in meters
+  for (const [npcId, mesh] of npcs.meshes.entries()) {
+    const dx = mesh.position.x - player.pos.x;
+    const dz = mesh.position.z - player.pos.z;
+    const d = Math.hypot(dx, dz);
+    if (d < bestDist) {
+      bestDist = d;
+      best = { npcId, dist: d };
+    }
+  }
+  return best;
+}
+
+// ----- NPC INTERACTION PROMPT (on-screen hint) -----
+
+function updateNpcPrompt() {
+  const promptEl = document.getElementById('npc-prompt');
+  if (!promptEl) return;
+  // Hide while in any panel/menu state
+  const blocked = (typeof paused !== 'undefined' && paused) ||
+                  (typeof mapOpen !== 'undefined' && mapOpen) ||
+                  (typeof diagOpen !== 'undefined' && diagOpen) ||
+                  (typeof logbookOpen !== 'undefined' && logbookOpen) ||
+                  (typeof codexOpen !== 'undefined' && codexOpen) ||
+                  (typeof invOpen !== 'undefined' && invOpen) ||
+                  (typeof greenroom !== 'undefined' && greenroom.connected) ||
+                  document.getElementById('npc-dialog').classList.contains('show') ||
+                  document.getElementById('settings-overlay').classList.contains('show');
+  if (blocked) { promptEl.classList.remove('show'); return; }
+  const near = findNearestInteractableNpc();
+  if (!near) { promptEl.classList.remove('show'); return; }
+  const def = NPC_DEFS[near.npcId];
+  if (!def) { promptEl.classList.remove('show'); return; }
+  document.getElementById('npc-prompt-name').textContent = def.name;
+  document.getElementById('npc-prompt-role').textContent = def.role;
+  promptEl.classList.add('show');
+  promptEl.dataset.npcId = near.npcId;
+}
+
+// ----- DIALOG OVERLAY -----
+
+function npcOpenDialog(npcId) {
+  const def = NPC_DEFS[npcId];
+  if (!def) return;
+  npcs.currentNpc = npcId;
+  // Pause the game so the world stops moving while talking
+  if (typeof paused !== 'undefined') paused = true;
+  // Mark as spoken-to
+  if (!npcs.spokenTo.has(npcId)) {
+    npcs.spokenTo.add(npcId);
+    npcs.save();
+  }
+  // If reward already collected, use the post-reward node
+  if (npcs.rewarded.has(npcId)) {
+    npcRenderDialogNode('__afterReward__');
+  } else {
+    npcRenderDialogNode('start');
+  }
+  document.getElementById('npc-dialog').classList.add('show');
+}
+
+function npcCloseDialog() {
+  document.getElementById('npc-dialog').classList.remove('show');
+  npcs.currentNpc = null;
+  npcs.currentNode = null;
+  if (typeof paused !== 'undefined') paused = false;
+}
+
+function npcRenderDialogNode(nodeId) {
+  const def = NPC_DEFS[npcs.currentNpc];
+  if (!def) return;
+  npcs.currentNode = nodeId;
+  let node;
+  if (nodeId === '__afterReward__') {
+    node = def.afterReward;
+  } else {
+    node = def.dialog[nodeId];
+  }
+  if (!node) { npcCloseDialog(); return; }
+  document.getElementById('npc-speaker').textContent = node.speaker || def.name;
+  // Intro line (only shown on the very first turn of a fresh conversation)
+  const introEl = document.getElementById('npc-intro');
+  if (nodeId === 'start' && def.intro) {
+    introEl.textContent = def.intro;
+    introEl.style.display = 'block';
+  } else {
+    introEl.style.display = 'none';
+  }
+  document.getElementById('npc-text').textContent = node.text;
+  // Render options
+  const optsEl = document.getElementById('npc-options');
+  optsEl.innerHTML = '';
+  (node.options || []).forEach((opt, idx) => {
+    const btn = document.createElement('button');
+    btn.className = 'npc-opt';
+    btn.textContent = `${idx + 1}. ${opt.label}`;
+    btn.addEventListener('click', () => npcHandleOption(opt));
+    optsEl.appendChild(btn);
+  });
+  // Apply pending reward if this node carries one
+  if (node.reward && !npcs.rewarded.has(npcs.currentNpc)) {
+    applyNpcReward(node.reward);
+    npcs.rewarded.add(npcs.currentNpc);
+    npcs.save();
+  }
+}
+
+function npcHandleOption(opt) {
+  if (opt.next === '__end__') {
+    npcCloseDialog();
+    return;
+  }
+  npcRenderDialogNode(opt.next);
+}
+
+function applyNpcReward(reward) {
+  const lines = [];
+  if (reward.caps && typeof wallet !== 'undefined') {
+    wallet.caps += reward.caps;
+    lines.push(`+${reward.caps} caps`);
+  }
+  if (reward.item && typeof addItem === 'function') {
+    // Honey jar is a new item: define it if not already
+    if (reward.item === 'honey_jar' && typeof ITEMS !== 'undefined' && !ITEMS.honey_jar) {
+      ITEMS.honey_jar = { name: 'HONEY JAR', weight: 0.4, value: 12, icon: '◉', desc: 'A glass jar of dark mountain honey, sealed with wax.' };
+    }
+    addItem(reward.item, reward.count || 1);
+    const def = (typeof ITEMS !== 'undefined') ? ITEMS[reward.item] : null;
+    lines.push(`+${reward.count || 1} ${def ? def.name : reward.item}`);
+  }
+  if (reward.item2 && typeof addItem === 'function') {
+    addItem(reward.item2, reward.count2 || 1);
+    const def = (typeof ITEMS !== 'undefined') ? ITEMS[reward.item2] : null;
+    lines.push(`+${reward.count2 || 1} ${def ? def.name : reward.item2}`);
+  }
+  if (reward.nodeAddress) {
+    if (typeof greenroom !== 'undefined' && greenroom.knownNodes && !greenroom.knownNodes.includes(reward.nodeAddress)) {
+      greenroom.knownNodes.push(reward.nodeAddress);
+      greenroom.save();
+      lines.push(`+ node address ${reward.nodeAddress}`);
+    }
+  }
+  if (reward.fragment) {
+    if (typeof codex !== 'undefined' && codex.unlocked && !codex.unlocked.has(reward.fragment)) {
+      if (typeof unlockCodexEntry === 'function') unlockCodexEntry(reward.fragment);
+      else codex.unlocked.add(reward.fragment);
+      lines.push(`+ decrypted fragment`);
+    }
+  }
+  if (reward.codex) {
+    // Add a codex entry on the fly if it doesn't exist
+    if (typeof codex !== 'undefined' && codex.unlocked && !codex.unlocked.has(reward.codex)) {
+      if (reward.codex === 'eileen_kettle_memorial' && typeof CODEX_ENTRIES !== 'undefined') {
+        // Inject a codex entry for OLD_KETTLE's memorial from Eileen's keeping
+        if (!CODEX_ENTRIES.find(c => c.id === 'eileen_kettle_memorial')) {
+          CODEX_ENTRIES.push({
+            id: 'eileen_kettle_memorial',
+            title: "Gus Pearson's Bookmark",
+            source: 'Pressed in a paperback at the lighthouse',
+            text: "A handwritten note, in pencil, on the back of a tea-shop receipt: 'If you are reading this you found her. Tell her the road was kind to me even at the end. Tell her the light is in the right place. Tell her she was always the better company. Tell her I am sorry I never finished the book. Tell her to start a new one and save my seat. - G.'",
+          });
+        }
+      }
+      if (typeof unlockCodexEntry === 'function') unlockCodexEntry(reward.codex);
+      else codex.unlocked.add(reward.codex);
+      lines.push(`+ codex entry`);
+    }
+  }
+  // Surface reward in comms log
+  if (lines.length && typeof addComm === 'function') {
+    addComm('TITAN-7', `Received: ${lines.join(', ')}.`, true);
+  }
+  if (typeof noteJournalEvent === 'function') {
+    const def = NPC_DEFS[npcs.currentNpc];
+    if (def) noteJournalEvent('discovery', `Spoke with ${def.name} and exchanged the passphrase.`);
+  }
+}
+
+
 
 setInterval(() => {
   if (!greenroom.connected) return;
@@ -22892,6 +23963,9 @@ function _loopBody() {
 
   renderer.render(scene, camera);
 
+  // Passphrase NPCs: update on-screen interaction prompt
+  if (typeof updateNpcPrompt === 'function' && gameStarted) updateNpcPrompt();
+
   // Drone POV: render scene a second time into the small rect occupied by
   // the drone-pov-frame element in the HUD. The HTML decorations (border,
   // crosshair, labels, scanlines) sit on top of the canvas pixels.
@@ -22928,6 +24002,8 @@ document.getElementById('start-btn').addEventListener('click', () => {
   savePilot();
   // Initialize audio context (user gesture is required for autoplay)
   initAudio();
+  // Re-apply settings now that audio nodes exist
+  if (typeof settings !== 'undefined' && settings.apply) settings.apply();
   sfxClick();
   document.body.classList.add('playing');
   document.getElementById('start-screen').classList.add('fade');
@@ -23086,6 +24162,8 @@ document.getElementById('start-btn').addEventListener('click', () => {
         'firmware',
         'footstepMuffled',
         'cpCollapsed',
+        'titan7_settings',
+        'titan7_npcs',
       ];
       for (const k of keys) {
         try { localStorage.removeItem(k); } catch (err) {}
@@ -23098,6 +24176,264 @@ document.getElementById('start-btn').addEventListener('click', () => {
       setTimeout(() => { location.reload(); }, 800);
     });
   }
+}
+
+// ============================================================
+// SETTINGS SYSTEM
+// ============================================================
+const settings = {
+  defaults: {
+    volume: 70,
+    ambient: true,         // true = ambient sounds on
+    footstepMuffled: false,
+    renderDistance: 2,     // 1=low, 2=medium, 3=high (maps to CHUNK_RADIUS)
+    shadows: true,
+    fov: 74,
+    reducedMotion: false,
+    hudScale: 'normal',    // 'normal' | 'large'
+  },
+  current: null,
+  load() {
+    let saved = {};
+    try { saved = JSON.parse(localStorage.getItem('titan7_settings') || '{}'); } catch (e) {}
+    // Honor legacy keys that pre-dated the settings system
+    try {
+      const legacyAmbient = localStorage.getItem('titan7_ambient_muted');
+      if (legacyAmbient === '1' && saved.ambient === undefined) saved.ambient = false;
+    } catch (e) {}
+    try {
+      const legacyMuffled = localStorage.getItem('footstepMuffled');
+      if (legacyMuffled === '1' && saved.footstepMuffled === undefined) saved.footstepMuffled = true;
+    } catch (e) {}
+    this.current = Object.assign({}, this.defaults, saved);
+  },
+  save() {
+    try { localStorage.setItem('titan7_settings', JSON.stringify(this.current)); } catch (e) {}
+    // Keep legacy keys in sync so other parts of the code that still read them
+    // get the right value.
+    try { localStorage.setItem('titan7_ambient_muted', this.current.ambient ? '0' : '1'); } catch (e) {}
+    try { localStorage.setItem('footstepMuffled', this.current.footstepMuffled ? '1' : '0'); } catch (e) {}
+  },
+  apply() {
+    const c = this.current;
+    // Audio: master volume
+    if (typeof audio !== 'undefined' && audio.master) {
+      audio.master.gain.value = c.volume / 100;
+    }
+    // Audio: ambient mute
+    if (typeof audio !== 'undefined') {
+      audio.ambientMuted = !c.ambient;
+      // Re-apply ambient gains immediately
+      if (audio.wind && audio.wind.gain) audio.wind.gain.value = c.ambient ? (audio._windTarget || 0) : 0;
+      if (audio.rain && audio.rain.gain) audio.rain.gain.value = c.ambient ? (audio._rainTarget || 0) : 0;
+      if (audio.reactor && audio.reactor.gain) audio.reactor.gain.value = c.ambient ? (audio._reactorTarget || 0) : 0;
+    }
+    // Audio: footstep muffle
+    if (typeof audio !== 'undefined' && audio.footstepBus) {
+      audio.footstepBus.gain.value = c.footstepMuffled ? 0.06 : 1.0;
+    }
+    // Graphics: render distance
+    if (typeof CHUNK_RADIUS !== 'undefined') {
+      const prev = CHUNK_RADIUS;
+      CHUNK_RADIUS = c.renderDistance;
+      // If radius changed and we're in game, force a chunk update
+      if (prev !== CHUNK_RADIUS && typeof updateChunks === 'function' && typeof player !== 'undefined' && player.pos) {
+        updateChunks(player.pos.x, player.pos.z);
+      }
+    }
+    // Graphics: shadows
+    if (typeof renderer !== 'undefined' && renderer.shadowMap) {
+      renderer.shadowMap.enabled = c.shadows;
+      // Force material re-evaluation so the change takes effect next frame
+      if (typeof scene !== 'undefined') {
+        scene.traverse(obj => {
+          if (obj.material) {
+            if (Array.isArray(obj.material)) obj.material.forEach(m => m.needsUpdate = true);
+            else obj.material.needsUpdate = true;
+          }
+        });
+      }
+    }
+    // Graphics: FOV
+    if (typeof player !== 'undefined') {
+      player.fov = c.fov;
+      player.fovTarget = c.fov;
+    }
+    if (typeof camera !== 'undefined') {
+      camera.fov = c.fov;
+      camera.updateProjectionMatrix();
+    }
+    // Accessibility: reduced motion
+    document.body.classList.toggle('reduced-motion', c.reducedMotion);
+    // Accessibility: HUD scale
+    document.body.classList.toggle('hud-large', c.hudScale === 'large');
+  },
+  set(key, value) {
+    this.current[key] = value;
+    this.save();
+    this.apply();
+  },
+};
+settings.load();
+settings.apply();
+
+// Wire the settings UI
+{
+  const overlay = document.getElementById('settings-overlay');
+  const openFromStart = document.getElementById('start-settings-link');
+  const closeBtn = document.getElementById('settings-close-btn');
+
+  function openSettings() {
+    syncSettingsUI();
+    overlay.classList.add('show');
+  }
+  function closeSettings() {
+    overlay.classList.remove('show');
+  }
+  function syncSettingsUI() {
+    const c = settings.current;
+    document.getElementById('s-volume').value = c.volume;
+    document.getElementById('s-volume-val').textContent = c.volume + '%';
+    document.getElementById('s-ambient').classList.toggle('on', c.ambient);
+    document.getElementById('s-ambient').textContent = c.ambient ? 'ON' : 'OFF';
+    document.getElementById('s-footstep').classList.toggle('on', c.footstepMuffled);
+    document.getElementById('s-footstep').textContent = c.footstepMuffled ? 'ON' : 'OFF';
+    document.querySelectorAll('#s-render-distance button').forEach(b => {
+      b.classList.toggle('active', parseInt(b.dataset.value, 10) === c.renderDistance);
+    });
+    document.getElementById('s-shadows').classList.toggle('on', c.shadows);
+    document.getElementById('s-shadows').textContent = c.shadows ? 'ON' : 'OFF';
+    document.getElementById('s-fov').value = c.fov;
+    document.getElementById('s-fov-val').textContent = c.fov + '°';
+    document.getElementById('s-reduced-motion').classList.toggle('on', c.reducedMotion);
+    document.getElementById('s-reduced-motion').textContent = c.reducedMotion ? 'ON' : 'OFF';
+    document.querySelectorAll('#s-hud-scale button').forEach(b => {
+      b.classList.toggle('active', b.dataset.value === c.hudScale);
+    });
+  }
+
+  // Open buttons
+  if (openFromStart) {
+    openFromStart.addEventListener('click', (e) => { e.preventDefault(); openSettings(); });
+  }
+  if (closeBtn) {
+    closeBtn.addEventListener('click', (e) => { e.preventDefault(); closeSettings(); });
+  }
+  // Click outside the box closes
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) closeSettings();
+  });
+
+  // Sliders
+  const volSlider = document.getElementById('s-volume');
+  volSlider.addEventListener('input', () => {
+    const v = parseInt(volSlider.value, 10);
+    document.getElementById('s-volume-val').textContent = v + '%';
+    settings.set('volume', v);
+  });
+  const fovSlider = document.getElementById('s-fov');
+  fovSlider.addEventListener('input', () => {
+    const v = parseInt(fovSlider.value, 10);
+    document.getElementById('s-fov-val').textContent = v + '°';
+    settings.set('fov', v);
+  });
+
+  // Toggles
+  document.getElementById('s-ambient').addEventListener('click', () => {
+    settings.set('ambient', !settings.current.ambient);
+    syncSettingsUI();
+  });
+  document.getElementById('s-footstep').addEventListener('click', () => {
+    settings.set('footstepMuffled', !settings.current.footstepMuffled);
+    syncSettingsUI();
+  });
+  document.getElementById('s-shadows').addEventListener('click', () => {
+    settings.set('shadows', !settings.current.shadows);
+    syncSettingsUI();
+  });
+  document.getElementById('s-reduced-motion').addEventListener('click', () => {
+    settings.set('reducedMotion', !settings.current.reducedMotion);
+    syncSettingsUI();
+  });
+
+  // Multi-option button groups
+  document.querySelectorAll('#s-render-distance button').forEach(b => {
+    b.addEventListener('click', () => {
+      settings.set('renderDistance', parseInt(b.dataset.value, 10));
+      syncSettingsUI();
+    });
+  });
+  document.querySelectorAll('#s-hud-scale button').forEach(b => {
+    b.addEventListener('click', () => {
+      settings.set('hudScale', b.dataset.value);
+      syncSettingsUI();
+    });
+  });
+
+  // Hotkey to open/close settings (O key) and ESC to close
+  document.addEventListener('keydown', (e) => {
+    // O key (only when not typing in an input)
+    const active = document.activeElement;
+    const isTyping = active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.isContentEditable);
+    if (isTyping) return;
+    if (e.key === 'o' || e.key === 'O') {
+      // Only allow in-game (or on start screen). Skip if GREENROOM is connected
+      // or other modal overlays are visible.
+      if (typeof greenroom !== 'undefined' && greenroom.connected) return;
+      if (overlay.classList.contains('show')) closeSettings();
+      else openSettings();
+      e.preventDefault();
+      return;
+    }
+    if (e.key === 'Escape' && overlay.classList.contains('show')) {
+      closeSettings();
+      e.preventDefault();
+      e.stopPropagation();
+    }
+  });
+
+  // Initial UI sync (in case the panel is opened before any game tick)
+  syncSettingsUI();
+}
+
+// Wire the NPC dialog close interactions (button + ESC)
+{
+  const closeBtn = document.getElementById('npc-dialog-close');
+  if (closeBtn) {
+    closeBtn.addEventListener('click', () => {
+      if (typeof npcCloseDialog === 'function') npcCloseDialog();
+    });
+  }
+  // Click outside the dialog box closes it
+  const dlg = document.getElementById('npc-dialog');
+  if (dlg) {
+    dlg.addEventListener('click', (e) => {
+      if (e.target === dlg && typeof npcCloseDialog === 'function') npcCloseDialog();
+    });
+  }
+  // ESC closes the dialog
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      const d = document.getElementById('npc-dialog');
+      if (d && d.classList.contains('show')) {
+        e.preventDefault();
+        e.stopPropagation();
+        if (typeof npcCloseDialog === 'function') npcCloseDialog();
+      }
+    }
+    // Number keys 1-4 to pick dialog options
+    const d = document.getElementById('npc-dialog');
+    if (d && d.classList.contains('show')) {
+      const n = parseInt(e.key, 10);
+      if (n >= 1 && n <= 9) {
+        const opts = d.querySelectorAll('.npc-opt');
+        if (opts[n - 1]) {
+          opts[n - 1].click();
+          e.preventDefault();
+        }
+      }
+    }
+  });
 }
 
 function runBootSequence() {
