@@ -2469,6 +2469,34 @@
     color: var(--amber-dim);
     margin-bottom: 6px;
   }
+  .side-section-title.with-action {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .side-sound-toggle {
+    pointer-events: auto;
+    cursor: pointer;
+    background: rgba(20, 14, 6, 0.7);
+    border: 1px solid var(--amber-dim);
+    color: var(--amber-dim);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 2px;
+    padding: 2px 8px;
+    user-select: none;
+    transition: all 0.15s;
+  }
+  .side-sound-toggle.on {
+    background: rgba(255, 154, 31, 0.18);
+    border-color: var(--amber);
+    color: var(--amber);
+    box-shadow: 0 0 4px rgba(255, 154, 31, 0.35), inset 0 0 4px rgba(255, 154, 31, 0.12);
+  }
+  .side-sound-toggle:hover {
+    color: var(--amber);
+    border-color: var(--amber);
+  }
   .side-stat-row {
     display: flex; justify-content: space-between;
     font-size: 11px; letter-spacing: 1.5px;
@@ -4362,12 +4390,33 @@
     position: fixed; inset: 0; z-index: 80;
     background: rgba(0,0,0,0.7);
     display: none;
+    flex-direction: column;
     align-items: center; justify-content: center;
     color: var(--amber);
-    font-size: 32px; letter-spacing: 12px;
     font-family: 'Black Ops One', monospace;
   }
   #paused.show { display: flex; }
+  #paused .paused-title {
+    font-size: 36px; letter-spacing: 14px;
+    text-shadow: 0 0 20px rgba(255, 154, 31, 0.5);
+  }
+  #paused .paused-hints {
+    margin-top: 28px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 3px;
+    color: var(--amber-dim);
+    text-align: center;
+    line-height: 2;
+  }
+  #paused .paused-hints .k {
+    background: var(--amber);
+    color: #08080b;
+    padding: 1px 8px;
+    margin-right: 8px;
+    font-weight: bold;
+    letter-spacing: 2px;
+  }
 
   /* ============================================================
      SETTINGS OVERLAY
@@ -5134,6 +5183,8 @@
     <span class="key">J</span><span>Open field journal</span>
     <span class="key">P</span><span>Photo mode</span>
     <span class="key">Z</span><span>Kneel / stand</span>
+    <span class="key">E</span><span>Talk to person nearby</span>
+    <span class="key">O</span><span>Settings menu</span>
     <span class="key">ESC</span><span>Pause / close panel</span>
   </div>
   <div class="byline">
@@ -5641,7 +5692,10 @@
     <span class="sub">FORECAST & CARGO</span>
   </div>
   <div class="side-section">
-    <div class="side-section-title">WEATHER FORECAST</div>
+    <div class="side-section-title with-action">
+      <span>WEATHER FORECAST</span>
+      <span id="side-sound-toggle" class="side-sound-toggle on" title="Toggle ambient sounds (wind, rain, reactor hum)">♪ AMBIENT ON</span>
+    </div>
     <div id="side-forecast"></div>
   </div>
   <div class="side-section">
@@ -5724,7 +5778,13 @@
   <button id="restart-btn">▶ DEPLOY NEW CHASSIS</button>
 </div>
 
-<div id="paused">PAUSED</div>
+<div id="paused">
+  <div class="paused-title">PAUSED</div>
+  <div class="paused-hints">
+    <div><span class="k">ESC</span>resume</div>
+    <div><span class="k">O</span>settings</div>
+  </div>
+</div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
@@ -24267,6 +24327,12 @@ const settings = {
     document.body.classList.toggle('reduced-motion', c.reducedMotion);
     // Accessibility: HUD scale
     document.body.classList.toggle('hud-large', c.hudScale === 'large');
+    // Sync the in-cockpit ambient toggle on the starboard weather panel
+    const sideToggle = document.getElementById('side-sound-toggle');
+    if (sideToggle) {
+      sideToggle.classList.toggle('on', c.ambient);
+      sideToggle.textContent = c.ambient ? '♪ AMBIENT ON' : '♪ AMBIENT OFF';
+    }
   },
   set(key, value) {
     this.current[key] = value;
@@ -24286,9 +24352,24 @@ settings.apply();
   function openSettings() {
     syncSettingsUI();
     overlay.classList.add('show');
+    // Pause the game so the world stops moving while adjusting settings
+    if (typeof gameStarted !== 'undefined' && gameStarted && typeof paused !== 'undefined' && !paused) {
+      settings._wasPaused = false;
+      paused = true;
+      const pausedEl = document.getElementById('paused');
+      // Don't show the big PAUSED banner; the settings overlay itself signals state
+      if (pausedEl) pausedEl.classList.remove('show');
+    } else {
+      settings._wasPaused = true;  // already paused, don't unpause on close
+    }
   }
   function closeSettings() {
     overlay.classList.remove('show');
+    // Resume the game if we paused it ourselves on open
+    if (!settings._wasPaused && typeof paused !== 'undefined' && paused && typeof gameStarted !== 'undefined' && gameStarted) {
+      paused = false;
+    }
+    settings._wasPaused = false;
   }
   function syncSettingsUI() {
     const c = settings.current;
@@ -24394,6 +24475,17 @@ settings.apply();
 
   // Initial UI sync (in case the panel is opened before any game tick)
   syncSettingsUI();
+
+  // Wire the in-cockpit ambient toggle on the starboard weather panel.
+  // Tapping it is a shortcut for the same setting in the panel.
+  const sideToggle = document.getElementById('side-sound-toggle');
+  if (sideToggle) {
+    sideToggle.addEventListener('click', (e) => {
+      e.preventDefault();
+      settings.set('ambient', !settings.current.ambient);
+      syncSettingsUI();
+    });
+  }
 }
 
 // Wire the NPC dialog close interactions (button + ESC)
