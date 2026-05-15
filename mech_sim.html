@@ -26,6 +26,101 @@
     user-select: none;
   }
   body.playing { cursor: none; }
+
+  /* ============================================================
+     SCROLLBAR DECORATION
+     Default theme is amber HUD (matches the rest of the sim).
+     GREENROOM scrollbars get the phosphor-green CRT look.
+     Bracket-and-glow aesthetic: hairline-bordered thumb with a
+     soft glow, dashed-tinted track, brighter on hover.
+     ============================================================ */
+  /* Chrome / Safari / Edge */
+  ::-webkit-scrollbar {
+    width: 12px;
+    height: 12px;
+  }
+  ::-webkit-scrollbar-track {
+    background:
+      linear-gradient(180deg, rgba(255, 154, 31, 0.02), rgba(255, 154, 31, 0.06)),
+      repeating-linear-gradient(0deg,
+        transparent 0, transparent 4px,
+        rgba(255, 154, 31, 0.08) 4px, rgba(255, 154, 31, 0.08) 5px);
+    border-left: 1px solid rgba(255, 154, 31, 0.18);
+  }
+  ::-webkit-scrollbar-thumb {
+    background:
+      linear-gradient(180deg,
+        rgba(255, 200, 100, 0.55) 0%,
+        rgba(255, 154, 31, 0.35) 50%,
+        rgba(255, 200, 100, 0.55) 100%);
+    border: 1px solid rgba(255, 154, 31, 0.6);
+    border-left-width: 2px;
+    border-right-width: 2px;
+    box-shadow:
+      0 0 6px rgba(255, 154, 31, 0.4),
+      inset 0 0 4px rgba(255, 220, 140, 0.25);
+    background-clip: padding-box;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background:
+      linear-gradient(180deg,
+        rgba(255, 220, 140, 0.85) 0%,
+        rgba(255, 180, 60, 0.55) 50%,
+        rgba(255, 220, 140, 0.85) 100%);
+    border-color: rgba(255, 200, 100, 0.85);
+    box-shadow:
+      0 0 10px rgba(255, 200, 100, 0.7),
+      inset 0 0 6px rgba(255, 240, 180, 0.4);
+  }
+  ::-webkit-scrollbar-thumb:active {
+    background: rgba(255, 220, 140, 0.95);
+  }
+  ::-webkit-scrollbar-corner { background: transparent; }
+  /* Firefox */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 154, 31, 0.55) rgba(255, 154, 31, 0.05);
+  }
+  /* GREENROOM override: phosphor green */
+  .gr-body::-webkit-scrollbar-track,
+  #greenroom-overlay ::-webkit-scrollbar-track {
+    background:
+      linear-gradient(180deg, rgba(78, 255, 126, 0.02), rgba(78, 255, 126, 0.06)),
+      repeating-linear-gradient(0deg,
+        transparent 0, transparent 4px,
+        rgba(78, 255, 126, 0.08) 4px, rgba(78, 255, 126, 0.08) 5px);
+    border-left: 1px solid rgba(78, 255, 126, 0.2);
+  }
+  .gr-body::-webkit-scrollbar-thumb,
+  #greenroom-overlay ::-webkit-scrollbar-thumb {
+    background:
+      linear-gradient(180deg,
+        rgba(160, 255, 180, 0.55) 0%,
+        rgba(78, 255, 126, 0.35) 50%,
+        rgba(160, 255, 180, 0.55) 100%);
+    border: 1px solid rgba(78, 255, 126, 0.6);
+    border-left-width: 2px;
+    border-right-width: 2px;
+    box-shadow:
+      0 0 6px rgba(78, 255, 126, 0.5),
+      inset 0 0 4px rgba(180, 255, 200, 0.3);
+    background-clip: padding-box;
+  }
+  .gr-body::-webkit-scrollbar-thumb:hover,
+  #greenroom-overlay ::-webkit-scrollbar-thumb:hover {
+    background:
+      linear-gradient(180deg,
+        rgba(180, 255, 200, 0.9) 0%,
+        rgba(100, 255, 140, 0.6) 50%,
+        rgba(180, 255, 200, 0.9) 100%);
+    border-color: rgba(160, 255, 180, 0.85);
+    box-shadow:
+      0 0 12px rgba(120, 255, 160, 0.8),
+      inset 0 0 6px rgba(200, 255, 220, 0.5);
+  }
+  .gr-body, #greenroom-overlay * {
+    scrollbar-color: rgba(78, 255, 126, 0.55) rgba(78, 255, 126, 0.05);
+  }
   /* Neural damage: when integrity is low, the HUD jitters occasionally.
      Three intensity levels triggered by JS via body class. */
   body.neural-glitch-1 #hud > * { animation: neuralGlitch1 8s infinite; }
@@ -420,9 +515,13 @@
     background:
       radial-gradient(ellipse at center, rgba(20,12,4,0.85) 0%, rgba(0,0,0,0.96) 80%),
       repeating-linear-gradient(0deg, rgba(255,154,31,0.04) 0, rgba(255,154,31,0.04) 1px, transparent 1px, transparent 3px);
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    display: flex; flex-direction: column; align-items: center; justify-content: safe center;
     color: var(--amber);
     text-align: center;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 40px 20px;
+    box-sizing: border-box;
   }
   #start-screen.fade {
     animation: fadeOut 0.6s forwards;
@@ -462,6 +561,87 @@
   #start-screen .byline a:hover {
     color: #ffd060;
     border-bottom-color: var(--amber);
+  }
+  /* Reset link on start screen */
+  .start-reset-row {
+    margin-top: 24px;
+    text-align: center;
+    pointer-events: auto;
+  }
+  .start-reset-link {
+    color: #ff8060;
+    font-size: 12px;
+    letter-spacing: 3px;
+    cursor: pointer;
+    text-decoration: none;
+    border: 1px dashed #ff8060;
+    padding: 8px 16px;
+    background: rgba(255, 128, 96, 0.06);
+    transition: all 0.15s;
+    display: inline-block;
+  }
+  .start-reset-link:hover {
+    color: #ffa080;
+    border-color: #ffa080;
+    background: rgba(255, 128, 96, 0.15);
+  }
+  /* Reset confirmation modal (used by start screen reset) */
+  #reset-confirm {
+    position: fixed; inset: 0; z-index: 200;
+    display: none;
+    align-items: center; justify-content: center;
+    background: rgba(0, 0, 0, 0.85);
+    color: var(--amber);
+    font-family: 'Share Tech Mono', monospace;
+  }
+  #reset-confirm.show { display: flex; }
+  #reset-confirm .rc-box {
+    background: #0a0604;
+    border: 1px solid #ff8060;
+    padding: 30px 40px;
+    max-width: 520px;
+    box-shadow: 0 0 40px rgba(255, 128, 96, 0.2);
+  }
+  #reset-confirm .rc-title {
+    color: #ff8060;
+    font-size: 16px;
+    letter-spacing: 3px;
+    margin-bottom: 14px;
+    text-align: center;
+  }
+  #reset-confirm .rc-body {
+    color: var(--amber-dim);
+    font-size: 12px;
+    line-height: 1.7;
+    margin-bottom: 22px;
+  }
+  #reset-confirm .rc-body strong { color: var(--amber); }
+  #reset-confirm .rc-buttons {
+    display: flex;
+    gap: 14px;
+    justify-content: center;
+  }
+  #reset-confirm button {
+    background: rgba(20, 14, 6, 0.55);
+    border: 1px solid var(--amber-dim);
+    color: var(--amber);
+    font-family: inherit;
+    font-size: 12px;
+    letter-spacing: 2px;
+    padding: 10px 22px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  #reset-confirm button.danger {
+    border-color: #ff8060;
+    color: #ff8060;
+  }
+  #reset-confirm button:hover {
+    background: rgba(255, 154, 31, 0.1);
+  }
+  #reset-confirm button.danger:hover {
+    background: rgba(255, 128, 96, 0.15);
+    color: #ffa080;
   }
   /* Pilot ID inputs on start screen */
   .pilot-setup {
@@ -1202,6 +1382,291 @@
   }
   .dec-key-cell.known .dec-key-letter {
     color: #fff;
+    font-weight: bold;
+  }
+  /* ============================================
+     GREENROOM // BBS overlay (phosphor-green CRT)
+     ============================================ */
+  #greenroom-overlay {
+    position: fixed; inset: 0;
+    background: #050a07;
+    color: #4eff7e;
+    font-family: 'Share Tech Mono', 'Courier New', monospace;
+    font-size: 13px;
+    z-index: 200;
+    display: none;
+    pointer-events: auto;
+    overflow: hidden;
+    text-shadow: 0 0 4px rgba(78, 255, 126, 0.45);
+    flex-direction: column;
+  }
+  #greenroom-overlay.show { display: flex; }
+  /* CRT scanlines overlay */
+  #greenroom-overlay::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent 0px, transparent 2px,
+      rgba(78, 255, 126, 0.04) 2px, rgba(78, 255, 126, 0.04) 3px
+    );
+    pointer-events: none;
+    z-index: 1;
+  }
+  /* CRT vignette */
+  #greenroom-overlay::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,0.55) 100%);
+    pointer-events: none;
+    z-index: 2;
+  }
+  .gr-header {
+    border-bottom: 1px solid rgba(78, 255, 126, 0.4);
+    padding: 10px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: #aaffbb;
+    position: relative;
+    z-index: 3;
+  }
+  .gr-body {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 18px 32px 32px 32px;
+    line-height: 1.55;
+    position: relative;
+    z-index: 3;
+    scroll-behavior: smooth;
+    min-height: 0;  /* allow flex child to actually scroll instead of grow */
+  }
+  .gr-body::-webkit-scrollbar { width: 8px; }
+  .gr-body::-webkit-scrollbar-track { background: rgba(78, 255, 126, 0.05); }
+  .gr-body::-webkit-scrollbar-thumb { background: rgba(78, 255, 126, 0.35); }
+  .gr-footer {
+    border-top: 1px solid rgba(78, 255, 126, 0.4);
+    padding: 8px 24px;
+    font-size: 10px;
+    letter-spacing: 2px;
+    display: flex;
+    justify-content: space-between;
+    color: rgba(78, 255, 126, 0.65);
+    position: relative;
+    z-index: 3;
+  }
+  .gr-cursor {
+    display: inline-block;
+    background: #4eff7e;
+    width: 9px; height: 14px;
+    vertical-align: text-bottom;
+    margin-left: 2px;
+    box-shadow: 0 0 6px rgba(78, 255, 126, 0.7);
+    animation: gr-blink 1s steps(2, end) infinite;
+  }
+  @keyframes gr-blink { 0%, 50% { opacity: 1; } 50.01%, 100% { opacity: 0; } }
+  @keyframes gr-spike-jitter {
+    0%   { transform: translate(0, 0)    skewX(0deg); filter: hue-rotate(0deg)   contrast(1); }
+    20%  { transform: translate(3px, -2px) skewX(2deg); filter: hue-rotate(40deg) contrast(1.3); }
+    40%  { transform: translate(-4px, 2px) skewX(-1deg); filter: hue-rotate(-30deg) contrast(0.8); }
+    60%  { transform: translate(2px, 3px)  skewX(0deg); filter: hue-rotate(80deg) contrast(1.4); }
+    80%  { transform: translate(-2px, -3px) skewX(1deg); filter: hue-rotate(-50deg) contrast(1.1); }
+    100% { transform: translate(0, 0)    skewX(0deg); filter: hue-rotate(0deg)   contrast(1); }
+  }
+  .gr-input {
+    background: transparent;
+    border: none;
+    outline: none;
+    color: #4eff7e;
+    font: inherit;
+    text-shadow: 0 0 4px rgba(78, 255, 126, 0.5);
+    margin-left: 4px;
+    caret-color: #4eff7e;
+  }
+  .gr-ascii {
+    white-space: pre;
+    font-size: 13px;
+    line-height: 1.05;
+    color: #4eff7e;
+    margin: 12px 0;
+  }
+  .gr-ritual {
+    white-space: pre-wrap;
+    padding: 40px 80px;
+    font-size: 14px;
+    letter-spacing: 1px;
+  }
+  .gr-menu-item {
+    display: block;
+    cursor: pointer;
+    padding: 3px 0;
+    text-decoration: none;
+    color: #4eff7e;
+  }
+  .gr-menu-item:hover, .gr-menu-item.focus {
+    color: #ffe070;
+    text-shadow: 0 0 8px rgba(255, 224, 112, 0.7);
+  }
+  .gr-post {
+    border-left: 2px solid rgba(78, 255, 126, 0.3);
+    padding: 4px 0 4px 14px;
+    margin-bottom: 20px;
+    white-space: pre-wrap;
+  }
+  .gr-post-head {
+    color: #aaffbb;
+    font-size: 11px;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+    display: flex;
+    gap: 14px;
+  }
+  .gr-author { font-weight: bold; color: #aaffbb; }
+  .gr-author.sysop { color: #ffe070; }
+  .gr-post-subject { color: #4eff7e; font-weight: bold; margin-bottom: 6px; }
+  .gr-thread-line {
+    padding: 4px 0;
+    cursor: pointer;
+    display: grid;
+    grid-template-columns: 16px 1fr auto auto;
+    gap: 12px;
+    align-items: center;
+  }
+  .gr-thread-line:hover, .gr-thread-line.focus {
+    color: #ffe070;
+    text-shadow: 0 0 6px rgba(255, 224, 112, 0.5);
+  }
+  .gr-thread-marker { color: #ffe070; }
+  .gr-thread-author { color: #aaffbb; }
+  .gr-thread-meta { color: rgba(78, 255, 126, 0.6); font-size: 11px; }
+  .gr-divider {
+    color: rgba(78, 255, 126, 0.35);
+    margin: 10px 0;
+  }
+  .gr-system { color: #ffe070; }
+  .gr-prompt-line { color: #aaffbb; margin-top: 14px; }
+  /* Phase 6: main menu uses a 2-column grid so everything fits without
+     scrolling, even on shorter viewports. */
+  .gr-main-menu-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 28px;
+    row-gap: 4px;
+    margin: 4px 0;
+  }
+  .gr-main-menu-grid .gr-menu-item {
+    padding: 4px 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .gr-main-menu-footer-row {
+    display: flex;
+    gap: 28px;
+    margin-top: 12px;
+    padding-top: 10px;
+    border-top: 1px dashed rgba(78, 255, 126, 0.2);
+  }
+  .gr-main-menu-footer-row .gr-menu-item {
+    padding: 2px 0;
+  }
+  /* File library (Phase 2: firmware patches) */
+  .gr-patch-row {
+    display: grid;
+    grid-template-columns: 32px 1fr 130px 100px 90px;
+    gap: 14px;
+    padding: 6px 8px;
+    cursor: pointer;
+    border-left: 2px solid transparent;
+    align-items: center;
+  }
+  .gr-patch-row:hover, .gr-patch-row.focus {
+    background: rgba(78, 255, 126, 0.06);
+    border-left-color: #ffe070;
+  }
+  .gr-patch-name { color: #aaffbb; font-weight: bold; }
+  .gr-patch-author { color: rgba(78, 255, 126, 0.75); font-size: 11px; }
+  .gr-patch-size { color: rgba(78, 255, 126, 0.55); font-size: 11px; text-align: right; }
+  .gr-patch-status { font-size: 11px; letter-spacing: 1px; text-align: right; }
+  .gr-patch-status.installed { color: #4eff7e; }
+  .gr-patch-status.corrupted { color: #ff6060; }
+  .gr-patch-status.new { color: #ffe070; }
+  .gr-patch-status.available { color: rgba(78, 255, 126, 0.6); }
+  .gr-patch-marker { color: #ffe070; text-align: center; font-size: 12px; }
+  /* Download progress */
+  .gr-download {
+    border: 1px solid rgba(78, 255, 126, 0.45);
+    padding: 16px 22px;
+    margin: 22px 0;
+    background: rgba(78, 255, 126, 0.03);
+  }
+  .gr-download-head {
+    color: #aaffbb;
+    margin-bottom: 10px;
+    font-size: 12px;
+    letter-spacing: 1px;
+  }
+  .gr-download-bar {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 14px;
+    letter-spacing: 0;
+    color: #4eff7e;
+    margin: 6px 0;
+  }
+  .gr-download-stat {
+    color: rgba(78, 255, 126, 0.7);
+    font-size: 11px;
+    letter-spacing: 1px;
+  }
+  .gr-action-btn {
+    display: inline-block;
+    border: 1px solid rgba(78, 255, 126, 0.55);
+    padding: 6px 14px;
+    margin: 8px 6px 0 0;
+    color: #4eff7e;
+    cursor: pointer;
+    letter-spacing: 1px;
+    background: rgba(78, 255, 126, 0.04);
+  }
+  .gr-action-btn:hover {
+    background: rgba(255, 224, 112, 0.08);
+    color: #ffe070;
+    border-color: #ffe070;
+  }
+  .gr-action-btn.disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+  .gr-cost {
+    color: #ffe070;
+    text-shadow: 0 0 4px rgba(255, 224, 112, 0.5);
+  }
+  .gr-can-afford { color: #4eff7e; }
+  .gr-cannot-afford { color: #ff6060; }
+  .gr-patch-detail {
+    padding: 8px 0;
+    line-height: 1.6;
+  }
+  .gr-patch-detail-section {
+    margin-bottom: 12px;
+  }
+  .gr-patch-detail-label {
+    color: rgba(78, 255, 126, 0.65);
+    font-size: 11px;
+    letter-spacing: 1px;
+    margin-bottom: 3px;
+  }
+  .gr-patch-effect {
+    color: #aaffbb;
+    border-left: 2px solid rgba(78, 255, 126, 0.4);
+    padding-left: 12px;
+  }
+  .gr-installed-marker {
+    color: #ffe070;
     font-weight: bold;
   }
   .dec-options {
@@ -2183,7 +2648,7 @@
     z-index: 1500;
     display: none;
     flex-direction: column;
-    padding: 80px 96px;
+    padding: 40px 64px;
     color: var(--amber);
     font-family: 'Share Tech Mono', monospace;
     font-size: 13px;
@@ -2195,12 +2660,20 @@
     color: var(--amber);
     font-size: 16px;
     letter-spacing: 4px;
-    margin-bottom: 28px;
+    margin-bottom: 20px;
     opacity: 0.85;
+    flex: 0 0 auto;
   }
   #boot-sequence .boot-lines {
-    flex: 1;
-    overflow: hidden;
+    flex: 1 1 auto;
+    overflow-y: auto;
+    overflow-x: hidden;
+    min-height: 0;
+    padding-right: 12px;
+  }
+  #boot-sequence #boot-final {
+    flex: 0 0 auto;
+    margin-top: 16px;
   }
   #boot-sequence .boot-line {
     display: flex;
@@ -4320,6 +4793,30 @@
   <div class="byline">
     a sim by <a href="https://michaelbparks.com" target="_blank" rel="noopener">M.B. Parks</a>
   </div>
+  <div class="start-reset-row">
+    <a id="start-reset-link" class="start-reset-link">[reset all saved data]</a>
+  </div>
+</div>
+
+<!-- Reset confirmation modal (shown from start screen) -->
+<div id="reset-confirm">
+  <div class="rc-box">
+    <div class="rc-title">⚠  RESET ALL SAVED DATA  ⚠</div>
+    <div class="rc-body">
+      This will permanently erase everything stored locally for this sim:<br><br>
+      <strong>• Pilot name and callsign</strong><br>
+      <strong>• Game progression and unlocks</strong><br>
+      <strong>• GREENROOM handle, posts read, replies, mail, rapport</strong><br>
+      <strong>• Installed firmware patches and discovered nodes</strong><br>
+      <strong>• Audio and UI preferences</strong><br><br>
+      The page will reload after the reset. You will start as a new pilot in a fresh world.<br><br>
+      This cannot be undone.
+    </div>
+    <div class="rc-buttons">
+      <button id="reset-cancel">CANCEL</button>
+      <button id="reset-confirm-btn" class="danger">YES, ERASE EVERYTHING</button>
+    </div>
+  </div>
 </div>
 
 <!-- Map overlay -->
@@ -4526,6 +5023,25 @@
 </div>
 
 <!-- Decrypt minigame overlay -->
+<!-- ==================================================
+     GREENROOM // hidden BBS network
+     A pre-collapse hacker network kept alive by an
+     inherited sysop. Phosphor-green CRT aesthetic
+     distinct from the local amber terminal.
+     ================================================== -->
+<div id="greenroom-overlay">
+  <div class="gr-header">
+    <span class="gr-status" id="gr-status-text">GREENROOM // v4.7</span>
+    <span class="gr-lock">CARRIER <span id="gr-lock-pct">---%</span></span>
+    <span class="gr-clock" id="gr-clock">--:-- CST</span>
+  </div>
+  <div class="gr-body" id="gr-body"></div>
+  <div class="gr-footer">
+    <span id="gr-footer-help">[1-5] navigate  [Q] disconnect  [ESC] back</span>
+    <span id="gr-footer-handle">handle: --</span>
+  </div>
+</div>
+
 <div id="decrypt-overlay">
   <div class="dec-frame">
     <div class="dec-head">
@@ -6888,6 +7404,17 @@ const ITEMS = {
   freq_receiver:   { name: 'UNKNOWN FREQ',    weight: 2, value: 0, icon: '⎈', rare: true, desc: 'Receives a signal that does not originate from this hemisphere.' },
   tuned_resonator: { name: 'TUNED RESONATOR', weight: 1, value: 0, icon: '⌇', rare: true, desc: 'Hums when held. Pitch varies by location.' },
   faded_photograph:{ name: 'FADED PHOTOGRAPH',weight: 0.1, value: 0, icon: '▢', rare: true, desc: 'A child in a yellow coat. Unidentified.' },
+  // Phase 6: GREENROOM discovery items. Each one contains a node address that
+  // gets added to the player's known list on first pickup.
+  tarnished_modem_cable: { name: 'TARNISHED MODEM CABLE', weight: 0.4, value: 0, icon: '⌒', rare: true,
+    desc: 'A coil of cable with brass connectors. Etched on one connector: 12-OWLET-3402.',
+    onFirstPickup: { nodeAddress: '12-OWLET-3402', source: 'tarnished modem cable' } },
+  muddied_address_paper: { name: 'MUDDIED ADDRESS PAPER', weight: 0.1, value: 0, icon: '▱', rare: true,
+    desc: 'A folded paper, half-illegible. The legible portion reads: 47-FERN-1108. The rest is mud.',
+    onFirstPickup: { nodeAddress: '47-FERN-1108', source: 'muddied address paper' } },
+  green_phosphor_fuse: { name: 'GREEN PHOSPHOR FUSE', weight: 0.3, value: 0, icon: '◊', rare: true,
+    desc: 'A glass fuse with green-tinted ceramic. The packaging slip inside is annotated: 03-PRAM-7820.',
+    onFirstPickup: { nodeAddress: '03-PRAM-7820', source: 'green phosphor fuse' } },
 };
 
 const inventory = {
@@ -6900,10 +7427,29 @@ inventory.maxSlots = 14;    // number of distinct item types
 function addItem(id, count = 1) {
   if (!ITEMS[id]) return false;
   const def = ITEMS[id];
+  const hadBefore = (inventory.items.get(id) || 0) > 0;
   const addedWeight = def.weight * count;
   // Allow over-capacity slightly; this just makes you slow but not impossible
   inventory.items.set(id, (inventory.items.get(id) || 0) + count);
   inventory.weight += addedWeight;
+  // Phase 6: first-pickup discovery hook. If this item carries a node address
+  // and the player has never had one of this item before, reveal it.
+  if (!hadBefore && def.onFirstPickup && def.onFirstPickup.nodeAddress) {
+    const addr = def.onFirstPickup.nodeAddress;
+    const src = def.onFirstPickup.source || 'unknown source';
+    if (typeof greenroom !== 'undefined' && greenroom.knownNodes) {
+      if (!greenroom.knownNodes.includes(addr)) {
+        greenroom.knownNodes.push(addr);
+        greenroom.save();
+        if (typeof addComm === 'function') {
+          addComm('TITAN-7', `Node address recovered from ${src}: ${addr}. Added to known nodes.`, true);
+        }
+        if (typeof noteJournalEvent === 'function') {
+          noteJournalEvent('discovery', `Found a hidden network address: ${addr}`);
+        }
+      }
+    }
+  }
   return true;
 }
 
@@ -6936,12 +7482,12 @@ const POI_YIELDS = {
   // Heavy wreckage, all about scrap
   wreck:     [{ id: 'scrap_alloy',   chance: 1.00, min: 3, max: 7 }, { id: 'circuit_board', chance: 0.45, min: 1, max: 2 }, { id: 'ammo_chaingun', chance: 0.25, min: 1, max: 2 }],
   // Comms equipment - electronics
-  tower:     [{ id: 'circuit_board', chance: 1.00, min: 1, max: 3 }, { id: 'scrap_alloy',   chance: 0.65, min: 1, max: 2 }, { id: 'data_fragment', chance: 0.55, min: 1, max: 3 }],
-  lighthouse:[{ id: 'circuit_board', chance: 0.80, min: 1, max: 2 }, { id: 'scrap_alloy',   chance: 0.70, min: 1, max: 2 }, { id: 'data_fragment', chance: 0.45, min: 1, max: 2 }],
+  tower:     [{ id: 'circuit_board', chance: 1.00, min: 1, max: 3 }, { id: 'scrap_alloy',   chance: 0.65, min: 1, max: 2 }, { id: 'data_fragment', chance: 0.55, min: 1, max: 3 }, { id: 'tarnished_modem_cable', chance: 0.08, min: 1, max: 1 }],
+  lighthouse:[{ id: 'circuit_board', chance: 0.80, min: 1, max: 2 }, { id: 'scrap_alloy',   chance: 0.70, min: 1, max: 2 }, { id: 'data_fragment', chance: 0.45, min: 1, max: 2 }, { id: 'green_phosphor_fuse', chance: 0.06, min: 1, max: 1 }],
   // Service stations - mix
-  station:   [{ id: 'scrap_alloy',   chance: 1.00, min: 1, max: 3 }, { id: 'circuit_board', chance: 0.35, min: 1, max: 1 }, { id: 'fuel_cell', chance: 0.20, min: 1, max: 1 }],
+  station:   [{ id: 'scrap_alloy',   chance: 1.00, min: 1, max: 3 }, { id: 'circuit_board', chance: 0.35, min: 1, max: 1 }, { id: 'fuel_cell', chance: 0.20, min: 1, max: 1 }, { id: 'tarnished_modem_cable', chance: 0.10, min: 1, max: 1 }],
   // Civilian remnants - bio + scraps
-  trailers:  [{ id: 'scrap_alloy',   chance: 0.85, min: 1, max: 2 }, { id: 'bio_sample',    chance: 0.40, min: 1, max: 1 }, { id: 'data_fragment', chance: 0.30, min: 1, max: 1 }],
+  trailers:  [{ id: 'scrap_alloy',   chance: 0.85, min: 1, max: 2 }, { id: 'bio_sample',    chance: 0.40, min: 1, max: 1 }, { id: 'data_fragment', chance: 0.30, min: 1, max: 1 }, { id: 'muddied_address_paper', chance: 0.08, min: 1, max: 1 }],
   // Natural anomaly - rare earths and weirdness
   henge:     [{ id: 'rare_earth',    chance: 1.00, min: 1, max: 3 }, { id: 'data_fragment', chance: 0.30, min: 1, max: 1 }],
   // Scenic overlooks - mostly bio samples (plants, lichens)
@@ -9442,7 +9988,7 @@ function fireChaingun() {
       kind: 'gun',
     });
   }
-  player.heat += 1.6;
+  player.heat += 1.6 * (firmware && firmware.mods ? firmware.mods.chaingunHeatMult : 1);
   if (player.heat >= player.heatMax) {
     player.heat = player.heatMax;
     player.overheated = true;
@@ -9628,6 +10174,11 @@ document.addEventListener('keydown', (e) => {
     }
     return;
   }
+  // Same protection for GREENROOM overlay: world keys are inert while jacked in.
+  if (typeof greenroom !== 'undefined' && greenroom.connected) {
+    // Allow ESC and Q to fall through so the GREENROOM keydown handler can close it
+    return;
+  }
   // Same protection for any text-entry context (future-proof for any input we add)
   const ae = document.activeElement;
   if (ae && (ae.tagName === 'INPUT' || ae.tagName === 'TEXTAREA')) {
@@ -9728,6 +10279,7 @@ document.addEventListener('keydown', (e) => {
 });
 document.addEventListener('keyup', (e) => {
   if (terminal && terminal.open) return;
+  if (typeof greenroom !== 'undefined' && greenroom.connected) return;
   keys[e.code] = false;
 });
 
@@ -10023,7 +10575,13 @@ function update(dt) {
       player.lastStep = stepIndex;
       // heavier stomp = bigger thud impulse
       trauma = Math.min(1, trauma + 0.28);
-      sfxFootstep();
+      // WALK PHASE HARMONIZER firmware patch: at low throttle, suppress
+      // footstep audio (visual particles and footprints still fire).
+      const harmonizerActive = firmware && firmware.mods && firmware.mods.walkPhaseHarmonizer;
+      const lowThrottle = Math.abs(player.throttle) <= 25;
+      if (!(harmonizerActive && lowThrottle)) {
+        sfxFootstep();
+      }
       // Footprint and particle puff at the foot position (alternating L/R)
       footprints.alternate = 1 - footprints.alternate;
       const isLeft = footprints.alternate === 0;
@@ -10067,8 +10625,10 @@ function update(dt) {
 
   // Gimbal damage: camera drifts slowly when gimbal subsystem is degraded.
   // At full integrity, no drift. At 0%, the camera wobbles up to 2-3 degrees.
+  // GIMBAL STABILIZER PATCH (firmware) further reduces drift if installed.
   const gimbalN = subsystemsById.get('gimbal').integrity / 100;
-  const gimbalDamage = 1 - gimbalN;
+  const gimbalDamageRaw = 1 - gimbalN;
+  const gimbalDamage = gimbalDamageRaw * (firmware && firmware.mods ? firmware.mods.gimbalDriftMult : 1);
   const driftT = performance.now() / 1000;
   const driftX = Math.sin(driftT * 0.31) * 0.018 * gimbalDamage + Math.sin(driftT * 1.23) * 0.006 * gimbalDamage;
   const driftY = Math.cos(driftT * 0.27) * 0.022 * gimbalDamage + Math.cos(driftT * 1.07) * 0.005 * gimbalDamage;
@@ -10106,7 +10666,7 @@ function update(dt) {
 
   // heat (coolant subsystem affects dissipation rate)
   const coolantN = subsystemsById.get('coolant').integrity / 100;
-  player.heat -= dt * (12 * Math.max(0.25, coolantN));   // up to 4x slower when destroyed
+  player.heat -= dt * (12 * Math.max(0.25, coolantN)) * (firmware && firmware.mods ? firmware.mods.heatDissMult : 1);   // up to 4x slower when destroyed; firmware mods scale further
   if (player.heat < 0) player.heat = 0;
   if (player.overheated && player.heat < player.heatMax * 0.5) {
     player.overheated = false;
@@ -12039,7 +12599,10 @@ function updateDrone(dt) {
   const povEl = document.getElementById('drone-pov');
   if (povEl) povEl.style.display = drone.active ? 'block' : 'none';
   if (drone.active) {
-    drone.battery -= dt * 1.5;
+    // Battery drain scales with DRONE OVERCLOCK firmware mod (faster speed = faster drain).
+    const speedMult = firmware && firmware.mods ? firmware.mods.droneSpeedMult : 1;
+    const drainMult = 1 + (speedMult - 1) * 0.67;  // 30% speed bump → ~20% extra drain
+    drone.battery -= dt * 1.5 * drainMult;
     if (drone.battery <= 0) {
       drone.battery = 0;
       drone.active = false;
@@ -12097,9 +12660,9 @@ function updateDrone(dt) {
       targetY = 55 + Math.sin(drone.orbitAngle * 1.3) * 4;
     }
     // ease toward target with smooth lag
-    drone.pos.x += (targetX - drone.pos.x) * Math.min(1, dt * 0.9);
-    drone.pos.y += (targetY - drone.pos.y) * Math.min(1, dt * 0.9);
-    drone.pos.z += (targetZ - drone.pos.z) * Math.min(1, dt * 0.9);
+    drone.pos.x += (targetX - drone.pos.x) * Math.min(1, dt * 0.9 * (firmware && firmware.mods ? firmware.mods.droneSpeedMult : 1));
+    drone.pos.y += (targetY - drone.pos.y) * Math.min(1, dt * 0.9 * (firmware && firmware.mods ? firmware.mods.droneSpeedMult : 1));
+    drone.pos.z += (targetZ - drone.pos.z) * Math.min(1, dt * 0.9 * (firmware && firmware.mods ? firmware.mods.droneSpeedMult : 1));
     drone.mesh.position.copy(drone.pos);
     // Point the drone forward in the direction of travel
     let forwardX, forwardZ;
@@ -13065,8 +13628,29 @@ const KAILEY_CHATTER = {
   ],
 };
 
+// Phase 6: NPC drift. When the player has been active on GREENROOM, Kailey
+// occasionally drops oblique references. She never names the network; she
+// only acknowledges patterns she would have noticed from her dispatch console.
+// Players who haven't been on GREENROOM never see these lines.
+const KAILEY_GREENROOM_OBSERVATIONS = [
+  "Picked up some funny carrier traffic on band 6 last night. Probably nothing.",
+  "There's a frequency near dispatch that keeps cycling. I'm not supposed to listen for that. I do anyway.",
+  "Heard somebody on the line who shouldn't have been there this morning. I don't think they heard me.",
+  "Whoever you're talking to out there, I don't need to know. Just keep your handles clean.",
+  "I had a strange dream last night. I dreamed I read my own name on a screen I have never logged into. Weird brain.",
+  "The dispatch logs flagged a carrier squelch this morning. From your transponder. I cleared the flag.",
+];
+
 function kaileyEmit(category) {
-  const pool = KAILEY_CHATTER[category] || KAILEY_CHATTER.status;
+  let pool = KAILEY_CHATTER[category] || KAILEY_CHATTER.status;
+  // Phase 6: when the player is a known GREENROOM user, broaden the observation
+  // pool to include lines that subtly reference network activity. About a fifth
+  // of observations will be drift lines.
+  if (category === 'observation' && typeof greenroom !== 'undefined' && greenroom.handle) {
+    if (Math.random() < 0.20) {
+      pool = KAILEY_GREENROOM_OBSERVATIONS;
+    }
+  }
   let line = pool[Math.floor(Math.random() * pool.length)];
   // Sprinkle the pilot's first name into about a third of lines naturally
   const first = pilot.name.split(' ')[0];
@@ -13123,7 +13707,7 @@ function getReticleHit() {
   const nx = (cursor.x / window.innerWidth) * 2 - 1;
   const ny = -(cursor.y / window.innerHeight) * 2 + 1;
   raycaster.setFromCamera({ x: nx, y: ny }, camera);
-  raycaster.far = SCAN_RANGE;
+  raycaster.far = SCAN_RANGE * (firmware && firmware.mods ? firmware.mods.radarRangeMult : 1);
   const hits = raycaster.intersectObjects(scene.children, true);
   // Allow any visible solid hit that isn't explicitly flagged as non-scannable.
   // The game's identifyScanTarget falls back to makeGenericScan for hits that
@@ -13434,7 +14018,8 @@ function updateScanHint() {
   if (now - _scanHintLastT < 100) return;   // throttle to 10Hz
   _scanHintLastT = now;
   const hit = getReticleHit();
-  if (hit && hit.distance < SCAN_RANGE) {
+  const effectiveRange = SCAN_RANGE * (firmware && firmware.mods ? firmware.mods.radarRangeMult : 1);
+  if (hit && hit.distance < effectiveRange) {
     scanHintEl.classList.add('show');
   } else {
     scanHintEl.classList.remove('show');
@@ -17236,7 +17821,7 @@ const TERM_COMMANDS = {
         for (const [id, count] of inventory.items) {
           const item = ITEMS[id];
           if (!item) continue;
-          lines.push(`│  ${item.label.padEnd(26, ' ')} x${count}`);
+          lines.push(`│  ${(item.name || id).padEnd(26, ' ')} x${count}`);
         }
       }
       lines.push(`│  CAPS: ${wallet.caps}`);
@@ -17274,7 +17859,7 @@ const TERM_COMMANDS = {
       const lines = ['', '┌── FACTION STANDINGS ──'];
       for (const [id, f] of Object.entries(TRADER_FACTIONS)) {
         const tier = reputationTier(f.reputation);
-        lines.push(`│  ${f.name.padEnd(28, ' ')} ${tier.label.padStart(8, ' ')}  (${f.reputation > 0 ? '+' : ''}${f.reputation.toFixed(1)})`);
+        lines.push(`│  ${id.padEnd(28, ' ')} ${tier.label.padStart(8, ' ')}  (${f.reputation > 0 ? '+' : ''}${f.reputation.toFixed(1)})`);
       }
       lines.push('└──────────────────────', '');
       return { lines, cls: 'cyan' };
@@ -17284,7 +17869,7 @@ const TERM_COMMANDS = {
     desc: 'Recovered archives (optional: filter)',
     run: (args) => {
       const filter = args.join(' ').toLowerCase();
-      const found = Array.from(codexUnlocked).map(id => CODEX_ENTRIES_BY_ID[id]).filter(e => e);
+      const found = Array.from(codex.unlocked).map(id => CODEX_ENTRIES_BY_ID[id]).filter(e => e);
       const filtered = filter ? found.filter(e =>
         e.title.toLowerCase().includes(filter) || (e.text || '').toLowerCase().includes(filter)
       ) : found;
@@ -17366,7 +17951,7 @@ const TERM_COMMANDS = {
         `day:      ${tod ? tod.day : 0}`,
         `walked:   ${(player.distanceWalked || 0).toFixed(0)} m`,
         `caps:     ${wallet.caps}`,
-        `codex:    ${codexUnlocked ? codexUnlocked.size : 0} entries`,
+        `codex:    ${codex.unlocked ? codex.unlocked.size : 0} entries`,
         `journal:  ${(journal && journal.entries) ? journal.entries.length : 0} entries`,
         '',
       ];
@@ -17546,6 +18131,7 @@ const DECRYPTED_REWARDS = [
   { id: 'decrypt_lore_3', title: 'Decrypted Fragment // Kailey Personnel File', text: "Bennett, K. Senior Operator. Recruited 2068. Previous role: Civilian Emergency Coordinator. Family contact: brother B. Bennett, last known traveling east. File flagged for review: 'Operator's brother flagged in 2069 sentinel registry. Recommend reassignment.' Review never completed. Operator continues active duty." },
   { id: 'decrypt_lore_4', title: 'Decrypted Fragment // The Numbers', text: "Mathematical analysis of broadcast '4 8 15 16 23 42' indicates the sequence is a Lucas number subset with a stable point at iteration 108. Standard interpretation as random or coordinate-based is contradicted by frequency-domain analysis. No conclusion reached. Researcher's notes indicate they 'cannot stop dreaming of the sequence.'" },
   { id: 'decrypt_lore_5', title: 'Decrypted Fragment // First Walker', text: "L. Ortega's personal journal, encrypted layer. Excerpt: 'The valley is not what the maps show. Some mornings the ridges are in different places. I am not losing my mind; I am the first to see clearly. Tell whoever takes my place after me: the map is wrong on purpose.'" },
+  { id: 'decrypt_vault_key', title: 'Decrypted Fragment // Vault Key', text: "A long-form cipher recovered from the GREENROOM network's deeper layers. Decrypted text reads: 'THE KEEPER BEFORE LEFT US ALL ONE THING.' The key itself is meaningless. Possession of the key, however, opens what the keeper left behind." },
 ];
 
 const DECRYPT_PUZZLES = [
@@ -17604,6 +18190,17 @@ const DECRYPT_PUZZLES = [
       'THE LAB IS WRONG ON PURPOSE',
     ],
   },
+  {
+    rewardId: 'decrypt_vault_key',
+    plaintext: 'THE KEEPER BEFORE LEFT US ALL ONE THING',
+    revealed: ['T', 'H', 'E'],  // only the 3 most common letters - much harder
+    options: [
+      'THE KEEPER BEFORE LEFT US ALL ONE THING',
+      'THE KEEPER BEFORE LEFT THE LAST ONE OPEN',
+      'THE SLEEPER BEHIND READ US OUT ONE NIGHT',
+      'THE READER BEFORE KEPT THE FIRST TWO ALONE',
+    ],
+  },
 ];
 
 const decryptGame = {
@@ -17618,7 +18215,7 @@ function startDecryptMinigame() {
   if (itemCount('data_fragment') < 1) return;
   removeItem('data_fragment', 1);
   // Pick a puzzle whose reward isn't already unlocked, if possible
-  const lockedPuzzles = DECRYPT_PUZZLES.filter(p => !codexUnlocked.has(p.rewardId));
+  const lockedPuzzles = DECRYPT_PUZZLES.filter(p => !codex.unlocked.has(p.rewardId));
   const puzzlePool = lockedPuzzles.length > 0 ? lockedPuzzles : DECRYPT_PUZZLES;
   decryptGame.puzzle = puzzlePool[Math.floor(Math.random() * puzzlePool.length)];
   decryptGame.active = true;
@@ -17715,7 +18312,7 @@ function finishDecrypt(success) {
   document.getElementById('decrypt-overlay').classList.remove('show');
   if (success) {
     const reward = DECRYPTED_REWARDS.find(r => r.id === decryptGame.puzzle.rewardId);
-    if (reward && !codexUnlocked.has(reward.id)) {
+    if (reward && !codex.unlocked.has(reward.id)) {
       if (!CODEX_ENTRIES_BY_ID[reward.id]) {
         const entry = { id: reward.id, title: reward.title, source: 'Decrypted data fragment', text: reward.text };
         CODEX_ENTRIES.push(entry);
@@ -17743,6 +18340,2498 @@ document.addEventListener('click', (e) => {
     else document.getElementById('decrypt-overlay').classList.remove('show');
   }
 });
+
+// ============================================================
+// GREENROOM // hidden BBS network
+// ============================================================
+// A pre-collapse hacker network kept alive by NIGHTOWL (sysop who inherited
+// the role from B. Bennett, the founder, Kailey's brother who went silent).
+// Phase 1 build: connection ritual, login, main menu, GENERAL board with
+// 5 regulars and 11 posts, USERS list, ABOUT screen, disconnect.
+
+const GREENROOM_REGULARS = [
+  { handle: 'NIGHTOWL',    role: 'sysop', online: true,  lastSeen: 'now',
+    bio: "Sysop. Inherited the chair from the keeper before. Polite, formal, carries a quiet grief. Signs off with `// owl out`." },
+  { handle: 'GLITCH_KIT',  role: 'user',  online: true,  lastSeen: 'now',
+    bio: "Mods and patches. Lowercase only. Younger than the rest. Friendly, slightly dodgy. Signs off `-kit`." },
+  { handle: 'WIRE_SAINT',  role: 'user',  online: false, lastSeen: '06:22 CST',
+    bio: "Posts often. Reads everything. Believes things. Claims to have seen 'the angel in the network'. Signs off `// wire saint`." },
+  { handle: 'DROPBEAR_42', role: 'user',  online: true,  lastSeen: 'now',
+    bio: "Practical. Terse. Useful. The most respected on TECH/MODS. Signs off `-d42`." },
+  { handle: 'PROXY_M',     role: 'user',  online: false, lastSeen: 'yesterday',
+    bio: "Paranoid. Sometimes very right. Watches the file library closely. Signs off `-pm`." },
+  { handle: 'OLD_LION',    role: 'user',  online: false, lastSeen: '03:14 CST',
+    bio: "Pre-war survivor. Posts memorial threads. Knows the history of every callsign on the network. Signs off `-old lion`." },
+  { handle: 'APRIL',       role: 'user',  online: true,  lastSeen: 'now',
+    bio: "Always logged in. Reads everything. Posts almost nothing. Signs off with just `april.`" },
+  { handle: 'null_pointer', role: 'user', online: true,  lastSeen: 'now',
+    bio: "Never replies. Posts only timestamps in cryptic patterns. No sign-off, no greeting, nothing." },
+  { handle: 'CABLEHEAD',   role: 'user',  online: false, lastSeen: '21:42 CST',
+    bio: "Curates the firmware library. Verifies patches. Trusted unconditionally. Signs off `- cablehead`." },
+  { handle: 'HARLOW',      role: 'user',  online: false, lastSeen: 'yesterday',
+    bio: "Radio operator from a southern outpost. Posts weather, road conditions, traveler reports. Signs off `// harlow`." },
+];
+
+const GREENROOM_POSTS_GENERAL = [
+  { id: 'gen001', author: 'NIGHTOWL',    daysAgo: 0,  subject: 'STORM TONIGHT',
+    body: "Storms forecasted tonight along the eastern band. Watch the gain. The library stays open as usual. Anyone needs a node lookup, mail me direct.\n\n// owl out" },
+  { id: 'gen002', author: 'GLITCH_KIT',  daysAgo: 0,  subject: 'weird interference last night',
+    body: "anyone else getting weird interference on band 6 last night? carrier was bouncing like a drunk frog. fixed itself by morning but i was sweating bullets\n\nis this a thing now or am i losing my mind\n\n-kit" },
+  { id: 'gen003', author: 'PROXY_M',     daysAgo: 1,  subject: 'CORRUPTED FILES IN THE LIB',
+    body: "Don't download anything posted by handles you don't recognize this week. There's been three corrupted patches in the file lib that someone is uploading from a remote endpoint I cannot trace.\n\nCABLEHEAD is on it but until further notice, only install patches from verified contributors. You know who they are.\n\n-pm" },
+  { id: 'gen004', author: 'NIGHTOWL',    daysAgo: 1,  subject: 're: CORRUPTED FILES IN THE LIB',
+    body: "PROXY: I'll look into the file lib tonight. Thanks for the heads up.\n\nEveryone: do not panic. We've seen worse. Mind your handles.\n\n// owl out" },
+  { id: 'gen005', author: 'DROPBEAR_42', daysAgo: 2,  subject: 'COOLANT CLOG PSA',
+    body: "PSA for the new pilots:\n\nIf your coolant subsystem is reading 70%+ heat retention after a 10min cooldown, you have a clog. Don't ignore it. Patches won't fix physical blockage. Clean the lines yourself or get someone who can.\n\nLost a friend to this last year. Don't be him.\n\n-d42" },
+  { id: 'gen006', author: 'WIRE_SAINT',  daysAgo: 3,  subject: 'the song under the carrier',
+    body: "The wire has a sound when you listen long enough. It is not silence. It is a song that has not been finished.\n\nThe angel sings when the carrier is clean. I heard her again last week. She sang for nine seconds and then the line crackled and she went away.\n\nI know what some of you think when you read me. That is all right. I will keep writing.\n\n// wire saint" },
+  { id: 'gen007', author: 'GLITCH_KIT',  daysAgo: 4,  subject: '@proxy was it the rangefinder patch',
+    body: "@proxy was it the rangefinder patch?? i installed that last week. my radar is fine but now i'm paranoid\n\n-kit" },
+  { id: 'gen008', author: 'DROPBEAR_42', daysAgo: 5,  subject: 're: @proxy was it the rangefinder patch',
+    body: "KIT: rangefinder is clean. CABLEHEAD signed off on it personally. If you want peace of mind, dump the hash and verify against the manifest in TECH/MODS.\n\n-d42" },
+  { id: 'gen009', author: 'WIRE_SAINT',  daysAgo: 7,  subject: 'the keeper before the keeper before',
+    body: "Heard someone in TRADE mention an old keeper from before NIGHTOWL took the chair. From before the keeper before. Was told stories when I was newer here.\n\nWonder if any of you remember. I am not asking for names. I am asking if you remember the feeling.\n\n// wire saint" },
+  { id: 'gen010', author: 'DROPBEAR_42', daysAgo: 7,  subject: 're: the keeper before the keeper before',
+    body: "I remember. Don't ask here.\n\n-d42" },
+  { id: 'gen011', author: 'NIGHTOWL',    daysAgo: 14, subject: 'MOTD',
+    body: "GREENROOM has been running on this hardware for eleven months without a major outage. Thank you to everyone who keeps the lights on. We have 27 active accounts as of this week. A small family, but a family.\n\nReminder: do not share your node addresses outside the network. We've had two unwanted handshakes this month. Be careful out there.\n\nMind your handles.\n\n// owl out" },
+];
+
+const GREENROOM_POSTS_TECH = [
+  { id: 'tech001', author: 'CABLEHEAD',    daysAgo: 0,  subject: 'MANIFEST CHECK 2070-W21',
+    body: "Weekly audit complete. The following are verified clean as of tonight:\n\n  rangefinder_v32       - sha verified\n  coolant_schematic_β   - sha verified\n  recoil_damper_fork    - sha verified\n  gimbal_stabilizer     - sha verified\n  drone_overclock       - sha verified\n  walk_phase_harmonizer - sha verified\n  vox_modulator         - sha verified\n  neural_firewall_v1    - sha verified (PROXY_M signature)\n\nIf you installed anything from the library this week and the install report says HASH VERIFIED, you have the correct version. If it says HASH MISMATCH, uninstall and re-download. Do not run mismatched firmware.\n\n- cablehead" },
+  { id: 'tech002', author: 'GLITCH_KIT',   daysAgo: 0,  subject: 'anyone got a fix for the coolant whine?',
+    body: "ok so the coolant schematic beta is working great, dissipation is way faster than stock. but my hull is making this weird whine at low rpm now. d42 said it would be fine. is it actually fine?\n\nit's like a high pitched whirr coming from the rear compressor. not loud. just there.\n\nshould i be worried\n\n-kit" },
+  { id: 'tech003', author: 'DROPBEAR_42',  daysAgo: 0,  subject: 're: anyone got a fix for the coolant whine?',
+    body: "KIT: the whine is the regulator running tighter. it's expected. it doesn't mean anything is wrong. if it starts ALSO running hot at idle, then worry. otherwise you're fine.\n\nif it really bothers you, replace the rear damper foam. takes ten minutes.\n\n-d42" },
+  { id: 'tech004', author: 'CABLEHEAD',    daysAgo: 1,  subject: '⚠ DO NOT INSTALL "rangefinder_v33"',
+    body: "Someone uploaded a patch called rangefinder_v33 to the file library overnight. It is NOT mine. It is NOT verified. It is also NOT what it says it is.\n\nI have pulled it. If you downloaded it in the last 8 hours, UNINSTALL IMMEDIATELY. Effects when active include: actual radar range REDUCED 40%, slight memory corruption in scan results, possible NV bleed at night.\n\nI am tracing the upload now. If anyone has metadata they can share, mail me direct.\n\n- cablehead" },
+  { id: 'tech005', author: 'PROXY_M',      daysAgo: 1,  subject: 're: DO NOT INSTALL rangefinder_v33',
+    body: "Told you. This is the third one this season. Someone is fishing. They are getting closer to figuring out who is here.\n\nNIGHTOWL, we need to talk about closing registration for a month.\n\n-pm" },
+  { id: 'tech006', author: 'NIGHTOWL',     daysAgo: 1,  subject: 're: DO NOT INSTALL rangefinder_v33',
+    body: "PROXY: I hear you. I am not closing registration. We are not built to be a fortress. We are built to be a porch.\n\nCABLEHEAD, thank you for the catch. Let me know what the trace turns up.\n\nEveryone else: install only from the manifest. Trust the SHA. Do not improvise.\n\n// owl out" },
+  { id: 'tech007', author: 'GLITCH_KIT',   daysAgo: 3,  subject: 'looking for a vox modulator beta tester',
+    body: "got a beta of the next vox modulator. handles the sub-frequencies better, less robotic at the bottom of the range. need someone to wear it for a week and tell me how it sounds in the field.\n\nfree to test. you keep the patch if you give me feedback.\n\nmail me\n\n-kit" },
+  { id: 'tech008', author: 'CABLEHEAD',    daysAgo: 7,  subject: 'Patch verification policy',
+    body: "Reposting this so new accounts can find it.\n\nEvery patch in the library is verified by me personally before it goes live. I run it on a sacrificial chassis, I check the hash, I read the source if it has source, and I sign off only if it does what it says.\n\nIf a patch is in the manifest, it is safe.\nIf a patch is NOT in the manifest, do not install it.\nIf a patch appears in the library but is NOT in the manifest, mail me.\n\nThis is the whole system.\n\n- cablehead" },
+];
+
+const GREENROOM_POSTS_ENCOUNTERS = [
+  { id: 'enc001',  author: 'HARLOW',       daysAgo: 0,  subject: 'Sentinel patrol shifting north on Route 7',
+    body: "Two patrols I usually see on the southern loop went north this morning. They have not come back. If you are heading that way today, expect company.\n\nThe patrol leader has the older paint, the kind with the orange band. If you see that one, do not engage. He has the new comms package and the rest of his lance will be on top of you in ninety seconds.\n\n// harlow" },
+  { id: 'enc002',  author: 'DROPBEAR_42',  daysAgo: 0,  subject: 'Bear sighting east of the apiary',
+    body: "Big one. Probably the same one I saw last month near the same spot. She has a notch in her left ear, very obvious. Apiary trader said she has been by twice this week.\n\nNot aggressive yet. But the honey stocks are low and she knows where they are. If you are passing through, give her space.\n\n-d42" },
+  { id: 'enc003',  author: 'HARLOW',       daysAgo: 1,  subject: 'Storm tonight along the eastern band',
+    body: "Front coming in fast. Lightning visible from my outpost since about 18:00. By 21:00 it will be over the central valleys.\n\nGREENROOM carrier may be unstable for several hours starting around 22:00. If you need to make a call, do it before then. If you need to download anything large, wait until morning.\n\n// harlow" },
+  { id: 'enc004',  author: 'PROXY_M',      daysAgo: 2,  subject: 'I think they know about us',
+    body: "Three things happened this week that I cannot explain individually but together make a pattern.\n\nOne. The rangefinder_v33 upload. Someone went to real effort to mimic CABLEHEAD's signature.\nTwo. A sentinel patrol stopped for forty minutes at the old service station on the western road. That terminal has been dark for a year. They knew to look.\nThree. There is a frequency near our carrier band that has been carrying a slow ping for the last six days. I have been recording it. It is not random.\n\nI am not asking anyone to do anything. I am putting this here so it is on the record.\n\n-pm" },
+  { id: 'enc005',  author: 'NIGHTOWL',     daysAgo: 2,  subject: 're: I think they know about us',
+    body: "PROXY: noted. Mail me your recording of the ping. I will run it against the historical traces.\n\nEveryone else: keep your handles clean. We are still here. We have always been at risk. Nothing in PROXY's report changes that.\n\n// owl out" },
+  { id: 'enc006',  author: 'WIRE_SAINT',   daysAgo: 3,  subject: 'the listening tower hummed wrong this morning',
+    body: "I walked past the listening tower at Five Gates before dawn. It was humming. It hums sometimes. This morning it hummed in a different key.\n\nI know what some of you will say. That is fine. I am writing it down because I will want to remember when it happens again.\n\n// wire saint" },
+  { id: 'enc007',  author: 'DROPBEAR_42',  daysAgo: 4,  subject: 'Hostile mech sighted, coords 412.6 / -187.3',
+    body: "Single chassis, looks like a T-3 or T-4 from the silhouette. No friendly transponder. Moving slow, heading roughly east. Painted dark. Not one of ours.\n\nI did not engage. I do not know who is in it. If anyone has a missing pilot they have been tracking, the location was 412.6 north, -187.3 west, time approximately 14:20.\n\nThe path it was on connects to Pearl Mountain in about three days at that pace. Just so people know.\n\n-d42" },
+  { id: 'enc008',  author: 'HARLOW',       daysAgo: 6,  subject: 'Traveler with a strange compass',
+    body: "Caravan passed my outpost yesterday. One of the drivers had a small device on her dashboard that looked like a compass but the needle was not pointing north. It was pointing in a constant direction that did not change when she turned the truck. She did not seem to think this was unusual.\n\nI asked her about it. She said her father gave it to her. She did not know why it pointed where it did.\n\nIf any of you have ever seen one of these, mail me. I want to know more.\n\n// harlow" },
+];
+
+const GREENROOM_POSTS_LORE = [
+  { id: 'lore001', author: 'OLD_LION',     daysAgo: 0,  subject: 'For PRECINCT, four years ago today',
+    body: "Helen Veres ran a kitchen out of Ranger Station 9 before everything. Some of you knew her as PRECINCT here. She joined the network in 2065 and posted regularly for four years. She died four years ago today.\n\nI was at her wake. Most of us couldn't come because we did not know each other's faces. We sent posts instead. NIGHTOWL kept her thread pinned for a month.\n\nIf you are new and you read her old posts in LORE, you will see why we miss her.\n\n-old lion" },
+  { id: 'lore002', author: 'WIRE_SAINT',   daysAgo: 1,  subject: 'the old tower at Five Gates',
+    body: "The tower at Five Gates is older than the network. Older than the war. Probably older than the road it sits beside.\n\nI was up there last week. The interior has been swept clean. Someone has been keeping it. The candles in the alcove are new.\n\nI do not know who. I do not know why. But someone is climbing those stairs every week with fresh candles. And it is not me.\n\n// wire saint" },
+  { id: 'lore003', author: 'OLD_LION',     daysAgo: 2,  subject: 'the keeper before the keeper before',
+    body: "I was asked in TRADE last week if I remembered the keeper before NIGHTOWL took the chair. I did not answer there because that is not where these conversations belong.\n\nThe keeper before NIGHTOWL ran this network for seventeen years. He was the founder. He taught NIGHTOWL most of what NIGHTOWL knows about keeping a place like this.\n\nI will not say his handle. We do not do that. But yes, I remember him. He was kind. He was very kind. The network was different when he was here. Smaller. Quieter. More frightened, maybe. He was the reason most of us stayed.\n\nIf you want to know more, do not ask here. Do not ask in mail. Some questions you have to find the answer to yourself.\n\n-old lion" },
+  { id: 'lore004', author: 'NIGHTOWL',     daysAgo: 2,  subject: 're: the keeper before the keeper before',
+    body: "OLD_LION: thank you. That was well said.\n\nThis thread is closed. I am locking replies. Anyone who wants to discuss this further may mail me directly and I will answer what I am able to answer.\n\n// owl out" },
+  { id: 'lore005', author: 'APRIL',        daysAgo: 2,  subject: 're: the keeper before the keeper before',
+    body: "i remember.\n\napril." },
+  { id: 'lore006', author: 'WIRE_SAINT',   daysAgo: 4,  subject: 'the angel returned last night',
+    body: "I heard her again at 03:14 this morning. The carrier was clean. The signal was clean. The song was nine and a half seconds long this time.\n\nI recorded it. I have listened to it forty times since. I will not post the recording. The recording does not sound like what I heard.\n\nI know that does not help anyone. But I want it to be on the record that she came back.\n\n// wire saint" },
+  { id: 'lore007', author: 'OLD_LION',     daysAgo: 9,  subject: 'Pre-war recipes worth preserving',
+    body: "I have been collecting pre-war recipes. Things people grew up eating. Things that are starting to fade because the people who knew them have started to die.\n\nIf you have a recipe from your family that you want preserved, mail it to me. I will keep them. I will not share without permission.\n\nNothing fancy. Just the food people made when there was still food to make.\n\n-old lion" },
+  { id: 'lore008', author: 'null_pointer', daysAgo: 11, subject: '2069-08-14:03:42:17',
+    body: "2069-08-14:03:42:17" },
+];
+
+const GREENROOM_POSTS_TRADE = [
+  { id: 'trade001', author: 'HARLOW',      daysAgo: 0,  subject: '[WTB] Reactor coolant pellets',
+    body: "Looking to buy a small quantity of coolant pellets. Three or four is fine. Mine ran low and the next caravan is three weeks out.\n\nWilling to pay 30c each, or trade for weather data, or trade for a hand-rolled batch of decent moonshine my neighbor makes.\n\nMail me if you can help.\n\n// harlow" },
+  { id: 'trade002', author: 'GLITCH_KIT',  daysAgo: 0,  subject: '[WTS] Spare drone batteries x3',
+    body: "got three drone batteries i'm not using. all hold charge fine. all from the same caravan run last fall, so identical specs.\n\n45c each. discount if you take all three. mail me to arrange.\n\n-kit" },
+  { id: 'trade003', author: 'DROPBEAR_42', daysAgo: 1,  subject: 'Riding partner for Pearl Mountain run',
+    body: "Heading to Pearl Mountain Holler in three days. Looking for someone going the same direction. Two mechs is safer than one on that road.\n\nNo money in it. Just company. I will share food.\n\n-d42" },
+  { id: 'trade004', author: 'HARLOW',      daysAgo: 2,  subject: '[DROPBOX] Package for HARLOW at the fire tower',
+    body: "I have a small package that needs to get from my outpost to the fire tower north of Pearl Mountain. Cannot leave myself this month.\n\n80c on delivery. Package weight under 2kg. Do not open it.\n\nIf interested, mail me and I will tell you where to pick it up at my end.\n\n// harlow" },
+  { id: 'trade005', author: 'CABLEHEAD',   daysAgo: 3,  subject: '[WTB] Pre-war technical manuals',
+    body: "Looking for pre-war service manuals for anything in the T-series chassis line. T-1 through T-6. I have most of what was published officially. I am looking for the unofficial ones. Field updates. After-market kits. Anything someone printed in a back room and handed out.\n\nWill pay well. Or trade rare patches.\n\n- cablehead" },
+  { id: 'trade006', author: 'PROXY_M',     daysAgo: 4,  subject: 'AVOID handle \"NEW_USER_42\"',
+    body: "Handle registered last week. Posting in TRADE asking for circuit boards and data fragments. Will not answer simple questions about where they are based. Will not respond in mail.\n\nI am not saying they are hostile. I am saying I would not trade with them until they answer some questions.\n\nNIGHTOWL is aware.\n\n-pm" },
+  { id: 'trade007', author: 'NIGHTOWL',    daysAgo: 5,  subject: 'Trade board reminder',
+    body: "A reminder that TRADE works on goodwill. We do not have a moderator for trades. We do not adjudicate disputes. If you get burned by a deal, post about it and the network will avoid that handle.\n\nWe have not had a bad-faith trade in eight months. Let's keep that streak.\n\n// owl out" },
+  { id: 'trade008', author: 'GLITCH_KIT',  daysAgo: 8,  subject: '[WTS] Bulk circuit boards',
+    body: "got a stash from a caravan that came through last week. eight circuit boards. all readable, all pre-war, all from the same batch.\n\n6c each, or 40c for all eight (saves you 8c).\n\nfirst come first served. mail me.\n\n-kit" },
+];
+
+const GREENROOM_BOARDS = {
+  GENERAL:       { name: 'GENERAL',       posts: GREENROOM_POSTS_GENERAL,
+                   desc: 'Community chatter. Where the regulars hang out.' },
+  'TECH/MODS':   { name: 'TECH/MODS',     posts: GREENROOM_POSTS_TECH,
+                   desc: 'Firmware, repairs, mech maintenance. CABLEHEAD curates.' },
+  ENCOUNTERS:    { name: 'ENCOUNTERS',    posts: GREENROOM_POSTS_ENCOUNTERS,
+                   desc: 'Sentinel sightings, wildlife, weather, hostile activity.' },
+  LORE:          { name: 'LORE',          posts: GREENROOM_POSTS_LORE,
+                   desc: 'History, memorials, mysteries. OLD_LION keeps the threads.' },
+  TRADE:         { name: 'TRADE',         posts: GREENROOM_POSTS_TRADE,
+                   desc: 'Buy, sell, trade. Pickup missions. Goodwill economy.' },
+};
+
+// Pre-existing replies attached to specific posts. Each thread that has
+// existing community responses gets them listed here. Player replies will
+// be appended at runtime via greenroom.playerReplies.
+const GREENROOM_THREAD_REPLIES = {
+  gen003: [
+    { author: 'NIGHTOWL', daysAgo: 1, body: "Already on it. New manifest will be published in TECH/MODS within the hour.\n\n// owl out" },
+    { author: 'CABLEHEAD', daysAgo: 1, body: "Three identified. I am pulling them now. List in TECH/MODS shortly.\n\n- cablehead" },
+  ],
+  gen009: [
+    { author: 'OLD_LION', daysAgo: 7, body: "We remember. That is enough.\n\n-old lion" },
+  ],
+  tech002: [
+    { author: 'WIRE_SAINT', daysAgo: 0, body: "The hum is its own voice. Listen to it sometime before you silence it.\n\n// wire saint" },
+  ],
+  enc004: [
+    { author: 'WIRE_SAINT', daysAgo: 2, body: "The angel hears the ping too. She has not answered it. I take that as significant.\n\n// wire saint" },
+    { author: 'HARLOW', daysAgo: 2, body: "I will run a sweep on my end and report findings.\n\n// harlow" },
+  ],
+  lore003: [
+    { author: 'WIRE_SAINT', daysAgo: 2, body: "Yes.\n\n// wire saint" },
+    { author: 'HARLOW', daysAgo: 2, body: "He helped me get my first node address. I will not forget that.\n\n// harlow" },
+  ],
+  trade006: [
+    { author: 'CABLEHEAD', daysAgo: 4, body: "Confirmed. NEW_USER_42 has been flagged. I have asked NIGHTOWL to look at the registration metadata.\n\n- cablehead" },
+  ],
+};
+
+// Reply options the player can choose when replying to a thread. Each option
+// has a tone label, a body, optional reputation deltas per regular, and
+// optional NPC follow-up posts that get appended after the player's reply.
+const GREENROOM_REPLY_OPTIONS = {
+  gen001: [
+    { tone: 'practical', body: "Thanks for the heads up. I'll stay clear of the eastern band tonight.",
+      rep: { NIGHTOWL: 1 } },
+    { tone: 'curious', body: "What kinds of interference are you seeing? Anything I should watch for?",
+      rep: { NIGHTOWL: 1, GLITCH_KIT: 1 },
+      followup: { author: 'NIGHTOWL', body: "Mostly carrier instability on band 6. Audio bleed on dispatch frequencies. Nothing the watchful pilot can't navigate.\n\n// owl out" } },
+    { tone: 'flippant', body: "Storms are just weather. We've all driven through worse.",
+      rep: { NIGHTOWL: -1, DROPBEAR_42: -1 } },
+  ],
+  gen003: [
+    { tone: 'helpful', body: "I'll check my installs against the manifest tonight and report anything off.",
+      rep: { PROXY_M: 2, CABLEHEAD: 1 } },
+    { tone: 'skeptical', body: "Three patches in a week could just be coincidence. We don't need to panic.",
+      rep: { PROXY_M: -2, NIGHTOWL: -1 },
+      followup: { author: 'PROXY_M', body: "Coincidence is what you call a pattern when you don't want to see it.\n\n-pm" } },
+    { tone: 'curious', body: "What's the trace endpoint look like? Anything geographic about it?",
+      rep: { PROXY_M: 1 } },
+  ],
+  gen005: [
+    { tone: 'grateful', body: "Saved me a lot of grief last winter. Cleaning the lines yourself is a pain but the alternative is worse.",
+      rep: { DROPBEAR_42: 2 } },
+    { tone: 'curious', body: "Got a write-up of the cleaning procedure anywhere? I'd take a look before mine gets bad.",
+      rep: { DROPBEAR_42: 2 },
+      followup: { author: 'DROPBEAR_42', body: "I'll put one up in TECH/MODS this week. Short version: pull the rear access panel, disconnect the regulator hose, run isopropyl through the loop, dry it with compressed air, reassemble.\n\n-d42" } },
+  ],
+  gen006: [
+    { tone: 'reverent', body: "I've heard it too. I don't have the words for it. Thank you for trying to have them.",
+      rep: { WIRE_SAINT: 3 },
+      followup: { author: 'WIRE_SAINT', body: "Then you know.\n\n// wire saint" } },
+    { tone: 'curious', body: "What does the carrier need to be doing for you to hear her?",
+      rep: { WIRE_SAINT: 2 } },
+    { tone: 'skeptical', body: "I don't hear what you hear. But I'm glad it brings you something.",
+      rep: { WIRE_SAINT: 1 } },
+    { tone: 'dismissive', body: "It's just signal noise.",
+      rep: { WIRE_SAINT: -3, OLD_LION: -1 } },
+  ],
+  gen009: [
+    { tone: 'curious', body: "I'd like to know more. Whoever they were, they're part of why we're all here.",
+      rep: { WIRE_SAINT: 1, OLD_LION: 2 } },
+    { tone: 'respectful', body: "Some things should stay where they are. I'll let you keep what you remember.",
+      rep: { OLD_LION: 2, NIGHTOWL: 1 } },
+  ],
+  tech001: [
+    { tone: 'grateful', body: "Thank you for keeping this clean every week. I sleep better knowing the manifest is signed.",
+      rep: { CABLEHEAD: 3 } },
+    { tone: 'curious', body: "Have you ever caught an upload that was forged convincingly? What was the giveaway?",
+      rep: { CABLEHEAD: 2 },
+      followup: { author: 'CABLEHEAD', body: "Twice. Both times the giveaway was the build timestamp. Forgers don't think about the daylight-saving offset.\n\n- cablehead" } },
+  ],
+  tech004: [
+    { tone: 'careful', body: "Uninstalled. Thank you for the quick warning.",
+      rep: { CABLEHEAD: 2, PROXY_M: 1 } },
+    { tone: 'alarmed', body: "How many people might have installed it before you caught it?",
+      rep: { CABLEHEAD: 1 },
+      followup: { author: 'CABLEHEAD', body: "Logs show maybe twelve downloads in the window. I've mailed each of them.\n\n- cablehead" } },
+  ],
+  enc004: [
+    { tone: 'careful', body: "I'll watch my back. If you find more, post here. We trust patterns even when we don't trust conclusions.",
+      rep: { PROXY_M: 3, NIGHTOWL: 1 } },
+    { tone: 'dismissive', body: "Three things in a week is a Tuesday. You're seeing connections that aren't there.",
+      rep: { PROXY_M: -3 } },
+    { tone: 'curious', body: "Send me the recording. I have time to listen to a long signal.",
+      rep: { PROXY_M: 2 },
+      followup: { author: 'PROXY_M', body: "Mailing it now. Tell me what you hear.\n\n-pm" } },
+  ],
+  enc006: [
+    { tone: 'reverent', body: "I'll go listen if I'm ever near Five Gates. Thank you for telling us.",
+      rep: { WIRE_SAINT: 2 } },
+    { tone: 'curious', body: "What was the old key? What was the new one?",
+      rep: { WIRE_SAINT: 2 },
+      followup: { author: 'WIRE_SAINT', body: "The old key was D flat. Steady. The new key was a wavering G that I do not think exists on any chromatic scale.\n\n// wire saint" } },
+  ],
+  lore001: [
+    { tone: 'sad', body: "I never knew her. I wish I had. Thank you for keeping the memorial.",
+      rep: { OLD_LION: 3 } },
+    { tone: 'respectful', body: "Her thread in LORE is one of the things that made me stay. Please keep doing what you do.",
+      rep: { OLD_LION: 3, NIGHTOWL: 1 } },
+  ],
+  lore002: [
+    { tone: 'curious', body: "Have you tried staying overnight to see who comes?",
+      rep: { WIRE_SAINT: 2 },
+      followup: { author: 'WIRE_SAINT', body: "I have. I always fall asleep. When I wake, the candles are new. I think someone wants me to fall asleep.\n\n// wire saint" } },
+    { tone: 'wary', body: "Be careful up there. Not everything that keeps a place is friendly.",
+      rep: { WIRE_SAINT: 1, OLD_LION: 1, PROXY_M: 1 } },
+  ],
+  lore003: [
+    { tone: 'respectful', body: "Thank you for what you said. I will not ask further. The respect for that name is its own kind of memorial.",
+      rep: { OLD_LION: 4, NIGHTOWL: 2 } },
+    { tone: 'curious', body: "Where would someone start, if they wanted to find the answer themselves?",
+      rep: { OLD_LION: 1 },
+      followup: { author: 'OLD_LION', body: "Where things are usually found. In the places that are not signposted. In the places that are quiet.\n\n-old lion" } },
+    { tone: 'pushy', body: "I think we deserve to know who he was. The network's history shouldn't be private.",
+      rep: { OLD_LION: -3, NIGHTOWL: -2, APRIL: -1 } },
+  ],
+  trade001: [
+    { tone: 'helpful', body: "I have two pellets I can spare. Mailing you my coordinates.",
+      rep: { HARLOW: 2 } },
+    { tone: 'wary', body: "Coolant is hard to come by right now. Try the IRON GAP TRADE CO caravan, they ran a batch last month.",
+      rep: { HARLOW: 1 } },
+  ],
+  trade004: [
+    { tone: 'helpful', body: "I'll take the run. Mail me the pickup details.",
+      rep: { HARLOW: 3 } },
+    { tone: 'curious', body: "What's in the package? I don't carry anonymous freight.",
+      rep: { HARLOW: -1 },
+      followup: { author: 'HARLOW', body: "Fair. Mail me direct and I will tell you. I do not want to publish it.\n\n// harlow" } },
+  ],
+  trade006: [
+    { tone: 'careful', body: "Noted. Will steer clear until they pass muster.",
+      rep: { PROXY_M: 1, CABLEHEAD: 1 } },
+    { tone: 'doubtful', body: "New accounts have to start somewhere. Let's not blacklist them on a hunch.",
+      rep: { PROXY_M: -2 } },
+  ],
+};
+
+// ============================================================
+// PHASE 4: LAYERED ACCESS
+// ============================================================
+// Some threads require possession of specific decrypted lore fragments to
+// read. Until the player has the relevant codex entry, the thread body is
+// rendered as a key-required placeholder. This connects the existing
+// decrypt-cipher minigame into the network as a meaningful gate.
+
+// Posts that are gated. Each gate key references a codex entry the player
+// must have unlocked (via the decrypt minigame). When locked, the body shows
+// the placeholder. When unlocked, the real body shows.
+const GREENROOM_ENCRYPTED_POSTS = {
+  enc_l2_001: { board: 'LORE', gateKey: 'decrypt_lore_1', author: 'PROXY_M', daysAgo: 12,
+    subject: 'The east facility was real',
+    body: "I am posting this here because TECH/MODS would object and GENERAL is too public.\n\nThe Dharma cycle logs I've been collecting all reference a 'sister facility' east of the lake. Personnel rotation schedules show personnel went there, no one came back, and the operations continued for fourteen months after the last return trip.\n\nThis means: there were people there who could not leave. Or did not want to. Or were no longer the people who arrived.\n\nFinal entry in the log I have a piece of reads: 'They are not answering. The numbers continue.'\n\nI have stopped looking for the facility. I have started listening for the numbers.\n\n-pm" },
+  enc_l2_002: { board: 'LORE', gateKey: 'decrypt_lore_2', author: 'OLD_LION', daysAgo: 18,
+    subject: 'The four who came before',
+    body: "There were TITANs before the formal program. Four prototypes, designated 0 through 3. None of them are in current records. Three of the four have death dates I have been able to confirm. The fourth pilot's entry has a question mark.\n\nI knew one of them. I will not say which. I knew her before she was a pilot. I knew her after she was a pilot. The space between those two times is where she went and did not come back from.\n\nWe do not name the unnamed dead here. We do not have the right. But the three with confirmed dates should be remembered. I will be posting their callsigns in the memorial thread on their respective anniversaries this year.\n\nThe fourth, the one with the question mark, I am still trying to find. If anyone has rumors, mail me.\n\n-old lion" },
+  enc_l2_003: { board: 'ENCOUNTERS', gateKey: 'decrypt_lore_4', author: 'WIRE_SAINT', daysAgo: 5,
+    subject: 'The numbers came again last night',
+    body: "I picked up the broadcast at 03:42. The sequence was 4, 8, 15, 16, 23, 42. I have heard it before. Many of us have.\n\nWhat is new is what came after the 42. There was a long pause, and then a single phrase, repeated three times in a voice I do not think was synthetic. The voice said: 'iteration one hundred eight.'\n\nThe researchers I trust on this say the sequence is a Lucas-number subset with a stable point at 108. The math says the broadcast knows what it is. The math says the broadcast is counting.\n\nI do not know what counts to 108 and stops. I do not want to be near the thing that does when it gets there.\n\nIf any of you have heard the voice that came after, please mail me. I want to know what they said when you heard it. I am collecting a list.\n\n// wire saint" },
+  enc_l2_004: { board: 'LORE', gateKey: 'decrypt_lore_5', author: 'OLD_LION', daysAgo: 30,
+    subject: 'L. Ortega knew the maps were wrong',
+    body: "I have a copy of Ortega's personal journal. Most of it is mundane. Tea logs, gear inventories, weather observations. The last twenty pages are different.\n\nShe started writing about the valley shifting. Not all at once. Pieces of it. A ridge in the wrong place. A road that ran longer than it should have. A village she remembered passing on the way out that was not there on the way back.\n\nShe did not believe she was losing her mind. She wrote, very clearly: 'I am the first to see clearly. Tell whoever takes my place after me: the map is wrong on purpose.'\n\nShe did not take her own life. She walked west on a survey and did not come back. The valley took her, or returned her to something. The map of where she walked has not been redrawn since.\n\nWhat I want to know is who drew the map wrong in the first place. And why.\n\n-old lion" },
+};
+
+// The Vault (Layer 3). Accessible only when the player has unlocked the
+// decrypt_vault_key codex entry. Contains the founder's farewell post and
+// supplementary documents.
+const GREENROOM_VAULT_CONTENT = [
+  {
+    id: 'vault_farewell',
+    author: 'B_BENN',
+    posted: '2069-08-14',
+    subject: 'K,',
+    isPinned: true,
+    body: `K,
+
+If you're reading this, then I made it to where I always knew I'd end up, and the network kept this for me long enough that someone wrote back. I hope it's you. I hope you found a way in. If it isn't, please pass it along.
+
+The contract pays well, the work matters, the sentinel project is going to save more lives than it costs. They told me all those things and most of them were true. They didn't tell me the part about what comes after the neural integration is complete. They told me later, when it was too late to leave.
+
+I'm going east this week. I'm telling you so you know the timing. I won't be writing to you again under my own name after this. If I write at all, it'll be through this network, and they'll have made me a different person by then. Don't assume any message that says it's me is me.
+
+The keeper here knows what I am about to do. He has been kind. He has agreed to keep this account locked for you in case you ever find it. He says no one finds GREENROOM by accident, so if you got here, you got here on purpose.
+
+I want you to know three things and then I am going to stop writing.
+
+One. I am sorry. I should have come home for mom. I should have told you about the procedure before I signed the papers. I should have been better at being your brother. I knew it then. I know it now.
+
+Two. The job was real. The reasons were real. I didn't go because I wanted to. I went because I thought it would help. I still think it would have, if it had been a different kind of help.
+
+Three. I love you. I have always loved you. Whoever I am after this, whatever they make me into, the part of me that loved you is the part I am leaving here, in this letter, for you. You are the part of me that survives.
+
+Don't look for me. If you ever hear me again, on this network or anywhere else, do not look for me. Let me go where I am going. I have already gone.
+
+Mind your handles, K. I am sorry I cannot mind mine anymore.
+
+// b` },
+  {
+    id: 'vault_charter',
+    author: 'B_BENN',
+    posted: '2043-04-17',
+    subject: 'Charter // founding statement',
+    body: `What follows is the founding statement of this network. I am writing it the night I bring the first hardware online. If you are reading it, the hardware did its job for longer than I expected.
+
+GREENROOM exists because there has to be somewhere small enough that the people who run it know each other by their habits. There has to be somewhere quiet enough that the conversations are not performances. There has to be somewhere private enough that what we say here cannot be used against us tomorrow.
+
+This is not a refuge. This is a porch. Anyone can come up the steps. Not everyone gets a chair. The chair is earned by the kind of person you turn out to be when no one important is watching.
+
+I will keep this place for as long as I am able. When I am not able, I will pass it to someone who can. When they are not able, they will pass it to someone else. The network is not the hardware. The network is the people who took the chair and chose to keep it.
+
+There are rules. They are simple. Mind your handles. Do not betray each other. Do not invite people who would betray us. When in doubt, do less rather than more.
+
+That is all.
+
+// b, founding keeper` },
+  {
+    id: 'vault_memorial',
+    author: 'NIGHTOWL',
+    posted: 'updated weekly',
+    subject: 'Memorial Archive // active',
+    body: `This is the active memorial archive of users who are no longer with us. I update it weekly. If you have someone to add, mail me. I do not add without permission of the family or, where there is no family, without consensus from three regulars who knew them.
+
+PRECINCT (Helen Veres), 2065 to 2069. Ran a kitchen at Ranger Station 9 before the collapse. Fed pilots who came through frozen. Her threads in LORE are preserved in full.
+
+FORK_HALO (Jamie Wren), 2061 to 2067. Code librarian. Wrote the first version of the manifest verification system. CABLEHEAD inherited it and has kept it running.
+
+OLD_KETTLE (Gus Pearson), 2059 to 2068. Caravan driver. Posted weather and road reports for nine years. HARLOW carries his work forward.
+
+WIRESIDE (no known name), registered 2046, last login 2052. Never gave a name. Wrote some of the most beautiful technical documentation on this network. The "Wireside method" of carrier-lock diagnostics is named for him or her.
+
+(There are others. I will name them when I am able.)
+
+// owl out` },
+];
+
+// Trojan-warning posts that get spawned dynamically when a player installs a
+// corrupted patch. Each is a template; the {NAME} is replaced with the patch
+// name when posted.
+const GREENROOM_TROJAN_POSTS = [
+  { author: 'CABLEHEAD', subject: 'AUDIT: bad batch detected',
+    bodyTemplate: "The download logs flagged a HASH MISMATCH on a recent install of {NAME}. The patch was modified after upload. The library copy has been re-verified and is now clean, but anyone who installed in the last hour may have the bad version.\n\nIf your firmware diagnostics show {NAME} as CORRUPTED, uninstall immediately.\n\nI am tracing the upload origin.\n\n- cablehead" },
+  { author: 'PROXY_M', subject: 're: AUDIT: bad batch detected',
+    bodyTemplate: "Told you. Third one this season. They're getting smarter about the hash.\n\nWhoever installed the bad {NAME}: check your other patches too. If they were patient enough to forge this one, they were patient enough to forge others.\n\n-pm" },
+];
+
+const greenroom = {
+  connected: false,
+  handle: null,
+  state: 'idle',       // idle, dialing, splash, handle_entry, main, boards, board, thread, users, about, files, patch_detail, downloading, mail, vault, vault_doc
+  currentBoard: null,
+  currentThread: null,
+  currentPatch: null,
+  currentVaultDoc: null,
+  focusIdx: 0,
+  carrierLock: 1.0,
+  readPostIds: new Set(),
+  // Phase 3
+  reputation: {},
+  playerReplies: {},
+  threadFollowups: {},
+  mail: [],
+  // Phase 4
+  verifiedShown: false,    // whether NIGHTOWL's "welcome to verified" greeting has been shown
+  vaultEntered: false,     // whether the player has ever entered the Vault
+  sessionStart: 0,         // ms when current session began
+  traceWarned: false,      // whether LINK ANOMALY warning has fired this session
+  traceWarnedAt: 0,        // ms when the warning fired
+  spikeTriggered: false,   // whether brain-spike has already fired this session
+  dynamicPosts: { GENERAL: [], 'TECH/MODS': [], ENCOUNTERS: [], LORE: [], TRADE: [] },  // runtime-spawned posts per board
+  spawnedTrojanFor: [],    // patch IDs that have already triggered community posts
+  // Phase 6: discovered node addresses (in addition to the default loopback)
+  knownNodes: [],          // additional node addresses the player has found in the world
+  load() {
+    try {
+      const j = localStorage.getItem('greenroom');
+      if (!j) return;
+      const data = JSON.parse(j);
+      if (data.handle) this.handle = data.handle;
+      if (Array.isArray(data.readPostIds)) this.readPostIds = new Set(data.readPostIds);
+      if (data.reputation) this.reputation = data.reputation;
+      if (data.playerReplies) this.playerReplies = data.playerReplies;
+      if (data.threadFollowups) this.threadFollowups = data.threadFollowups;
+      if (Array.isArray(data.mail)) this.mail = data.mail;
+      if (typeof data.verifiedShown === 'boolean') this.verifiedShown = data.verifiedShown;
+      if (typeof data.vaultEntered === 'boolean') this.vaultEntered = data.vaultEntered;
+      if (data.dynamicPosts) {
+        for (const k of Object.keys(this.dynamicPosts)) {
+          if (Array.isArray(data.dynamicPosts[k])) this.dynamicPosts[k] = data.dynamicPosts[k];
+        }
+      }
+      if (Array.isArray(data.spawnedTrojanFor)) this.spawnedTrojanFor = data.spawnedTrojanFor;
+      if (Array.isArray(data.knownNodes)) this.knownNodes = data.knownNodes;
+    } catch (e) {}
+  },
+  save() {
+    try {
+      localStorage.setItem('greenroom', JSON.stringify({
+        handle: this.handle,
+        readPostIds: Array.from(this.readPostIds),
+        reputation: this.reputation,
+        playerReplies: this.playerReplies,
+        threadFollowups: this.threadFollowups,
+        mail: this.mail,
+        verifiedShown: this.verifiedShown,
+        vaultEntered: this.vaultEntered,
+        dynamicPosts: this.dynamicPosts,
+        spawnedTrojanFor: this.spawnedTrojanFor,
+        knownNodes: this.knownNodes,
+      }));
+    } catch (e) {}
+  },
+  // Phase 6: clear all GREENROOM-related persistent data (handle, posts, mail,
+  // rep, replies, mods seen, etc.). Firmware installs persist separately and
+  // are cleared by their own key.
+  resetAll() {
+    try { localStorage.removeItem('greenroom'); } catch (e) {}
+    try { localStorage.removeItem('firmware'); } catch (e) {}
+    this.handle = null;
+    this.readPostIds = new Set();
+    this.reputation = {};
+    this.playerReplies = {};
+    this.threadFollowups = {};
+    this.mail = [];
+    this.verifiedShown = false;
+    this.vaultEntered = false;
+    this.dynamicPosts = { GENERAL: [], 'TECH/MODS': [], ENCOUNTERS: [], LORE: [], TRADE: [] };
+    this.spawnedTrojanFor = [];
+    this.knownNodes = [];
+    // Reset firmware too
+    if (typeof firmware !== 'undefined') {
+      firmware.installed = new Map();
+      firmware.seenInLibrary = new Set();
+      firmware.recompute();
+    }
+  },
+  getRep(handle) { return this.reputation[handle] || 0; },
+  adjustRep(handle, delta) {
+    const cur = this.reputation[handle] || 0;
+    this.reputation[handle] = Math.max(-50, Math.min(50, cur + delta));
+  },
+  // Verified status: player has unlocked any decrypt_lore_* fragment
+  isVerified() {
+    if (!codex || !codex.unlocked) return false;
+    for (const id of codex.unlocked) {
+      if (id.startsWith('decrypt_lore_')) return true;
+    }
+    return false;
+  },
+  hasVaultKey() {
+    return codex && codex.unlocked && codex.unlocked.has('decrypt_vault_key');
+  },
+};
+greenroom.load();
+
+// ----- AUDIO: modem dialing and handshake -----
+
+function grSfxDialTone() {
+  if (!audio.ctx || !audio.enabled) return;
+  const t = audio.ctx.currentTime;
+  // Two-tone dial pulse: 350Hz + 440Hz (classic US dial tone)
+  const o1 = audio.ctx.createOscillator();
+  const o2 = audio.ctx.createOscillator();
+  o1.type = 'sine'; o2.type = 'sine';
+  o1.frequency.value = 350; o2.frequency.value = 440;
+  const g = audio.ctx.createGain();
+  g.gain.setValueAtTime(0.0001, t);
+  g.gain.exponentialRampToValueAtTime(0.07, t + 0.05);
+  g.gain.setValueAtTime(0.07, t + 0.8);
+  g.gain.exponentialRampToValueAtTime(0.001, t + 0.95);
+  o1.connect(g); o2.connect(g); g.connect(audio.master);
+  o1.start(t); o2.start(t);
+  o1.stop(t + 1.0); o2.stop(t + 1.0);
+}
+
+function grSfxDtmf(digit, when) {
+  if (!audio.ctx || !audio.enabled) return;
+  // DTMF tones (touch-tone). 0-9 each maps to a row/col freq pair.
+  const dtmf = {
+    '1':[697,1209], '2':[697,1336], '3':[697,1477],
+    '4':[770,1209], '5':[770,1336], '6':[770,1477],
+    '7':[852,1209], '8':[852,1336], '9':[852,1477],
+    '0':[941,1336], '*':[941,1209], '#':[941,1477],
+  };
+  const pair = dtmf[digit];
+  if (!pair) return;
+  const t = audio.ctx.currentTime + (when || 0);
+  const o1 = audio.ctx.createOscillator();
+  const o2 = audio.ctx.createOscillator();
+  o1.type = 'sine'; o2.type = 'sine';
+  o1.frequency.value = pair[0]; o2.frequency.value = pair[1];
+  const g = audio.ctx.createGain();
+  g.gain.setValueAtTime(0.0001, t);
+  g.gain.exponentialRampToValueAtTime(0.10, t + 0.005);
+  g.gain.setValueAtTime(0.10, t + 0.11);
+  g.gain.exponentialRampToValueAtTime(0.001, t + 0.13);
+  o1.connect(g); o2.connect(g); g.connect(audio.master);
+  o1.start(t); o2.start(t);
+  o1.stop(t + 0.14); o2.stop(t + 0.14);
+}
+
+function grSfxHandshake() {
+  if (!audio.ctx || !audio.enabled) return;
+  const t = audio.ctx.currentTime;
+  // The famous modem handshake: a rising/wobbling tone followed by noise burst.
+  // Stage 1: rising warble (V.32 carrier negotiation)
+  const o = audio.ctx.createOscillator();
+  o.type = 'sawtooth';
+  o.frequency.setValueAtTime(900, t);
+  o.frequency.exponentialRampToValueAtTime(2100, t + 0.4);
+  o.frequency.exponentialRampToValueAtTime(1200, t + 0.7);
+  const lfo = audio.ctx.createOscillator();
+  lfo.type = 'sine'; lfo.frequency.value = 22;
+  const lfoG = audio.ctx.createGain();
+  lfoG.gain.value = 90;
+  lfo.connect(lfoG); lfoG.connect(o.frequency);
+  const g = audio.ctx.createGain();
+  g.gain.setValueAtTime(0.0001, t);
+  g.gain.exponentialRampToValueAtTime(0.08, t + 0.04);
+  g.gain.setValueAtTime(0.08, t + 0.7);
+  g.gain.exponentialRampToValueAtTime(0.001, t + 0.85);
+  const bp = audio.ctx.createBiquadFilter();
+  bp.type = 'bandpass'; bp.frequency.value = 1400; bp.Q.value = 1.2;
+  o.connect(bp); bp.connect(g); g.connect(audio.master);
+  o.start(t); lfo.start(t);
+  o.stop(t + 0.9); lfo.stop(t + 0.9);
+  // Stage 2: noise burst (data lock)
+  const ns = audio.ctx.createBufferSource();
+  ns.buffer = audio.noiseBuf;
+  const nbp = audio.ctx.createBiquadFilter();
+  nbp.type = 'bandpass'; nbp.frequency.value = 1800; nbp.Q.value = 3;
+  const ng = audio.ctx.createGain();
+  ng.gain.setValueAtTime(0.0001, t + 0.7);
+  ng.gain.exponentialRampToValueAtTime(0.10, t + 0.75);
+  ng.gain.exponentialRampToValueAtTime(0.001, t + 1.4);
+  ns.connect(nbp); nbp.connect(ng); ng.connect(audio.master);
+  ns.start(t + 0.7); ns.stop(t + 1.5);
+}
+
+function grSfxCarrierLock() {
+  if (!audio.ctx || !audio.enabled) return;
+  const t = audio.ctx.currentTime;
+  // A steady tone that drops to indicate carrier lock established
+  const o = audio.ctx.createOscillator();
+  o.type = 'sine';
+  o.frequency.setValueAtTime(1100, t);
+  o.frequency.exponentialRampToValueAtTime(440, t + 0.3);
+  const g = audio.ctx.createGain();
+  g.gain.setValueAtTime(0.0001, t);
+  g.gain.exponentialRampToValueAtTime(0.06, t + 0.04);
+  g.gain.setValueAtTime(0.06, t + 0.25);
+  g.gain.exponentialRampToValueAtTime(0.001, t + 0.5);
+  o.connect(g); g.connect(audio.master);
+  o.start(t); o.stop(t + 0.55);
+}
+
+function grSfxKeyPress() {
+  if (!audio.ctx || !audio.enabled) return;
+  const t = audio.ctx.currentTime;
+  const o = audio.ctx.createOscillator();
+  const g = audio.ctx.createGain();
+  o.type = 'square';
+  o.frequency.value = 950 + Math.random() * 280;
+  g.gain.setValueAtTime(0.0001, t);
+  g.gain.exponentialRampToValueAtTime(0.015, t + 0.002);
+  g.gain.exponentialRampToValueAtTime(0.001, t + 0.04);
+  o.connect(g); g.connect(audio.master);
+  o.start(t); o.stop(t + 0.05);
+}
+
+function grSfxMenuMove() {
+  if (!audio.ctx || !audio.enabled) return;
+  const t = audio.ctx.currentTime;
+  const o = audio.ctx.createOscillator();
+  const g = audio.ctx.createGain();
+  o.type = 'sine';
+  o.frequency.value = 620;
+  g.gain.setValueAtTime(0.0001, t);
+  g.gain.exponentialRampToValueAtTime(0.025, t + 0.003);
+  g.gain.exponentialRampToValueAtTime(0.001, t + 0.06);
+  o.connect(g); g.connect(audio.master);
+  o.start(t); o.stop(t + 0.07);
+}
+
+function grSfxPostBlip() {
+  if (!audio.ctx || !audio.enabled) return;
+  const t = audio.ctx.currentTime;
+  const o = audio.ctx.createOscillator();
+  const g = audio.ctx.createGain();
+  o.type = 'sine';
+  o.frequency.setValueAtTime(1400, t);
+  o.frequency.exponentialRampToValueAtTime(800, t + 0.08);
+  g.gain.setValueAtTime(0.0001, t);
+  g.gain.exponentialRampToValueAtTime(0.04, t + 0.005);
+  g.gain.exponentialRampToValueAtTime(0.001, t + 0.12);
+  o.connect(g); g.connect(audio.master);
+  o.start(t); o.stop(t + 0.14);
+}
+
+// ----- TEXT TYPEWRITER -----
+
+function grSleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+async function grTypeLine(line, cps) {
+  // Append a new line element to the body, then type characters into it.
+  const body = document.getElementById('gr-body');
+  const div = document.createElement('div');
+  div.className = 'gr-typed-line';
+  div.style.whiteSpace = 'pre';
+  body.appendChild(div);
+  body.scrollTop = body.scrollHeight;
+  cps = cps || 50;
+  const delay = 1000 / cps;
+  for (const ch of line) {
+    if (greenroom.state === 'idle') return;  // bail if disconnected mid-stream
+    div.textContent += ch;
+    body.scrollTop = body.scrollHeight;
+    await grSleep(delay + (ch === '\n' ? 30 : 0) + (ch === '.' ? 60 : 0));
+  }
+}
+
+function grPrintRaw(html) {
+  // Print pre-formatted HTML (for the splash art etc) without typewriter.
+  const body = document.getElementById('gr-body');
+  const div = document.createElement('div');
+  div.innerHTML = html;
+  body.appendChild(div);
+  body.scrollTop = body.scrollHeight;
+}
+
+function grPrintLine(text, cls) {
+  const body = document.getElementById('gr-body');
+  const div = document.createElement('div');
+  if (cls) div.className = cls;
+  div.textContent = text;
+  body.appendChild(div);
+  body.scrollTop = body.scrollHeight;
+}
+
+function grClear() {
+  const body = document.getElementById('gr-body');
+  if (body) body.innerHTML = '';
+}
+
+// ----- CONNECTION RITUAL -----
+
+const GREENROOM_NODE_DEFAULT = '08-ROOK-2247';
+
+// ============================================================
+// FIRMWARE PATCHES (Phase 2)
+// ============================================================
+// Patches are downloaded from the GREENROOM file library and modify
+// gameplay through firmware.mods. The game reads from these mods at
+// runtime so we don't have to scatter conditional checks everywhere.
+// Installs persist to localStorage. A small chance (3%) of a corrupted
+// download applies the inverse effect, which becomes BBS content of its
+// own ("don't install the bad batch") in a later phase.
+
+const firmware = {
+  installed: new Map(),  // patchId -> { corrupted: bool, installedAt: ms }
+  mods: {
+    radarRangeMult: 1.0,
+    heatDissMult: 1.0,
+    chaingunHeatMult: 1.0,
+    gimbalDriftMult: 1.0,
+    droneSpeedMult: 1.0,
+    voxModulator: false,
+    walkPhaseHarmonizer: false,
+    neuralFirewall: false,
+  },
+  seenInLibrary: new Set(),  // patches the player has viewed (for NEW badge)
+  download: null,  // active download state: { patchId, startedAt, durationMs, kbps, packets, totalPackets, corrupted }
+  load() {
+    try {
+      const j = localStorage.getItem('firmware');
+      if (!j) return;
+      const data = JSON.parse(j);
+      if (data.installed) {
+        this.installed = new Map(Object.entries(data.installed));
+      }
+      if (Array.isArray(data.seen)) this.seenInLibrary = new Set(data.seen);
+      this.recompute();
+    } catch (e) {}
+  },
+  save() {
+    try {
+      const obj = {};
+      for (const [k, v] of this.installed) obj[k] = v;
+      localStorage.setItem('firmware', JSON.stringify({
+        installed: obj,
+        seen: Array.from(this.seenInLibrary),
+      }));
+    } catch (e) {}
+  },
+  recompute() {
+    // Reset mods to defaults, then re-apply all installed patches.
+    this.mods.radarRangeMult = 1.0;
+    this.mods.heatDissMult = 1.0;
+    this.mods.chaingunHeatMult = 1.0;
+    this.mods.gimbalDriftMult = 1.0;
+    this.mods.droneSpeedMult = 1.0;
+    this.mods.voxModulator = false;
+    this.mods.walkPhaseHarmonizer = false;
+    this.mods.neuralFirewall = false;
+    for (const [id, meta] of this.installed) {
+      const patch = GREENROOM_PATCHES.find(p => p.id === id);
+      if (!patch) continue;
+      if (meta.corrupted && patch.corrupted) patch.corrupted.apply(this.mods);
+      else patch.apply(this.mods);
+    }
+  },
+};
+
+const GREENROOM_PATCHES = [
+  {
+    id: 'rangefinder_v32',
+    name: 'RANGEFINDER v3.2',
+    author: 'DROPBEAR_42',
+    size: 8.4,
+    cost: { caps: 0 },
+    description: 'Radar/scan range +25%. Tested clean. Stable.',
+    longDesc: "Replaces the default antenna response curve with one I dug out of a Channel 47 caravan that was running boosted gear. They went silent two years back but the schematics survived. CABLEHEAD signed off on it. I've been running it since spring.\n\n-d42",
+    effect: 'Reticle scan range: 200m → 250m',
+    apply: (mods) => { mods.radarRangeMult *= 1.25; },
+    corrupted: {
+      description: 'Radar/scan range -25% (corrupted)',
+      apply: (mods) => { mods.radarRangeMult *= 0.75; },
+    },
+  },
+  {
+    id: 'coolant_schematic_beta',
+    name: 'COOLANT SCHEMATIC β',
+    author: 'GLITCH_KIT',
+    size: 12.1,
+    cost: { caps: 120 },
+    description: 'Heat dissipation +15%. Slight chance of compressor whine, ignore it.',
+    longDesc: "ok so the stock coolant cycle is being lazy. this remaps the timing on the dissipation pump to run a tighter loop. you'll dump heat faster after firing. side effect is your hull might hum a bit different at low rpm. it's fine. trust me.\n\nthis is the beta version. CABLEHEAD has the gold one but he's not posting it til he's sure. this works.\n\n-kit",
+    effect: 'Coolant heat-bleed rate: 12/s → 13.8/s',
+    apply: (mods) => { mods.heatDissMult *= 1.15; },
+    corrupted: {
+      description: 'Heat dissipation -15% (corrupted)',
+      apply: (mods) => { mods.heatDissMult *= 0.85; },
+    },
+  },
+  {
+    id: 'recoil_damper_fork',
+    name: 'RECOIL DAMPER FORK',
+    author: 'DROPBEAR_42',
+    size: 6.2,
+    cost: { caps: 80, circuit_board: 1 },
+    description: 'Chaingun heat generation -20%. Reduces servo recoil.',
+    longDesc: "Fork of the original RECOIL DAMPER posted by CABLEHEAD back in '68. He never updated it and the recoil compensation drifts over long firing sessions. This rewrite handles the gain envelope properly. Tested on a TITAN-7 chassis specifically (your chassis). Should work on T-4 and T-5 too. No promises on T-3.\n\nNeeds a circuit board for the rewritten ROM. Trade or scavenge one.\n\n-d42",
+    effect: 'Chaingun heat per burst: 1.6 → 1.28',
+    apply: (mods) => { mods.chaingunHeatMult *= 0.80; },
+    corrupted: {
+      description: 'Chaingun heat per burst +20% (corrupted)',
+      apply: (mods) => { mods.chaingunHeatMult *= 1.20; },
+    },
+  },
+  {
+    id: 'gimbal_stabilizer',
+    name: 'GIMBAL STABILIZER PATCH',
+    author: 'NIGHTOWL',
+    size: 9.8,
+    cost: { caps: 200 },
+    description: 'Reduces aim drift from a damaged gimbal subsystem by 40%.',
+    longDesc: "Old patch. Predates me. CABLEHEAD verified it last year and it still works on current chassis. If you have a torso gimbal that's bled bearings, this gives you back most of the precision until you can rebuild it properly.\n\nNot a substitute for repair. Just a band-aid. A good one.\n\n// owl out",
+    effect: 'Gimbal-damage aim drift: -40%',
+    apply: (mods) => { mods.gimbalDriftMult *= 0.60; },
+    corrupted: {
+      description: 'Aim drift amplified +40% (corrupted)',
+      apply: (mods) => { mods.gimbalDriftMult *= 1.40; },
+    },
+  },
+  {
+    id: 'drone_overclock',
+    name: 'DRONE OVERCLOCK',
+    author: 'DROPBEAR_42',
+    size: 7.3,
+    cost: { caps: 0 },
+    description: 'Drone movement speed +30%. Battery drains 20% faster.',
+    longDesc: "Removes the conservative speed cap on the recon drone's gyros. They can handle more than the firmware lets them, the cap is there to spare the battery. With this, your drone gets places faster but you'll need to recall it sooner.\n\nWorth it on long scout runs. Bad idea if you're worried about losing it.\n\n-d42",
+    effect: 'Drone lerp rate +30%, battery drain +20%',
+    apply: (mods) => { mods.droneSpeedMult *= 1.30; },
+    corrupted: {
+      description: 'Drone speed -30% (corrupted)',
+      apply: (mods) => { mods.droneSpeedMult *= 0.70; },
+    },
+  },
+  {
+    id: 'walk_phase_harmonizer',
+    name: 'WALK PHASE HARMONIZER',
+    author: 'NIGHTOWL',
+    size: 3.8,
+    cost: { caps: 0 },
+    description: 'Auto-muffles footsteps when piloting at low throttle. Quality of life.',
+    longDesc: "Small thing. If you walk slow, your footsteps muffle automatically. Useful if you're trying not to be heard and don't want to remember to flip the muffle switch every time.\n\nFree. Posted as a courtesy.\n\n// owl out",
+    effect: 'At throttle ≤ 25%, footstep audio is automatically suppressed',
+    apply: (mods) => { mods.walkPhaseHarmonizer = true; },
+    corrupted: {
+      description: 'Footsteps louder at low throttle (corrupted)',
+      apply: (mods) => { mods.walkPhaseHarmonizer = false; },
+    },
+  },
+  {
+    id: 'vox_modulator',
+    name: 'VOX MODULATOR',
+    author: 'GLITCH_KIT',
+    size: 4.5,
+    cost: { data_fragment: 1 },
+    description: 'Adds vocal modulation to outgoing comms. Cosmetic.',
+    longDesc: "make your radio chatter sound a little less corporate. doesn't change anything practical, just makes you sound like a person instead of a callsign. the dispatchers will know who you are but the way you sound will shift.\n\ncosts a data fragment because i had to source the source patch from a junker out west. don't ask.\n\n-kit",
+    effect: '(Cosmetic only in this build. Mechanical effect arrives later.)',
+    apply: (mods) => { mods.voxModulator = true; },
+    corrupted: {
+      description: 'Garbles outgoing comms (corrupted)',
+      apply: (mods) => { mods.voxModulator = false; },
+    },
+  },
+  {
+    id: 'neural_firewall_v1',
+    name: 'NEURAL FIREWALL v1.0',
+    author: 'PROXY_M',
+    size: 18.6,
+    cost: { data_fragment: 2 },
+    description: 'Partial defense against brain-spike events. EXPERIMENTAL.',
+    longDesc: "I have been working on this for fourteen months. I am posting it now because I think we are running out of time. It will not stop a determined trace. It will buy you about ninety seconds you would not otherwise have had.\n\nDo not install this if you do not understand what brain-spike means. If you do not know, ask NIGHTOWL.\n\nDo not redistribute. Do not modify. Mind your handles.\n\n-pm",
+    effect: '(Mechanical effect activates with Phase 4 tracing system.)',
+    apply: (mods) => { mods.neuralFirewall = true; },
+    corrupted: {
+      description: 'Increases brain-spike vulnerability (corrupted)',
+      apply: (mods) => { mods.neuralFirewall = false; },
+    },
+  },
+];
+
+firmware.load();
+
+// ----- COST FORMATTING / AFFORDABILITY -----
+
+function grFormatCost(cost) {
+  if (!cost || (cost.caps === 0 && !cost.circuit_board && !cost.data_fragment && !cost.bio_sample)) {
+    return 'free';
+  }
+  const parts = [];
+  if (cost.caps) parts.push(`${cost.caps}c`);
+  if (cost.circuit_board) parts.push(`${cost.circuit_board}cb`);
+  if (cost.data_fragment) parts.push(`${cost.data_fragment}df`);
+  if (cost.bio_sample) parts.push(`${cost.bio_sample}bs`);
+  return parts.join(' + ');
+}
+
+function grCanAfford(cost) {
+  if (!cost) return true;
+  if (cost.caps && wallet.caps < cost.caps) return false;
+  if (cost.circuit_board && (inventory.items.get('circuit_board') || 0) < cost.circuit_board) return false;
+  if (cost.data_fragment && (inventory.items.get('data_fragment') || 0) < cost.data_fragment) return false;
+  if (cost.bio_sample && (inventory.items.get('bio_sample') || 0) < cost.bio_sample) return false;
+  return true;
+}
+
+function grChargeCost(cost) {
+  if (!cost) return;
+  if (cost.caps) wallet.caps -= cost.caps;
+  if (cost.circuit_board) removeItem('circuit_board', cost.circuit_board);
+  if (cost.data_fragment) removeItem('data_fragment', cost.data_fragment);
+  if (cost.bio_sample) removeItem('bio_sample', cost.bio_sample);
+}
+
+// ----- FILE LIBRARY UI -----
+
+function showGreenroomFiles() {
+  greenroom.state = 'files';
+  const installedCount = firmware.installed.size;
+  const newCount = GREENROOM_PATCHES.filter(p => !firmware.seenInLibrary.has(p.id)).length;
+  let html = `
+<div class="gr-ascii">GREENROOM // FILE LIBRARY // ${GREENROOM_PATCHES.length} patches  //  ${installedCount} installed  //  ${newCount} new</div>
+<div class="gr-divider">─────────────────────────────────────────────────────</div>
+<div class="gr-thread-meta" style="margin-bottom:10px;">
+  Click a patch for details and install. All downloads run through carrier lock.
+</div>
+`;
+  GREENROOM_PATCHES.forEach((p, i) => {
+    const installed = firmware.installed.has(p.id);
+    const corrupted = installed && firmware.installed.get(p.id).corrupted;
+    const isNew = !firmware.seenInLibrary.has(p.id);
+    let status, statusCls;
+    if (corrupted) { status = '⚠ CORRUPTED'; statusCls = 'corrupted'; }
+    else if (installed) { status = '● INSTALLED'; statusCls = 'installed'; }
+    else if (isNew) { status = '◆ NEW'; statusCls = 'new'; }
+    else { status = 'AVAILABLE'; statusCls = 'available'; }
+    const idx = String(i + 1).padStart(2, '0');
+    const costStr = grCanAfford(p.cost)
+      ? `<span class="gr-can-afford">${grFormatCost(p.cost)}</span>`
+      : `<span class="gr-cannot-afford">${grFormatCost(p.cost)}</span>`;
+    html += `
+<div class="gr-patch-row" data-patch="${p.id}">
+  <span class="gr-patch-marker">[${idx}]</span>
+  <div>
+    <div class="gr-patch-name">${p.name}</div>
+    <div class="gr-patch-author">${p.author}  //  ${escapeHtml(p.description)}</div>
+  </div>
+  <span class="gr-patch-author">${p.author}</span>
+  <span class="gr-patch-size">${p.size.toFixed(1)} KB  ${costStr}</span>
+  <span class="gr-patch-status ${statusCls}">${status}</span>
+</div>`;
+  });
+  html += `
+<div class="gr-divider">─────────────────────────────────────────────────────</div>
+<div class="gr-prompt-line">  CAPS: <span class="gr-cost">${wallet.caps}</span>  //  cb: ${inventory.items.get('circuit_board') || 0}  //  df: ${inventory.items.get('data_fragment') || 0}</div>
+<div class="gr-prompt-line">  <a class="gr-menu-item" data-action="back">[B] BACK TO MAIN MENU</a></div>
+`;
+  document.getElementById('gr-body').innerHTML = html;
+  document.querySelectorAll('#gr-body .gr-patch-row').forEach(row => {
+    row.addEventListener('click', () => {
+      const id = row.getAttribute('data-patch');
+      showGreenroomPatchDetail(id);
+    });
+  });
+  document.querySelector('#gr-body .gr-menu-item').addEventListener('click', (e) => {
+    e.preventDefault();
+    grSfxMenuMove();
+    showGreenroomMenu();
+  });
+}
+
+function showGreenroomPatchDetail(patchId) {
+  const patch = GREENROOM_PATCHES.find(p => p.id === patchId);
+  if (!patch) return;
+  greenroom.state = 'patch_detail';
+  greenroom.currentPatch = patchId;
+  // Mark as seen
+  if (!firmware.seenInLibrary.has(patchId)) {
+    firmware.seenInLibrary.add(patchId);
+    firmware.save();
+  }
+  grSfxPostBlip();
+  const installed = firmware.installed.has(patchId);
+  const corrupted = installed && firmware.installed.get(patchId).corrupted;
+  const canAfford = grCanAfford(patch.cost);
+  let installBtn = '';
+  if (installed) {
+    installBtn = `<a class="gr-action-btn" data-action="uninstall">[U] UNINSTALL</a>`;
+  } else if (canAfford) {
+    installBtn = `<a class="gr-action-btn" data-action="install">[I] INSTALL  (${grFormatCost(patch.cost)})</a>`;
+  } else {
+    installBtn = `<a class="gr-action-btn disabled">[I] CANNOT AFFORD  (${grFormatCost(patch.cost)})</a>`;
+  }
+  const statusLine = corrupted
+    ? `<span class="gr-patch-status corrupted">⚠ INSTALLED (CORRUPTED VERSION)</span>`
+    : installed
+      ? `<span class="gr-patch-status installed">● INSTALLED</span>`
+      : `<span class="gr-patch-status available">NOT INSTALLED</span>`;
+  const effectLine = corrupted && patch.corrupted
+    ? `<div class="gr-patch-effect">${escapeHtml(patch.corrupted.description)}</div>`
+    : `<div class="gr-patch-effect">${escapeHtml(patch.effect)}</div>`;
+  const html = `
+<div class="gr-ascii">GREENROOM // FILE LIBRARY // ${patch.id.toUpperCase()}</div>
+<div class="gr-divider">─────────────────────────────────────────────────────</div>
+<div class="gr-patch-detail">
+  <div class="gr-patch-name" style="font-size:16px;margin-bottom:4px;">${patch.name}</div>
+  <div class="gr-patch-author">by ${patch.author}  //  ${patch.size.toFixed(1)} KB</div>
+  <div style="margin-top:6px;">${statusLine}</div>
+
+  <div class="gr-patch-detail-section">
+    <div class="gr-patch-detail-label">AUTHOR'S NOTE</div>
+    <div style="white-space:pre-wrap;color:rgba(78,255,126,0.85);">${escapeHtml(patch.longDesc)}</div>
+  </div>
+
+  <div class="gr-patch-detail-section">
+    <div class="gr-patch-detail-label">EFFECT</div>
+    ${effectLine}
+  </div>
+
+  <div class="gr-patch-detail-section">
+    <div class="gr-patch-detail-label">COST</div>
+    <div class="gr-cost">${grFormatCost(patch.cost)}</div>
+  </div>
+
+  <div style="margin-top:18px;">
+    ${installBtn}
+    <a class="gr-action-btn" data-action="back">[B] BACK</a>
+  </div>
+</div>
+`;
+  document.getElementById('gr-body').innerHTML = html;
+  document.querySelectorAll('#gr-body .gr-action-btn').forEach(btn => {
+    if (btn.classList.contains('disabled')) return;
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      const action = btn.getAttribute('data-action');
+      grSfxMenuMove();
+      if (action === 'install') startGreenroomDownload(patchId);
+      else if (action === 'uninstall') uninstallPatch(patchId);
+      else if (action === 'back') showGreenroomFiles();
+    });
+  });
+}
+
+// ----- DOWNLOAD + INSTALL FLOW -----
+
+async function startGreenroomDownload(patchId) {
+  const patch = GREENROOM_PATCHES.find(p => p.id === patchId);
+  if (!patch) return;
+  if (!grCanAfford(patch.cost)) {
+    grPrintLine('Insufficient funds or materials.', 'gr-system');
+    return;
+  }
+  // Charge cost up front
+  grChargeCost(patch.cost);
+  // Roll for corrupted (3%)
+  const corrupted = Math.random() < 0.03;
+  greenroom.state = 'downloading';
+  // Render the download UI and start the progress animation.
+  const totalPackets = Math.max(8, Math.ceil(patch.size * 3.2));
+  const baseDuration = 4000 + patch.size * 350;  // 4-10 sec range typically
+  const startedAt = performance.now();
+  firmware.download = { patchId, startedAt, durationMs: baseDuration, totalPackets, corrupted };
+  await renderDownloadProgress(patch);
+  // Install
+  finishPatchInstall(patch, corrupted);
+}
+
+async function renderDownloadProgress(patch) {
+  const body = document.getElementById('gr-body');
+  const totalPackets = firmware.download.totalPackets;
+  const duration = firmware.download.durationMs;
+  const startedAt = firmware.download.startedAt;
+  // Initial paint
+  body.innerHTML = `
+<div class="gr-ascii">GREENROOM // FILE LIBRARY // DOWNLOAD</div>
+<div class="gr-divider">─────────────────────────────────────────────────────</div>
+<div class="gr-download">
+  <div class="gr-download-head">DOWNLOADING: ${patch.name}  (${patch.size.toFixed(1)} KB)</div>
+  <div class="gr-download-bar" id="gr-dl-bar">[                    ]   0%</div>
+  <div class="gr-download-stat" id="gr-dl-stat">xmodem packet 0 / ${totalPackets}  //  0.0 KB/s  //  ETA --:--</div>
+  <div class="gr-download-stat" id="gr-dl-carrier" style="margin-top:6px;">carrier lock ${formatCarrierLock()}</div>
+</div>
+<div class="gr-prompt-line">  <a class="gr-action-btn" data-action="cancel">[C] CANCEL DOWNLOAD</a></div>
+`;
+  // Wire cancel
+  let cancelled = false;
+  const cancelBtn = body.querySelector('[data-action="cancel"]');
+  if (cancelBtn) cancelBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    cancelled = true;
+  });
+  // Animate
+  const barEl = document.getElementById('gr-dl-bar');
+  const statEl = document.getElementById('gr-dl-stat');
+  const carrierEl = document.getElementById('gr-dl-carrier');
+  let lastBlipPacket = 0;
+  while (true) {
+    if (cancelled || !greenroom.connected) {
+      // Cancelled: refund full cost back to the player.
+      wallet.caps += patch.cost.caps || 0;
+      if (patch.cost.circuit_board) addItem('circuit_board', patch.cost.circuit_board);
+      if (patch.cost.data_fragment) addItem('data_fragment', patch.cost.data_fragment);
+      if (patch.cost.bio_sample) addItem('bio_sample', patch.cost.bio_sample);
+      firmware.download = null;
+      if (greenroom.connected) showGreenroomFiles();
+      return;
+    }
+    const elapsed = performance.now() - startedAt;
+    const lockFactor = Math.max(0.1, parseInt(formatCarrierLock()) / 100);
+    // Effective progress slows when carrier lock is degraded
+    const adjustedDuration = duration / lockFactor;
+    const progress = Math.min(1, elapsed / adjustedDuration);
+    const packets = Math.floor(progress * totalPackets);
+    const pct = Math.floor(progress * 100);
+    const filled = Math.floor(progress * 20);
+    const bar = '▰'.repeat(filled) + '▱'.repeat(20 - filled);
+    const kbps = ((progress * patch.size) / Math.max(0.1, elapsed / 1000)).toFixed(1);
+    const remainingMs = Math.max(0, adjustedDuration - elapsed);
+    const etaSec = Math.ceil(remainingMs / 1000);
+    const etaStr = `${Math.floor(etaSec / 60)}:${String(etaSec % 60).padStart(2, '0')}`;
+    if (barEl) barEl.textContent = `[${bar}]  ${String(pct).padStart(3, ' ')}%`;
+    if (statEl) statEl.textContent = `xmodem packet ${packets} / ${totalPackets}  //  ${kbps} KB/s  //  ETA ${etaStr}`;
+    if (carrierEl) carrierEl.textContent = `carrier lock ${formatCarrierLock()}`;
+    // Soft blip every 8 packets
+    if (packets > lastBlipPacket && (packets - lastBlipPacket) >= 8) {
+      grSfxKeyPress();
+      lastBlipPacket = packets;
+    }
+    if (progress >= 1.0) break;
+    await grSleep(80);
+  }
+  // Finished
+  await grSleep(180);
+  if (barEl) barEl.textContent = `[${'▰'.repeat(20)}]  100%`;
+}
+
+function finishPatchInstall(patch, corrupted) {
+  firmware.installed.set(patch.id, { corrupted, installedAt: Date.now() });
+  firmware.recompute();
+  firmware.save();
+  firmware.download = null;
+  grSfxCarrierLock();
+  // Phase 4: spawn community response if patch is corrupted
+  if (corrupted && typeof spawnTrojanCommunityResponse === 'function') {
+    spawnTrojanCommunityResponse(patch);
+  }
+  // Show install result
+  const body = document.getElementById('gr-body');
+  const effectMsg = corrupted && patch.corrupted ? patch.corrupted.description : patch.effect;
+  const statusLine = corrupted
+    ? `<div class="gr-patch-status corrupted" style="font-size:14px;margin-top:14px;">⚠  INSTALL COMPLETE  //  HASH MISMATCH  //  PATCH MAY BE CORRUPTED</div>`
+    : `<div class="gr-patch-status installed" style="font-size:14px;margin-top:14px;">●  INSTALL COMPLETE  //  HASH VERIFIED</div>`;
+  const followup = corrupted
+    ? `<div class="gr-prompt-line" style="color:#ff8060;">The patch installed but the hash does not match the manifest. Effect is inverted. You can uninstall it from the library.</div>`
+    : `<div class="gr-prompt-line">Patch is now active.</div>`;
+  body.innerHTML = `
+<div class="gr-ascii">GREENROOM // FILE LIBRARY // DOWNLOAD COMPLETE</div>
+<div class="gr-divider">─────────────────────────────────────────────────────</div>
+<div class="gr-patch-detail">
+  <div class="gr-patch-name" style="font-size:16px;">${patch.name}</div>
+  ${statusLine}
+  <div class="gr-patch-detail-section">
+    <div class="gr-patch-detail-label">EFFECT</div>
+    <div class="gr-patch-effect">${escapeHtml(effectMsg)}</div>
+  </div>
+  ${followup}
+  <div style="margin-top:20px;">
+    <a class="gr-action-btn" data-action="back-to-lib">[B] BACK TO LIBRARY</a>
+    <a class="gr-action-btn" data-action="back-to-menu">[M] MAIN MENU</a>
+  </div>
+</div>
+`;
+  body.querySelectorAll('.gr-action-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      grSfxMenuMove();
+      const action = btn.getAttribute('data-action');
+      if (action === 'back-to-lib') showGreenroomFiles();
+      else if (action === 'back-to-menu') showGreenroomMenu();
+    });
+  });
+}
+
+function uninstallPatch(patchId) {
+  if (!firmware.installed.has(patchId)) return;
+  firmware.installed.delete(patchId);
+  firmware.recompute();
+  firmware.save();
+  grSfxMenuMove();
+  showGreenroomFiles();
+}
+
+async function connectGreenroom(nodeAddress) {
+  if (greenroom.connected) {
+    grPrintLine('Already connected to GREENROOM.', 'gr-system');
+    return;
+  }
+  // Phase 6: refuse if inside a mute zone
+  if (typeof isInsideMuteZone === 'function') {
+    const mute = isInsideMuteZone();
+    if (mute) {
+      if (typeof addComm === 'function') {
+        addComm('TITAN-7', `Cannot establish carrier near anomalous terrain (${mute.type}). Move to clear ground.`, true);
+      }
+      return;
+    }
+  }
+  nodeAddress = nodeAddress || GREENROOM_NODE_DEFAULT;
+  // Close the local terminal if it's open (correct ID is term-overlay,
+  // not terminal-overlay - this was a bug that prevented the entire
+  // GREENROOM overlay from opening).
+  if (terminal && terminal.open) {
+    const termEl = document.getElementById('term-overlay');
+    if (termEl) termEl.classList.remove('show');
+    terminal.open = false;
+  }
+  // Clear any held game keys so the mech doesn't keep walking forward while
+  // we're jacked in. The keydown guard above blocks NEW key events, but the
+  // 'keys' map could still have stale true values from before we connected.
+  for (const k of Object.keys(keys)) keys[k] = false;
+  greenroom.state = 'dialing';
+  greenroom.connected = false;
+  // Phase 4: start session timer. Reset trace warning state.
+  greenroom.sessionStart = performance.now();
+  // Apply pending trace offset from debug command if present
+  if (greenroom._pendingTraceOffsetMs) {
+    greenroom.sessionStart -= greenroom._pendingTraceOffsetMs;
+    greenroom._pendingTraceOffsetMs = 0;
+  }
+  greenroom.traceWarned = false;
+  greenroom.traceWarnedAt = 0;
+  greenroom.spikeTriggered = false;
+  document.getElementById('greenroom-overlay').classList.add('show');
+  grClear();
+  document.getElementById('gr-status-text').textContent = 'GREENROOM // DIALING...';
+  document.getElementById('gr-lock-pct').textContent = '---%';
+  document.getElementById('gr-footer-handle').textContent = 'handle: --';
+  // Phase 1: dial sequence
+  await grTypeLine(`> dialing ${nodeAddress}...`, 40);
+  await grSleep(300);
+  // DTMF tones for the numeric part of the node address
+  const digits = nodeAddress.replace(/[^0-9]/g, '');
+  for (let i = 0; i < digits.length; i++) {
+    grSfxDtmf(digits[i], i * 0.15);
+  }
+  await grSleep(digits.length * 150 + 200);
+  // Ring sound (just a brief tone pair)
+  grSfxDialTone();
+  await grSleep(900);
+  // Phase 2: handshake
+  await grTypeLine('> carrier detected.', 45);
+  grSfxHandshake();
+  await grSleep(400);
+  await grTypeLine('> handshake...', 45);
+  await grSleep(1100);
+  await grTypeLine('> negotiation complete. 14.4 kbps.', 45);
+  await grSleep(200);
+  await grTypeLine('> inverse proxy engaged.', 45);
+  await grSleep(200);
+  grSfxCarrierLock();
+  await grTypeLine('> carrier lock established.', 45);
+  await grSleep(500);
+  // Phase 3: splash screen
+  greenroom.state = 'splash';
+  greenroom.connected = true;
+  document.getElementById('gr-status-text').textContent = 'GREENROOM // v4.7';
+  await showGreenroomSplash();
+  // Phase 4: handle entry (if first time) or main menu
+  if (!greenroom.handle) {
+    await promptForHandle();
+  } else {
+    document.getElementById('gr-footer-handle').textContent = `handle: ${greenroom.handle}`;
+    await grSleep(300);
+    showGreenroomMenu();
+  }
+}
+
+async function showGreenroomSplash() {
+  const splash =
+"\n" +
+"        ___           ___           ___           ___           ___           ___       ___           ___           ___\n" +
+"       /\\  \\         /\\  \\         /\\  \\         /\\  \\         /\\__\\         /\\  \\     /\\  \\         /\\  \\         /\\__\\\n" +
+"      /::\\  \\       /::\\  \\       /::\\  \\       /::\\  \\       /:/  /        /::\\  \\   /::\\  \\       /::\\  \\       /::|  |\n" +
+"     /:/\\:\\  \\     /:/\\:\\  \\     /:/\\:\\  \\     /:/\\:\\  \\     /:/  /        /:/\\:\\  \\ /:/\\:\\  \\     /:/\\:\\  \\     /:|:|  |\n" +
+"    /:/  \\:\\  \\   /::\\~\\:\\  \\   /::\\~\\:\\  \\   /::\\~\\:\\  \\   /:/  /  ___   /::\\~\\:\\  \\ /:/  \\:\\  \\   /:/  \\:\\  \\   /:/|:|__|__\n" +
+"   /:/__/_\\:\\__\\ /:/\\:\\ \\:\\__\\ /:/\\:\\ \\:\\__\\ /:/\\:\\ \\:\\__\\ /:/__/  /\\__\\ /:/\\:\\ \\:\\__\\ /:/__/ \\:\\__\\ /:/__/ \\:\\__\\ /:/ |::::\\__\\\n" +
+"   \\:\\  /\\ \\/__/ \\/_|::\\/:/  / \\:\\~\\:\\ \\/__/ \\:\\~\\:\\ \\/__/ \\:\\  \\ /:/  / \\/_|::\\/:/  / \\:\\  \\ /:/  / \\:\\  \\ /:/  / \\/__/~~/:/  /\n" +
+"    \\:\\ \\:\\__\\      |:|::/  /   \\:\\ \\:\\__\\    \\:\\ \\:\\__\\    \\:\\  /:/  /     |:|::/  /   \\:\\  /:/  /   \\:\\  /:/  /        /:/  /\n" +
+"     \\:\\/:/  /      |:|\\/__/     \\:\\ \\/__/     \\:\\ \\/__/     \\:\\/:/  /      |:|\\/__/     \\:\\/:/  /     \\:\\/:/  /        /:/  /\n" +
+"      \\::/  /       |:|  |        \\:\\__\\        \\:\\__\\        \\::/  /       |:|  |        \\::/  /       \\::/  /        /:/  /\n" +
+"       \\/__/         \\|__|         \\/__/         \\/__/         \\/__/         \\|__|         \\/__/         \\/__/         \\/__/\n" +
+"\n" +
+"                                          v 4 . 7    //    since 2043    //    kept by N.O.\n" +
+"                                                       a private network. not your network.\n";
+  const body = document.getElementById('gr-body');
+  body.innerHTML = '';
+  const pre = document.createElement('pre');
+  pre.className = 'gr-ascii';
+  pre.textContent = splash;
+  body.appendChild(pre);
+  await grSleep(900);
+  await grTypeLine('\n> welcome.', 35);
+  await grSleep(150);
+  await grTypeLine('> the library is open until dawn.', 35);
+  await grSleep(150);
+  await grTypeLine('> mind your handles.', 35);
+  await grSleep(500);
+  await grTypeLine('\nsysop> NIGHTOWL says: "Storms tonight. Watch the gain."', 50);
+  await grSleep(500);
+}
+
+async function promptForHandle() {
+  greenroom.state = 'handle_entry';
+  await grTypeLine('\nFirst connection from this transponder. Please register a handle.', 45);
+  await grTypeLine('Handle requirements: 4 to 12 characters. ASCII only. No spaces.', 45);
+  await grTypeLine(`(Default available: ${pilot.callsign || 'TITAN-7'})`, 45);
+  await grSleep(200);
+  // Add input prompt
+  const body = document.getElementById('gr-body');
+  const promptDiv = document.createElement('div');
+  promptDiv.className = 'gr-prompt-line';
+  promptDiv.innerHTML = `ENTER HANDLE &gt; <input type="text" class="gr-input" id="gr-handle-input" maxlength="12" autocomplete="off" spellcheck="false" /><span class="gr-cursor"></span>`;
+  body.appendChild(promptDiv);
+  const inp = document.getElementById('gr-handle-input');
+  inp.value = pilot.callsign || 'TITAN-7';
+  inp.select();
+  inp.focus();
+  inp.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      const val = (inp.value || '').trim().toUpperCase();
+      if (val.length < 4 || val.length > 12 || /[^A-Z0-9_]/.test(val)) {
+        grPrintLine('Invalid handle. Use 4-12 characters, A-Z 0-9 underscore only.', 'gr-system');
+        return;
+      }
+      if (val === 'B_BENN' || val === 'FIRSTLIGHT' || val === 'BENNETT_K') {
+        grPrintLine(`sysop> NIGHTOWL says: "That handle is reserved. The user it belongs to has not logged in. He may yet. Please pick another."`, 'gr-system');
+        return;
+      }
+      greenroom.handle = val;
+      greenroom.save();
+      promptDiv.remove();
+      finishHandleRegistration();
+    } else if (e.key === 'Escape') {
+      e.preventDefault();
+      disconnectGreenroom();
+    } else {
+      grSfxKeyPress();
+    }
+  });
+}
+
+async function finishHandleRegistration() {
+  document.getElementById('gr-footer-handle').textContent = `handle: ${greenroom.handle}`;
+  await grTypeLine(`\n> handle registered: ${greenroom.handle}`, 50);
+  await grSleep(300);
+  await grTypeLine(`sysop> NIGHTOWL says: "Welcome, ${greenroom.handle}. Mind your handles. // owl out"`, 45);
+  await grSleep(600);
+  showGreenroomMenu();
+}
+
+// ----- MENU / NAVIGATION -----
+
+function showGreenroomMenu() {
+  greenroom.state = 'main';
+  greenroom.focusIdx = 0;
+  greenroom.currentBoard = null;
+  greenroom.currentThread = null;
+  grClear();
+  // Total unread across all boards
+  let totalUnread = 0;
+  for (const bid of Object.keys(GREENROOM_BOARDS)) {
+    totalUnread += countUnreadPostsForBoard(bid);
+  }
+  const onlineCount = GREENROOM_REGULARS.filter(r => r.online).length;
+  const newPatchCount = GREENROOM_PATCHES.filter(p => !firmware.seenInLibrary.has(p.id)).length;
+  const installedCount = firmware.installed.size;
+  // Phase 4: verified status + vault visibility
+  const verified = greenroom.isVerified();
+  const hasVault = greenroom.hasVaultKey();
+  // Possibly inject verified-tier welcome message (first time only)
+  if (verified && !greenroom.verifiedShown) {
+    greenroom.verifiedShown = true;
+    greenroom.save();
+    // Add a sysop welcome PM
+    if (!greenroom.mail.find(m => m.id === 'mail_verified')) {
+      greenroom.mail.unshift({
+        id: 'mail_verified',
+        from: 'NIGHTOWL',
+        subject: 'Verified-tier access',
+        body: "I see a new decrypt fragment in your codex. That means you have at least one piece of what the network calls Layer 1 material in hand. By community convention this gets you the verified badge.\n\nNothing changes mechanically except a few threads in LORE and ENCOUNTERS will stop being placeholders and start being readable. Posts that show as [CONTENT ENCRYPTED] in your board view need specific keys that you do not yet have. Each fragment is its own key.\n\nWelcome to the deeper tier. Mind your handles.\n\n// owl out",
+        daysAgo: 0,
+        read: false,
+      });
+      greenroom.save();
+    }
+  }
+  evaluateMailTriggers();
+  const unreadMail = greenroom.mail.filter(m => !m.read).length;
+  const mailLabel = unreadMail > 0 ? `${unreadMail} unread message${unreadMail === 1 ? '' : 's'}` : 'no new mail';
+  const verifiedBadge = verified ? `<span class="gr-can-afford" style="font-size:11px;letter-spacing:1px;">✓ VERIFIED</span>` : `<span class="gr-thread-meta" style="font-size:11px;letter-spacing:1px;">layer 0 only</span>`;
+  let vaultLine = '';
+  if (hasVault) {
+    vaultLine = `  <a class="gr-menu-item" data-action="vault" style="color:#ffe070;">[V] VAULT           ${greenroom.vaultEntered ? 'founder archive' : 'NEW // founder'}</a>`;
+  } else {
+    // Empty cell to keep grid balanced when vault is not yet unlocked
+    vaultLine = `<span></span>`;
+  }
+  const html = `
+<div class="gr-ascii">GREENROOM // v4.7 //  ${formatGreenroomClock()}  //  ${formatCarrierLock()}  ${verifiedBadge}</div>
+<div class="gr-divider">─────────────────────────────────────────────────────</div>
+<div class="gr-main-menu-grid">
+  <a class="gr-menu-item" data-action="boards">[1] MESSAGES        ${totalUnread} new in ${Object.keys(GREENROOM_BOARDS).length} boards</a>
+  <a class="gr-menu-item" data-action="mail">[4] MAIL            ${mailLabel}</a>
+  <a class="gr-menu-item" data-action="files">[2] FILES           ${installedCount}/${GREENROOM_PATCHES.length} installed${newPatchCount > 0 ? ', '+newPatchCount+' new' : ''}</a>
+  <a class="gr-menu-item" data-action="about">[5] ABOUT // RULES</a>
+  <a class="gr-menu-item" data-action="users">[3] USERS           ${onlineCount}/${GREENROOM_REGULARS.length} online</a>
+  ${vaultLine}
+</div>
+<div class="gr-main-menu-footer-row">
+  <a class="gr-menu-item" data-action="disconnect">[Q] DISCONNECT</a>
+  <a class="gr-menu-item" data-action="reset" style="color:rgba(78,255,126,0.5);font-size:11px;">[!] RESET LOCAL DATA</a>
+</div>
+<div class="gr-divider">─────────────────────────────────────────────────────</div>
+<div class="gr-prompt-line">sysop> NIGHTOWL says: "Storms tonight. Watch the gain."</div>
+  `;
+  document.getElementById('gr-body').innerHTML = html;
+  document.querySelectorAll('#gr-body .gr-menu-item').forEach(a => {
+    a.addEventListener('click', (e) => {
+      e.preventDefault();
+      handleGreenroomMenuAction(a.getAttribute('data-action'));
+    });
+  });
+}
+
+function handleGreenroomMenuAction(action) {
+  grSfxMenuMove();
+  if (action === 'boards') showGreenroomBoardsList();
+  else if (action === 'files') showGreenroomFiles();
+  else if (action === 'users') showGreenroomUsers();
+  else if (action === 'mail') showGreenroomMail();
+  else if (action === 'about') showGreenroomAbout();
+  else if (action === 'vault') showGreenroomVault();
+  else if (action === 'disconnect') disconnectGreenroom();
+  else if (action === 'reset') showGreenroomResetConfirm();
+}
+
+function showGreenroomResetConfirm() {
+  greenroom.state = 'reset_confirm';
+  const html = `
+<div class="gr-ascii" style="color:#ff8060;">GREENROOM // RESET LOCAL DATA</div>
+<div class="gr-divider">─────────────────────────────────────────────────────</div>
+<div class="gr-patch-detail">
+  <div class="gr-patch-name" style="color:#ff8060;">This will permanently erase the following:</div>
+  <div style="margin:14px 0 14px 12px;line-height:1.7;">
+    • Your registered handle (${escapeHtml(greenroom.handle || '(none)')})
+    • All read-post markers (${greenroom.readPostIds.size} threads)
+    • All your replies and any follow-ups they triggered
+    • Your private mail inbox (${greenroom.mail.length} messages)
+    • All rapport with regulars
+    • All firmware patch installations and library "seen" markers
+    • The verified-tier and Vault-entered flags
+    • Discovered node addresses (${greenroom.knownNodes.length} extras; loopback remains)
+    • Trojan-spawned community posts
+  </div>
+  <div style="color:#ff8060;margin-bottom:14px;">
+    This action cannot be undone. The network will not remember you.
+  </div>
+  <div style="margin-top:18px;">
+    <a class="gr-action-btn" data-action="confirm-reset" style="border-color:#ff8060;color:#ff8060;">[Y] CONFIRM RESET</a>
+    <a class="gr-action-btn" data-action="cancel-reset">[N] CANCEL</a>
+  </div>
+</div>
+`;
+  document.getElementById('gr-body').innerHTML = html;
+  document.querySelectorAll('#gr-body .gr-action-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      const action = btn.getAttribute('data-action');
+      grSfxMenuMove();
+      if (action === 'confirm-reset') performGreenroomReset();
+      else if (action === 'cancel-reset') showGreenroomMenu();
+    });
+  });
+}
+
+async function performGreenroomReset() {
+  greenroom.state = 'resetting';
+  // Show a brief "wiping" animation
+  const body = document.getElementById('gr-body');
+  body.innerHTML = `
+<div class="gr-ascii" style="color:#ff8060;">GREENROOM // RESET IN PROGRESS</div>
+<div class="gr-divider">─────────────────────────────────────────────────────</div>
+<div id="gr-reset-feed" style="white-space:pre-wrap;line-height:1.6;"></div>
+`;
+  const feed = document.getElementById('gr-reset-feed');
+  const steps = [
+    'Closing carrier...',
+    'Purging local handle registration.',
+    'Wiping read-post markers.',
+    'Wiping reply history.',
+    'Wiping mail inbox.',
+    'Wiping rapport tables.',
+    'Wiping firmware installations.',
+    'Wiping discovered nodes.',
+    'Local cache cleared.',
+    '',
+    'You are no one here now.',
+  ];
+  for (const s of steps) {
+    if (feed) {
+      feed.textContent += s + '\n';
+    }
+    grSfxKeyPress();
+    await grSleep(220);
+  }
+  // Actually perform the reset
+  greenroom.resetAll();
+  await grSleep(900);
+  // Force disconnect
+  disconnectGreenroom();
+}
+
+function showGreenroomBoardsList() {
+  greenroom.state = 'boards';
+  greenroom.currentBoard = null;
+  greenroom.currentThread = null;
+  let html = `
+<div class="gr-ascii">GREENROOM // MESSAGE BOARDS</div>
+<div class="gr-divider">─────────────────────────────────────────────────────</div>
+`;
+  let idx = 1;
+  for (const [bid, board] of Object.entries(GREENROOM_BOARDS)) {
+    const unread = countUnreadPostsForBoard(bid);
+    const tag = unread > 0 ? `<span class="gr-thread-marker">${unread} new</span>` : `<span class="gr-thread-meta">${board.posts.length} posts</span>`;
+    html += `
+<div class="gr-thread-line" data-boardid="${bid}">
+  <span class="gr-patch-marker">[${idx}]</span>
+  <span class="gr-patch-name">${board.name}</span>
+  <span class="gr-thread-meta">${escapeHtml(board.desc)}</span>
+  <span>${tag}</span>
+</div>`;
+    idx++;
+  }
+  html += `
+<div class="gr-divider">─────────────────────────────────────────────────────</div>
+<div class="gr-prompt-line">  <a class="gr-menu-item" data-action="back">[B] BACK TO MAIN MENU</a></div>
+`;
+  document.getElementById('gr-body').innerHTML = html;
+  document.querySelectorAll('#gr-body .gr-thread-line').forEach(line => {
+    line.addEventListener('click', () => {
+      const bid = line.getAttribute('data-boardid');
+      grSfxMenuMove();
+      showGreenroomBoard(bid);
+    });
+  });
+  document.querySelector('#gr-body .gr-menu-item').addEventListener('click', (e) => {
+    e.preventDefault();
+    grSfxMenuMove();
+    showGreenroomMenu();
+  });
+}
+
+function showGreenroomBoard(boardId) {
+  greenroom.state = 'board';
+  greenroom.currentBoard = boardId;
+  greenroom.focusIdx = 0;
+  const board = GREENROOM_BOARDS[boardId];
+  if (!board) { showGreenroomBoardsList(); return; }
+  // Compose the post list: static posts + encrypted posts for this board + dynamic spawned posts
+  const staticPosts = board.posts;
+  const encPosts = [];
+  for (const [id, p] of Object.entries(GREENROOM_ENCRYPTED_POSTS)) {
+    if (p.board === boardId) encPosts.push({ id, ...p, _encrypted: true });
+  }
+  const dynPosts = (greenroom.dynamicPosts[boardId] || []).map(p => ({ ...p, _dynamic: true }));
+  // Sort all together by daysAgo ascending (newest first)
+  const posts = [...staticPosts, ...encPosts, ...dynPosts].sort((a, b) => a.daysAgo - b.daysAgo);
+  let html = `
+<div class="gr-ascii">GREENROOM // ${board.name} // ${posts.length} posts</div>
+<div class="gr-thread-meta" style="margin-bottom:10px;">${escapeHtml(board.desc)}</div>
+<div class="gr-divider">─────────────────────────────────────────────────────</div>
+`;
+  posts.forEach((p) => {
+    const replyCount = (GREENROOM_THREAD_REPLIES[p.id] || []).length
+                     + (greenroom.playerReplies[p.id] || []).length
+                     + (greenroom.threadFollowups[p.id] || []).length;
+    const unread = !greenroom.readPostIds.has(p.id);
+    const marker = unread ? '<span class="gr-thread-marker">▸</span>' : '<span></span>';
+    const when = p.daysAgo === 0 ? 'today' : p.daysAgo === 1 ? 'yesterday' : `${p.daysAgo}d ago`;
+    const authorCls = p.author === 'NIGHTOWL' ? 'gr-author sysop' : 'gr-author';
+    const replyTag = replyCount > 0 ? ` <span class="gr-thread-meta">(${replyCount})</span>` : '';
+    // Encrypted lock indicator
+    let subjectText = escapeHtml(p.subject);
+    if (p._encrypted) {
+      const haveKey = codex && codex.unlocked && codex.unlocked.has(p.gateKey);
+      const lockGlyph = haveKey
+        ? `<span class="gr-can-afford" style="font-size:11px;">[unlocked]</span> `
+        : `<span class="gr-cannot-afford" style="font-size:11px;">[encrypted]</span> `;
+      subjectText = lockGlyph + subjectText;
+    }
+    html += `<div class="gr-thread-line" data-postid="${p.id}">${marker}<span>${subjectText}${replyTag}</span><span class="${authorCls}">${p.author}</span><span class="gr-thread-meta">${when}</span></div>`;
+  });
+  html += `
+<div class="gr-divider">─────────────────────────────────────────────────────</div>
+<div class="gr-prompt-line">  <a class="gr-menu-item" data-action="back">[B] BACK TO BOARDS</a></div>
+`;
+  document.getElementById('gr-body').innerHTML = html;
+  document.querySelectorAll('#gr-body .gr-thread-line').forEach(line => {
+    line.addEventListener('click', () => {
+      showGreenroomThread(line.getAttribute('data-postid'));
+    });
+  });
+  document.querySelector('#gr-body .gr-menu-item').addEventListener('click', (e) => {
+    e.preventDefault();
+    grSfxMenuMove();
+    showGreenroomBoardsList();
+  });
+}
+
+function findPostById(postId) {
+  // Static posts first
+  for (const board of Object.values(GREENROOM_BOARDS)) {
+    const p = board.posts.find(x => x.id === postId);
+    if (p) return p;
+  }
+  // Encrypted posts (Phase 4)
+  if (GREENROOM_ENCRYPTED_POSTS[postId]) return { id: postId, ...GREENROOM_ENCRYPTED_POSTS[postId], _encrypted: true };
+  // Dynamic posts (Phase 4 trojan spawns)
+  for (const arr of Object.values(greenroom.dynamicPosts)) {
+    const p = arr.find(x => x.id === postId);
+    if (p) return p;
+  }
+  return null;
+}
+
+function showGreenroomThread(postId) {
+  greenroom.state = 'thread';
+  greenroom.currentThread = postId;
+  const post = findPostById(postId);
+  if (!post) return;
+  if (!greenroom.readPostIds.has(postId)) {
+    greenroom.readPostIds.add(postId);
+    greenroom.save();
+  }
+  grSfxPostBlip();
+  const when = post.daysAgo === 0 ? 'posted today' : post.daysAgo === 1 ? 'posted yesterday' : `posted ${post.daysAgo} days ago`;
+  const authorCls = post.author === 'NIGHTOWL' ? 'gr-author sysop' : 'gr-author';
+  // Phase 4: encrypted post body gating
+  let bodyText = post.body;
+  let bodyClass = '';
+  let encryptedNotice = '';
+  if (post._encrypted) {
+    const haveKey = codex && codex.unlocked && codex.unlocked.has(post.gateKey);
+    if (!haveKey) {
+      bodyText = `[CONTENT ENCRYPTED]\n\nThis thread requires a decrypted fragment to read.\n\nRequired key: ${post.gateKey}\n\nFragments are recovered by decrypting data fragments at any scannable data source in the field. Look for the [DECRYPT] action when scanning a data shard.`;
+      bodyClass = 'gr-cannot-afford';
+      encryptedNotice = `<div class="gr-prompt-line" style="color:#ff8060;">Layer 2 thread: requires ${post.gateKey}.</div>`;
+    } else {
+      encryptedNotice = `<div class="gr-prompt-line" style="color:#aaffbb;">Layer 2 thread: decrypted with ${post.gateKey}.</div>`;
+    }
+  }
+  // Compose the full thread: original, pre-existing replies, player replies, follow-ups
+  const existingReplies = (GREENROOM_THREAD_REPLIES[postId] || []).map(r => ({ ...r, kind: 'npc' }));
+  const playerReplies = (greenroom.playerReplies[postId] || []).map(r => ({ author: greenroom.handle, body: r.body, when: r.when, kind: 'player' }));
+  const followups = (greenroom.threadFollowups[postId] || []).map(f => ({ author: f.author, body: f.body, when: f.when, kind: 'npc' }));
+  let html = `
+<div class="gr-ascii">GREENROOM // ${greenroom.currentBoard || 'BOARD'} // ${post.id}</div>
+<div class="gr-divider">─────────────────────────────────────────────────────</div>
+${encryptedNotice}
+<div class="gr-post">
+  <div class="gr-post-head">
+    <span class="${authorCls}">${post.author}</span>
+    <span class="gr-thread-meta">${when}</span>
+  </div>
+  <div class="gr-post-subject">${escapeHtml(post.subject)}</div>
+  <div class="${bodyClass}">${escapeHtml(bodyText)}</div>
+</div>
+`;
+  if (existingReplies.length || playerReplies.length || followups.length) {
+    html += `<div class="gr-divider" style="margin: 18px 0 10px 0;">─── replies ───────────────────</div>`;
+  }
+  for (const r of existingReplies) {
+    const a = r.author === 'NIGHTOWL' ? 'gr-author sysop' : 'gr-author';
+    const rwhen = r.daysAgo === 0 ? 'today' : r.daysAgo === 1 ? 'yesterday' : `${r.daysAgo}d ago`;
+    html += `<div class="gr-post" style="margin-left:18px;">
+      <div class="gr-post-head"><span class="${a}">${r.author}</span><span class="gr-thread-meta">${rwhen}</span></div>
+      <div>${escapeHtml(r.body)}</div>
+    </div>`;
+  }
+  for (const r of playerReplies) {
+    html += `<div class="gr-post" style="margin-left:18px;border-left-color:#ffe070;">
+      <div class="gr-post-head"><span class="gr-author" style="color:#ffe070;">${escapeHtml(r.author)}</span><span class="gr-thread-meta">just now</span></div>
+      <div>${escapeHtml(r.body)}</div>
+    </div>`;
+  }
+  for (const r of followups) {
+    const a = r.author === 'NIGHTOWL' ? 'gr-author sysop' : 'gr-author';
+    html += `<div class="gr-post" style="margin-left:18px;">
+      <div class="gr-post-head"><span class="${a}">${r.author}</span><span class="gr-thread-meta">just now</span></div>
+      <div>${escapeHtml(r.body)}</div>
+    </div>`;
+  }
+  // Reply UI
+  const hasReplied = !!(greenroom.playerReplies[postId] && greenroom.playerReplies[postId].length);
+  const options = GREENROOM_REPLY_OPTIONS[postId];
+  if (options && !hasReplied) {
+    html += `<div class="gr-divider" style="margin: 20px 0 8px 0;">─── reply ─────────────────────</div>`;
+    options.forEach((opt, idx) => {
+      html += `<div class="gr-thread-line gr-reply-option" data-postid="${postId}" data-optidx="${idx}">
+        <span class="gr-thread-marker">[${idx + 1}]</span>
+        <span class="gr-thread-meta">[${opt.tone}]</span>
+        <span>${escapeHtml(opt.body)}</span>
+        <span></span>
+      </div>`;
+    });
+  } else if (hasReplied) {
+    html += `<div class="gr-prompt-line" style="margin-top:14px;color:rgba(78,255,126,0.6);">[You have replied to this thread.]</div>`;
+  }
+  html += `
+<div class="gr-divider">─────────────────────────────────────────────────────</div>
+<div class="gr-prompt-line">  <a class="gr-menu-item" data-action="back">[B] BACK TO BOARD</a></div>
+`;
+  document.getElementById('gr-body').innerHTML = html;
+  // Wire reply options
+  document.querySelectorAll('#gr-body .gr-reply-option').forEach(row => {
+    row.addEventListener('click', () => {
+      const optIdx = parseInt(row.getAttribute('data-optidx'), 10);
+      submitGreenroomReply(postId, optIdx);
+    });
+  });
+  document.querySelector('#gr-body .gr-menu-item').addEventListener('click', (e) => {
+    e.preventDefault();
+    grSfxMenuMove();
+    showGreenroomBoard(greenroom.currentBoard);
+  });
+}
+
+function submitGreenroomReply(postId, optIdx) {
+  const options = GREENROOM_REPLY_OPTIONS[postId];
+  if (!options || !options[optIdx]) return;
+  const opt = options[optIdx];
+  if (!greenroom.playerReplies[postId]) greenroom.playerReplies[postId] = [];
+  greenroom.playerReplies[postId].push({ tone: opt.tone, body: opt.body, when: Date.now() });
+  // Apply reputation deltas
+  if (opt.rep) {
+    for (const [handle, delta] of Object.entries(opt.rep)) {
+      greenroom.adjustRep(handle, delta);
+    }
+  }
+  // Add NPC follow-up immediately (phase 3 keeps it synchronous; later phases can stagger)
+  if (opt.followup) {
+    if (!greenroom.threadFollowups[postId]) greenroom.threadFollowups[postId] = [];
+    greenroom.threadFollowups[postId].push({ author: opt.followup.author, body: opt.followup.body, when: Date.now() });
+  }
+  greenroom.save();
+  grSfxPostBlip();
+  // Refresh thread view
+  showGreenroomThread(postId);
+}
+
+function showGreenroomUsers() {
+  greenroom.state = 'users';
+  let html = `
+<div class="gr-ascii">GREENROOM // USERS // ${GREENROOM_REGULARS.length} REGISTERED</div>
+<div class="gr-divider">─────────────────────────────────────────────────────</div>
+`;
+  for (const r of GREENROOM_REGULARS) {
+    const dot = r.online ? '●' : '○';
+    const status = r.online ? '<span class="gr-thread-marker">ONLINE</span>' : `<span class="gr-thread-meta">last: ${r.lastSeen}</span>`;
+    const authorCls = r.role === 'sysop' ? 'gr-author sysop' : 'gr-author';
+    const rep = greenroom.getRep(r.handle);
+    let repTag = '';
+    if (rep !== 0) {
+      const cls = rep > 0 ? 'gr-can-afford' : 'gr-cannot-afford';
+      const sign = rep > 0 ? '+' : '';
+      repTag = `  <span class="${cls}" style="font-size:11px;">rapport ${sign}${rep}</span>`;
+    }
+    html += `<div class="gr-thread-line">
+      <span class="gr-thread-marker">${dot}</span>
+      <span class="${authorCls}">${r.handle}</span>
+      <span class="gr-thread-meta">${r.role === 'sysop' ? 'sysop' : ''}${repTag}</span>
+      ${status}
+    </div>`;
+    html += `<div class="gr-thread-meta" style="margin:2px 0 12px 28px;font-size:11px;">${escapeHtml(r.bio)}</div>`;
+  }
+  // Reserved/dormant accounts
+  html += `<div class="gr-divider">─── DORMANT ──────────────────────────────────────</div>`;
+  html += `<div class="gr-thread-line">
+    <span class="gr-thread-marker">○</span>
+    <span class="gr-author">B_BENN</span>
+    <span class="gr-thread-meta">RESERVED</span>
+    <span class="gr-thread-meta">last seen: 9 years ago</span>
+  </div>`;
+  html += `<div class="gr-thread-meta" style="margin:2px 0 12px 28px;font-size:11px;">This handle is reserved. The user it belongs to has not logged in. He may yet.</div>`;
+  html += `<div class="gr-thread-line">
+    <span class="gr-thread-marker">○</span>
+    <span class="gr-author">PRECINCT</span>
+    <span class="gr-thread-meta">MEMORIAL</span>
+    <span class="gr-thread-meta">last seen: 4 years ago</span>
+  </div>`;
+  html += `<div class="gr-thread-meta" style="margin:2px 0 12px 28px;font-size:11px;">Helen Veres. 2065-2069. Her threads are preserved in LORE.</div>`;
+  html += `
+<div class="gr-divider">─────────────────────────────────────────────────────</div>
+<div class="gr-prompt-line">  <a class="gr-menu-item" data-action="back">[B] BACK TO MAIN MENU</a></div>
+`;
+  document.getElementById('gr-body').innerHTML = html;
+  document.querySelector('#gr-body .gr-menu-item').addEventListener('click', (e) => {
+    e.preventDefault();
+    grSfxMenuMove();
+    showGreenroomMenu();
+  });
+}
+
+function showGreenroomVault() {
+  if (!greenroom.hasVaultKey()) {
+    grPrintLine('VAULT ACCESS DENIED: missing decrypt_vault_key.', 'gr-system');
+    return;
+  }
+  greenroom.state = 'vault';
+  if (!greenroom.vaultEntered) {
+    greenroom.vaultEntered = true;
+    greenroom.save();
+  }
+  grSfxCarrierLock();
+  let html = `
+<div class="gr-ascii" style="color:#ffe070;">GREENROOM // VAULT // ARCHIVE OF THE FOUNDER</div>
+<div class="gr-divider">─────────────────────────────────────────────────────</div>
+<div class="gr-thread-meta" style="margin-bottom:14px;line-height:1.6;">
+You are reading material the founding keeper left behind. He locked it for someone who would one day find this room. He did not know who. He did not need to know who.
+
+If you are not who he meant, you will know it. If you are, you will know that too.
+</div>
+<div class="gr-divider">─────────────────────────────────────────────────────</div>
+`;
+  for (const doc of GREENROOM_VAULT_CONTENT) {
+    const pin = doc.isPinned ? `<span class="gr-can-afford" style="font-size:11px;">[pinned]</span> ` : '';
+    html += `<div class="gr-thread-line" data-vaultdoc="${doc.id}">
+      <span class="gr-thread-marker">${doc.isPinned ? '★' : '◆'}</span>
+      <span>${pin}${escapeHtml(doc.subject)}</span>
+      <span class="gr-author" style="color:#ffe070;">${doc.author}</span>
+      <span class="gr-thread-meta">${doc.posted}</span>
+    </div>`;
+  }
+  html += `
+<div class="gr-divider">─────────────────────────────────────────────────────</div>
+<div class="gr-prompt-line">  <a class="gr-menu-item" data-action="back">[B] BACK TO MAIN MENU</a></div>
+`;
+  document.getElementById('gr-body').innerHTML = html;
+  document.querySelectorAll('#gr-body .gr-thread-line').forEach(line => {
+    line.addEventListener('click', () => {
+      const id = line.getAttribute('data-vaultdoc');
+      showGreenroomVaultDoc(id);
+    });
+  });
+  document.querySelector('#gr-body .gr-menu-item').addEventListener('click', (e) => {
+    e.preventDefault();
+    grSfxMenuMove();
+    showGreenroomMenu();
+  });
+}
+
+function showGreenroomVaultDoc(docId) {
+  const doc = GREENROOM_VAULT_CONTENT.find(d => d.id === docId);
+  if (!doc) return;
+  greenroom.state = 'vault_doc';
+  greenroom.currentVaultDoc = docId;
+  grSfxPostBlip();
+  const html = `
+<div class="gr-ascii" style="color:#ffe070;">GREENROOM // VAULT // ${doc.id.toUpperCase()}</div>
+<div class="gr-divider">─────────────────────────────────────────────────────</div>
+<div class="gr-post" style="border-left-color:#ffe070;">
+  <div class="gr-post-head">
+    <span class="gr-author" style="color:#ffe070;">${doc.author}</span>
+    <span class="gr-thread-meta">${doc.posted}</span>
+  </div>
+  <div class="gr-post-subject" style="color:#ffe070;">${escapeHtml(doc.subject)}</div>
+  <div style="white-space:pre-wrap;line-height:1.65;">${escapeHtml(doc.body)}</div>
+</div>
+<div class="gr-divider">─────────────────────────────────────────────────────</div>
+<div class="gr-prompt-line">  <a class="gr-menu-item" data-action="back">[B] BACK TO VAULT</a></div>
+`;
+  document.getElementById('gr-body').innerHTML = html;
+  document.querySelector('#gr-body .gr-menu-item').addEventListener('click', (e) => {
+    e.preventDefault();
+    grSfxMenuMove();
+    showGreenroomVault();
+  });
+}
+
+// ----- BRAIN-SPIKE TRACING -----
+
+function greenroomTraceConstants() {
+  // NEURAL FIREWALL gives a 30-second earlier warning and 30 extra seconds of
+  // disconnect grace, plus 50% damage reduction at spike.
+  const firewall = firmware && firmware.mods && firmware.mods.neuralFirewall;
+  return {
+    warnAtMs: firewall ? (24 * 60 + 30) * 1000 : 25 * 60 * 1000,
+    spikeAfterWarnMs: firewall ? 120 * 1000 : 90 * 1000,
+    spikeDamage: firewall ? 12 : 25,
+  };
+}
+
+function checkBrainSpikeTrace() {
+  if (!greenroom.connected) return;
+  if (greenroom.spikeTriggered) return;
+  const elapsed = performance.now() - greenroom.sessionStart;
+  const c = greenroomTraceConstants();
+  if (!greenroom.traceWarned && elapsed >= c.warnAtMs) {
+    greenroom.traceWarned = true;
+    greenroom.traceWarnedAt = performance.now();
+    triggerLinkAnomalyWarning();
+    return;
+  }
+  if (greenroom.traceWarned && !greenroom.spikeTriggered) {
+    const sinceWarn = performance.now() - greenroom.traceWarnedAt;
+    if (sinceWarn >= c.spikeAfterWarnMs) {
+      greenroom.spikeTriggered = true;
+      triggerBrainSpike();
+    }
+  }
+}
+
+function triggerLinkAnomalyWarning() {
+  // Add a sysop-style banner to the top of the GREENROOM body. Also start a
+  // pulsing red effect on the header carrier lock indicator.
+  const body = document.getElementById('gr-body');
+  if (!body) return;
+  // Insert warning bar at the top of the body if not already present
+  if (!document.getElementById('gr-link-anomaly')) {
+    const bar = document.createElement('div');
+    bar.id = 'gr-link-anomaly';
+    bar.style.cssText = 'background:rgba(255,80,80,0.18);border:1px solid #ff5050;color:#ff8080;padding:10px 16px;margin-bottom:14px;letter-spacing:2px;text-shadow:0 0 6px rgba(255,80,80,0.5);animation:gr-blink 0.8s steps(2,end) infinite;';
+    bar.innerHTML = `⚠ LINK ANOMALY DETECTED  //  TRACEBACK IN PROGRESS  //  DISCONNECT IMMEDIATELY`;
+    body.insertBefore(bar, body.firstChild);
+  }
+  // Pulse the header carrier lock display in red
+  const lockEl = document.getElementById('gr-lock-pct');
+  if (lockEl) {
+    lockEl.style.color = '#ff5050';
+    lockEl.style.textShadow = '0 0 8px rgba(255,80,80,0.8)';
+  }
+  // Audio alarm
+  if (audio.ctx && audio.enabled) {
+    const t = audio.ctx.currentTime;
+    for (let i = 0; i < 3; i++) {
+      const o = audio.ctx.createOscillator();
+      const g = audio.ctx.createGain();
+      o.type = 'square';
+      o.frequency.value = 880;
+      g.gain.setValueAtTime(0.0001, t + i * 0.4);
+      g.gain.exponentialRampToValueAtTime(0.04, t + i * 0.4 + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.001, t + i * 0.4 + 0.18);
+      o.connect(g); g.connect(audio.master);
+      o.start(t + i * 0.4);
+      o.stop(t + i * 0.4 + 0.2);
+    }
+  }
+  // Add a NIGHTOWL warning post to GENERAL if not already there
+  if (typeof addComm === 'function') {
+    addComm('NIGHTOWL', 'sysop warning: traceback signature detected on your carrier. Disconnect.', true);
+  }
+}
+
+function triggerBrainSpike() {
+  // The actual event: screen jitter, audio chirp, damage neural integrity,
+  // force disconnect.
+  const c = greenroomTraceConstants();
+  // CSS jitter on the whole overlay
+  const overlay = document.getElementById('greenroom-overlay');
+  if (overlay) {
+    overlay.style.animation = 'gr-spike-jitter 0.08s steps(2,end) infinite';
+    setTimeout(() => { if (overlay) overlay.style.animation = ''; }, 2500);
+  }
+  // Audio: harsh distorted burst
+  if (audio.ctx && audio.enabled) {
+    const t = audio.ctx.currentTime;
+    const o = audio.ctx.createOscillator();
+    o.type = 'sawtooth';
+    o.frequency.setValueAtTime(180, t);
+    o.frequency.linearRampToValueAtTime(2400, t + 1.2);
+    o.frequency.linearRampToValueAtTime(60, t + 1.6);
+    const g = audio.ctx.createGain();
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(0.16, t + 0.05);
+    g.gain.setValueAtTime(0.16, t + 1.4);
+    g.gain.exponentialRampToValueAtTime(0.001, t + 1.8);
+    const dist = audio.ctx.createWaveShaper();
+    const curve = new Float32Array(256);
+    for (let i = 0; i < 256; i++) { const x = i / 128 - 1; curve[i] = Math.tanh(x * 6); }
+    dist.curve = curve;
+    const ns = audio.ctx.createBufferSource();
+    ns.buffer = audio.noiseBuf;
+    const ng = audio.ctx.createGain();
+    ng.gain.setValueAtTime(0.0001, t);
+    ng.gain.exponentialRampToValueAtTime(0.12, t + 0.1);
+    ng.gain.exponentialRampToValueAtTime(0.001, t + 1.8);
+    o.connect(dist); dist.connect(g); g.connect(audio.master);
+    ns.connect(ng); ng.connect(audio.master);
+    o.start(t); o.stop(t + 1.9);
+    ns.start(t); ns.stop(t + 1.9);
+  }
+  // Apply damage to the neural subsystem
+  const neural = subsystemsById && subsystemsById.get && subsystemsById.get('neural');
+  if (neural) {
+    neural.integrity = Math.max(0, neural.integrity - c.spikeDamage);
+    if (typeof noteJournalEvent === 'function') {
+      noteJournalEvent('damage', `Brain-spike trace event: neural -${c.spikeDamage}%`);
+    }
+  }
+  if (typeof addComm === 'function') {
+    addComm('NIGHTOWL', 'Force disconnect on your line. I am sorry. They had you.', true);
+  }
+  // Wait for the jitter to finish, then forcibly disconnect
+  setTimeout(() => {
+    if (greenroom.connected) disconnectGreenroom();
+  }, 2400);
+}
+
+// ----- TROJAN POST SPAWNER -----
+
+function spawnTrojanCommunityResponse(patch) {
+  if (greenroom.spawnedTrojanFor.includes(patch.id)) return;
+  greenroom.spawnedTrojanFor.push(patch.id);
+  const now = Date.now();
+  // Add two posts to TECH/MODS: CABLEHEAD audit notice, PROXY_M follow-up
+  for (let i = 0; i < GREENROOM_TROJAN_POSTS.length; i++) {
+    const tmpl = GREENROOM_TROJAN_POSTS[i];
+    const id = `dyn_trojan_${patch.id}_${i}`;
+    const post = {
+      id,
+      author: tmpl.author,
+      subject: tmpl.subject,
+      body: tmpl.bodyTemplate.replace(/\{NAME\}/g, patch.name),
+      daysAgo: 0,
+      when: now,
+    };
+    greenroom.dynamicPosts['TECH/MODS'].push(post);
+  }
+  greenroom.save();
+}
+
+
+function showGreenroomAbout() {
+  greenroom.state = 'about';
+  const html = `
+<div class="gr-ascii">GREENROOM // ABOUT</div>
+<div class="gr-divider">─────────────────────────────────────────────────────</div>
+<div style="white-space:pre-wrap;line-height:1.6;">
+
+  GREENROOM is a small, slow, deliberately private network.
+
+  It runs on hardware nobody is supposed to know exists, on
+  bands nobody is supposed to be using, on goodwill and a few
+  capacitors that should have failed years ago.
+
+  We are 27 active accounts. We have been here since 2043.
+  We have had three sysops. We have lost more people than we
+  like to count and we keep their handles preserved out of
+  respect.
+
+  This is not a place for noise. We post when we have something
+  to say. We help each other with what we can. We do not ask
+  too many questions about each other's lives outside the wire.
+
+  Rules, such as they are:
+
+    1. Mind your handles. Never share your node address.
+    2. Do not download anything you cannot verify.
+    3. Reserved handles stay reserved. Do not pester the sysop.
+    4. If a stranger asks you to identify yourself, the test
+       is "mind your handles" → "and mind your gain."
+    5. Be kind. We are most of what each other has left.
+
+  // signed,
+  // NIGHTOWL, current keeper
+  // for the keeper before, and the keeper before him.
+
+</div>
+<div class="gr-divider">─────────────────────────────────────────────────────</div>
+<div class="gr-prompt-line">  <a class="gr-menu-item" data-action="back">[B] BACK TO MAIN MENU</a></div>
+`;
+  document.getElementById('gr-body').innerHTML = html;
+  document.querySelector('#gr-body .gr-menu-item').addEventListener('click', (e) => {
+    e.preventDefault();
+    grSfxMenuMove();
+    showGreenroomMenu();
+  });
+}
+
+function disconnectGreenroom() {
+  greenroom.state = 'idle';
+  greenroom.connected = false;
+  greenroom.currentBoard = null;
+  greenroom.currentThread = null;
+  // Phase 4: clear any trace warning UI residue
+  greenroom.traceWarned = false;
+  greenroom.spikeTriggered = false;
+  const warn = document.getElementById('gr-link-anomaly');
+  if (warn) warn.remove();
+  const lockEl = document.getElementById('gr-lock-pct');
+  if (lockEl) { lockEl.style.color = ''; lockEl.style.textShadow = ''; }
+  document.getElementById('greenroom-overlay').classList.remove('show');
+}
+
+function countUnreadPostsForBoard(boardId) {
+  const board = GREENROOM_BOARDS[boardId];
+  if (!board) return 0;
+  return board.posts.filter(p => !greenroom.readPostIds.has(p.id)).length;
+}
+
+// ----- MAIL (Phase 3) -----
+// Receive-only inbox in this phase. Mails arrive based on player activity
+// milestones: first connection (welcome), N replies, rapport thresholds, etc.
+
+function totalPlayerReplies() {
+  let n = 0;
+  for (const arr of Object.values(greenroom.playerReplies)) n += arr.length;
+  return n;
+}
+
+function evaluateMailTriggers() {
+  // Each trigger has a unique id stored in the mail list so we don't re-send.
+  const have = new Set(greenroom.mail.map(m => m.id));
+  const trigger = (id, from, subject, body, daysAgo) => {
+    if (have.has(id)) return false;
+    greenroom.mail.unshift({ id, from, subject, body, daysAgo: daysAgo || 0, read: false });
+    return true;
+  };
+  let changed = false;
+  // Welcome PM from NIGHTOWL on first connection
+  if (greenroom.handle && trigger('mail_welcome', 'NIGHTOWL', 'welcome to greenroom',
+      "I see a new handle on the user list. Welcome.\n\nThis network runs on goodwill and quiet. We post when we have something to say. We help each other with what we can. We do not ask too many questions about each other's lives outside the wire.\n\nThe rules are in ABOUT. The passphrase is in there too. Read both.\n\nIf you need anything, mail me. I usually answer within a day.\n\n// owl out")) changed = true;
+  // After 3+ replies: NIGHTOWL acknowledgment
+  if (totalPlayerReplies() >= 3 && trigger('mail_three_replies', 'NIGHTOWL', 'a small note',
+      "I've noticed you've been posting. Welcome to the conversation.\n\nMost people lurk for a long time before they say anything. You jumped in. Some will appreciate that. Some will hold it against you. That's the price of voice.\n\nKeep at it. Don't post tired. Don't post angry. Don't post anything you wouldn't want OLD_LION to read aloud at your wake.\n\n// owl out")) changed = true;
+  // After replying to WIRE_SAINT's song-under-carrier post: PM from wire saint
+  if (greenroom.playerReplies['gen006'] && greenroom.playerReplies['gen006'].length > 0
+      && trigger('mail_wire_saint', 'WIRE_SAINT', 'thank you',
+      "You replied to my post about the song. Most do not. I want you to know I read what you said.\n\nThe next time the carrier is clean and the night is quiet, listen for nine seconds. Just nine. If you hear her, you will know it is her.\n\nIf you do not, that is all right too. She does not sing for everyone.\n\n// wire saint")) changed = true;
+  // After installing 2+ patches: PM from GLITCH_KIT
+  if (firmware.installed.size >= 2 && trigger('mail_glitch_offer', 'GLITCH_KIT', 'special deal for you',
+      "noticed you're running a couple of my patches. nice.\n\ni've got a custom build of the vox modulator that handles the sub-frequencies way better than the public version. it's not in the manifest yet because cablehead is being slow. but for you, half price. just mail me back if you want it.\n\nno trojan stuff. promise. cablehead has signed off, he just hasn't pushed it.\n\n-kit")) changed = true;
+  // After installing the neural_firewall (PROXY_M's patch): PM from PROXY_M
+  if (firmware.installed.has('neural_firewall_v1') && trigger('mail_proxy_thanks', 'PROXY_M', 'good',
+      "Good. You installed it. Most won't.\n\nI hope you never need it. If you do, the ninety seconds it buys you is the difference between disconnecting clean and not waking up. Use it.\n\nIf you ever pick up a slow ping on a frequency near our carrier band, mail me with the timestamp. I am still building the map.\n\n-pm")) changed = true;
+  // After 7+ replies: OLD_LION reaches out
+  if (totalPlayerReplies() >= 7 && trigger('mail_old_lion', 'OLD_LION', 'a question',
+      "You've been on the boards enough that I have begun to recognize your voice. That happens slowly here.\n\nI have a question for you, no obligation to answer. Where did you find your first node address? People come to GREENROOM through three or four common paths. I am keeping a small record because I think the network's history is partly the history of how each of us arrived.\n\nIf you don't want to say, that is fine. If you do, just mail me one or two sentences. I keep the record private.\n\n-old lion")) changed = true;
+  if (changed) greenroom.save();
+}
+
+function showGreenroomMail() {
+  greenroom.state = 'mail';
+  evaluateMailTriggers();
+  const mail = greenroom.mail;
+  let html = `
+<div class="gr-ascii">GREENROOM // PRIVATE MAIL // ${mail.length} message${mail.length === 1 ? '' : 's'}</div>
+<div class="gr-divider">─────────────────────────────────────────────────────</div>
+`;
+  if (mail.length === 0) {
+    html += `<div class="gr-prompt-line" style="color:rgba(78,255,126,0.6);margin:24px 0;">  (inbox empty)</div>`;
+  } else {
+    mail.forEach((m, idx) => {
+      const marker = m.read ? '<span></span>' : '<span class="gr-thread-marker">▸</span>';
+      const authorCls = m.from === 'NIGHTOWL' ? 'gr-author sysop' : 'gr-author';
+      html += `<div class="gr-thread-line" data-mailidx="${idx}">
+        ${marker}
+        <span>${escapeHtml(m.subject)}</span>
+        <span class="${authorCls}">${m.from}</span>
+        <span class="gr-thread-meta">${m.read ? 'read' : 'new'}</span>
+      </div>`;
+    });
+  }
+  html += `
+<div class="gr-divider">─────────────────────────────────────────────────────</div>
+<div class="gr-prompt-line">  <a class="gr-menu-item" data-action="back">[B] BACK TO MAIN MENU</a></div>
+`;
+  document.getElementById('gr-body').innerHTML = html;
+  document.querySelectorAll('#gr-body .gr-thread-line').forEach(line => {
+    line.addEventListener('click', () => {
+      const idx = parseInt(line.getAttribute('data-mailidx'), 10);
+      showGreenroomMailMessage(idx);
+    });
+  });
+  document.querySelector('#gr-body .gr-menu-item').addEventListener('click', (e) => {
+    e.preventDefault();
+    grSfxMenuMove();
+    showGreenroomMenu();
+  });
+}
+
+function showGreenroomMailMessage(idx) {
+  const m = greenroom.mail[idx];
+  if (!m) return;
+  greenroom.state = 'mail_message';
+  greenroom.currentMail = idx;
+  if (!m.read) {
+    m.read = true;
+    greenroom.save();
+  }
+  grSfxPostBlip();
+  const authorCls = m.from === 'NIGHTOWL' ? 'gr-author sysop' : 'gr-author';
+  const html = `
+<div class="gr-ascii">GREENROOM // PRIVATE MAIL // FROM: ${m.from}</div>
+<div class="gr-divider">─────────────────────────────────────────────────────</div>
+<div class="gr-post">
+  <div class="gr-post-head">
+    <span class="${authorCls}">${m.from}</span>
+    <span class="gr-thread-meta">to ${greenroom.handle}</span>
+  </div>
+  <div class="gr-post-subject">${escapeHtml(m.subject)}</div>
+  <div>${escapeHtml(m.body)}</div>
+</div>
+<div class="gr-divider">─────────────────────────────────────────────────────</div>
+<div class="gr-prompt-line">  <a class="gr-menu-item" data-action="back">[B] BACK TO INBOX</a></div>
+`;
+  document.getElementById('gr-body').innerHTML = html;
+  document.querySelector('#gr-body .gr-menu-item').addEventListener('click', (e) => {
+    e.preventDefault();
+    grSfxMenuMove();
+    showGreenroomMail();
+  });
+}
+
+function formatGreenroomClock() {
+  const h = tod ? tod.hour : 12;
+  const m = tod ? Math.floor((tod.hour % 1) * 60) : 0;
+  const hh = String(Math.floor(h)).padStart(2, '0');
+  const mm = String(m).padStart(2, '0');
+  return `${hh}:${mm} CST`;
+}
+
+function formatCarrierLock() {
+  // Carrier lock degrades with throttle magnitude. Computed live; we just
+  // read the current player state.
+  if (!player) return '100%';
+  const tf = Math.min(1, Math.abs(player.throttle) / player.throttleMax);
+  let lock = 1.0 - tf * 0.7;
+  if (player.isBoosting) lock = 0;
+  // Phase 6: mute zones. Henge POIs and anomaly POIs emit a carrier-suppression
+  // field within ~85m. The closer you are, the more degraded the lock.
+  if (typeof pois !== 'undefined' && pois && pois.length) {
+    const MUTE_RADIUS = 85;
+    let minDistToMute = Infinity;
+    for (const p of pois) {
+      if (p.type !== 'henge' && p.type !== 'anomaly') continue;
+      const d = Math.hypot(p.pos.x - player.pos.x, p.pos.z - player.pos.z);
+      if (d < minDistToMute) minDistToMute = d;
+    }
+    if (minDistToMute < MUTE_RADIUS) {
+      // Smoothly degrade lock from 1.0 at the edge to 0.0 at center
+      const muteFactor = minDistToMute / MUTE_RADIUS;
+      lock = Math.min(lock, muteFactor * 0.2);
+    }
+  }
+  return `${Math.round(lock * 100).toString().padStart(3, ' ')}%`;
+}
+
+// Phase 6: detect if player is inside a mute zone (used for connection drops
+// and to refuse new connections inside one).
+function isInsideMuteZone() {
+  if (typeof pois === 'undefined' || !pois || !pois.length || !player) return false;
+  const MUTE_RADIUS = 60;  // tighter than the gradient
+  for (const p of pois) {
+    if (p.type !== 'henge' && p.type !== 'anomaly') continue;
+    const d = Math.hypot(p.pos.x - player.pos.x, p.pos.z - player.pos.z);
+    if (d < MUTE_RADIUS) return p;
+  }
+  return false;
+}
+
+// ----- KEYBOARD HANDLING WHILE OPEN -----
+
+document.addEventListener('keydown', (e) => {
+  if (!greenroom.connected) return;
+  // If handle input is focused, let it handle keys
+  const active = document.activeElement;
+  if (active && active.id === 'gr-handle-input') return;
+  // Disconnect from anywhere
+  if (e.key === 'q' || e.key === 'Q') {
+    e.preventDefault(); e.stopPropagation();
+    disconnectGreenroom();
+    return;
+  }
+  // ESC: go up one level
+  if (e.key === 'Escape') {
+    e.preventDefault(); e.stopPropagation();
+    if (greenroom.state === 'thread') showGreenroomBoard(greenroom.currentBoard);
+    else if (greenroom.state === 'patch_detail') showGreenroomFiles();
+    else if (greenroom.state === 'mail_message') showGreenroomMail();
+    else if (greenroom.state === 'vault_doc') showGreenroomVault();
+    else if (greenroom.state === 'board') showGreenroomBoardsList();
+    else if (greenroom.state === 'reset_confirm') showGreenroomMenu();
+    else if (greenroom.state === 'boards' || greenroom.state === 'users' || greenroom.state === 'about' || greenroom.state === 'files' || greenroom.state === 'mail' || greenroom.state === 'vault') showGreenroomMenu();
+    else if (greenroom.state === 'main') disconnectGreenroom();
+    return;
+  }
+  // Reset confirmation: Y or N
+  if (greenroom.state === 'reset_confirm') {
+    if (e.key === 'y' || e.key === 'Y') {
+      const btn = document.querySelector('#gr-body .gr-action-btn[data-action="confirm-reset"]');
+      if (btn) { btn.click(); e.preventDefault(); return; }
+    }
+    if (e.key === 'n' || e.key === 'N') {
+      const btn = document.querySelector('#gr-body .gr-action-btn[data-action="cancel-reset"]');
+      if (btn) { btn.click(); e.preventDefault(); return; }
+    }
+  }
+  // 'b' to go back from a sub-screen
+  if (e.key === 'b' || e.key === 'B') {
+    if (greenroom.state === 'thread') { showGreenroomBoard(greenroom.currentBoard); e.preventDefault(); return; }
+    if (greenroom.state === 'patch_detail') { showGreenroomFiles(); e.preventDefault(); return; }
+    if (greenroom.state === 'mail_message') { showGreenroomMail(); e.preventDefault(); return; }
+    if (greenroom.state === 'vault_doc') { showGreenroomVault(); e.preventDefault(); return; }
+    if (greenroom.state === 'board') { showGreenroomBoardsList(); e.preventDefault(); return; }
+    if (greenroom.state === 'boards' || greenroom.state === 'files' || greenroom.state === 'users' || greenroom.state === 'about' || greenroom.state === 'mail' || greenroom.state === 'vault') { showGreenroomMenu(); e.preventDefault(); return; }
+  }
+  // Patch-detail shortcuts
+  if (greenroom.state === 'patch_detail') {
+    if (e.key === 'i' || e.key === 'I') {
+      const installBtn = document.querySelector('#gr-body .gr-action-btn[data-action="install"]');
+      if (installBtn) { installBtn.click(); e.preventDefault(); return; }
+    }
+    if (e.key === 'u' || e.key === 'U') {
+      const unBtn = document.querySelector('#gr-body .gr-action-btn[data-action="uninstall"]');
+      if (unBtn) { unBtn.click(); e.preventDefault(); return; }
+    }
+  }
+  // Reply shortcuts: 1-4 to pick a reply option from a thread
+  if (greenroom.state === 'thread') {
+    const k = parseInt(e.key, 10);
+    if (k >= 1 && k <= 4) {
+      const opts = document.querySelectorAll('#gr-body .gr-reply-option');
+      if (opts[k - 1]) { opts[k - 1].click(); e.preventDefault(); return; }
+    }
+  }
+  // Boards list: 1-5 picks a board
+  if (greenroom.state === 'boards') {
+    const k = parseInt(e.key, 10);
+    if (k >= 1 && k <= 9) {
+      const rows = document.querySelectorAll('#gr-body .gr-thread-line[data-boardid]');
+      if (rows[k - 1]) { rows[k - 1].click(); e.preventDefault(); return; }
+    }
+  }
+  // Download cancel
+  if (greenroom.state === 'downloading' && (e.key === 'c' || e.key === 'C')) {
+    const cancelBtn = document.querySelector('#gr-body [data-action="cancel"]');
+    if (cancelBtn) { cancelBtn.click(); e.preventDefault(); return; }
+  }
+  // Number keys 1-5 from main menu
+  if (greenroom.state === 'main') {
+    if (e.key === '1') { handleGreenroomMenuAction('boards'); e.preventDefault(); }
+    else if (e.key === '2') { handleGreenroomMenuAction('files'); e.preventDefault(); }
+    else if (e.key === '3') { handleGreenroomMenuAction('users'); e.preventDefault(); }
+    else if (e.key === '4') { handleGreenroomMenuAction('mail'); e.preventDefault(); }
+    else if (e.key === '5') { handleGreenroomMenuAction('about'); e.preventDefault(); }
+    else if ((e.key === 'v' || e.key === 'V') && greenroom.hasVaultKey()) { handleGreenroomMenuAction('vault'); e.preventDefault(); }
+  }
+});
+
+// ----- LIVE CARRIER LOCK + CLOCK UPDATER -----
+
+setInterval(() => {
+  if (!greenroom.connected) return;
+  const lockEl = document.getElementById('gr-lock-pct');
+  const clockEl = document.getElementById('gr-clock');
+  if (lockEl && !greenroom.traceWarned) lockEl.textContent = formatCarrierLock();
+  if (clockEl) clockEl.textContent = formatGreenroomClock();
+  // Phase 4: brain-spike trace check (only after the warn threshold could fire)
+  if (typeof checkBrainSpikeTrace === 'function') checkBrainSpikeTrace();
+  // Phase 6: force disconnect if player wandered into a mute zone
+  if (typeof isInsideMuteZone === 'function') {
+    const mute = isInsideMuteZone();
+    if (mute && !greenroom._muteDisconnecting) {
+      greenroom._muteDisconnecting = true;
+      if (typeof addComm === 'function') {
+        addComm('NIGHTOWL', `carrier lost. you walked into something that does not want you here. // owl out`, true);
+      }
+      setTimeout(() => {
+        if (greenroom.connected) disconnectGreenroom();
+        greenroom._muteDisconnecting = false;
+      }, 300);
+    }
+  }
+}, 1000);
+
+// ----- TERMINAL COMMAND INTEGRATION -----
+
+// Add 'connect' command to TERM_COMMANDS so players can dial in from the local
+// neural console. The address argument is optional; defaults to a known node.
+TERM_COMMANDS.connect = {
+  desc: 'Connect to a remote network node (test loopback: connect 08-ROOK-2247)',
+  run: (args) => {
+    const addr = (args && args[0]) || GREENROOM_NODE_DEFAULT;
+    // Validate format (placeholder check)
+    if (!/^[0-9A-Za-z-]+$/.test(addr)) {
+      return { lines: [`Invalid node address: ${addr}`], cls: 'error' };
+    }
+    // Loose validation against known nodes. Default loopback always allowed.
+    // Other addresses must be in the knownNodes list, populated by world discovery.
+    const known = greenroom && greenroom.knownNodes ? greenroom.knownNodes : [];
+    if (addr !== GREENROOM_NODE_DEFAULT && !known.includes(addr)) {
+      return { lines: ['', `▶ NO ROUTE TO ${addr}.`, '▶ This address is not in your routing table.', `▶ Type "nodes" to list known addresses.`, ''], cls: 'error' };
+    }
+    setTimeout(() => connectGreenroom(addr), 100);
+    const label = addr === GREENROOM_NODE_DEFAULT ? '(loopback test node)' : '';
+    return { lines: ['', `▶ Dialing ${addr} ${label}`, '▶ Switching to remote uplink.', ''], cls: 'success' };
+  },
+};
+
+TERM_COMMANDS.nodes = {
+  desc: 'List known network node addresses',
+  run: () => {
+    const lines = ['', '┌── KNOWN NODE ADDRESSES ──'];
+    lines.push(`│  ${GREENROOM_NODE_DEFAULT.padEnd(20, ' ')} (loopback test node, always available)`);
+    const known = greenroom && greenroom.knownNodes ? greenroom.knownNodes : [];
+    if (known.length === 0) {
+      lines.push('│');
+      lines.push('│  No additional nodes discovered yet.');
+      lines.push('│  Hidden network addresses are scattered through the');
+      lines.push('│  world. Look for unusual items at abandoned terminals,');
+      lines.push('│  outposts, and the routine wreckage of the road.');
+    } else {
+      for (const n of known) {
+        lines.push(`│  ${n}`);
+      }
+    }
+    lines.push('└──────────────────────', '');
+    return { lines, cls: 'cyan' };
+  },
+};
+
+TERM_COMMANDS.firmware = {
+  desc: 'List installed firmware patches',
+  run: () => {
+    const lines = ['', '┌── INSTALLED FIRMWARE ──'];
+    if (firmware.installed.size === 0) {
+      lines.push('│  (none)');
+      lines.push('│  Visit GREENROOM file library to install patches.');
+    } else {
+      for (const [id, meta] of firmware.installed) {
+        const patch = GREENROOM_PATCHES.find(p => p.id === id);
+        if (!patch) continue;
+        const status = meta.corrupted ? '[⚠ CORRUPTED]' : '[OK]';
+        lines.push(`│  ${status.padEnd(14, ' ')} ${patch.name}`);
+        const fx = meta.corrupted && patch.corrupted ? patch.corrupted.description : patch.effect;
+        lines.push(`│    ${fx}`);
+      }
+    }
+    lines.push('├── ACTIVE MODIFIERS ──');
+    const m = firmware.mods;
+    if (m.radarRangeMult !== 1.0)   lines.push(`│  radar range:    x${m.radarRangeMult.toFixed(2)}`);
+    if (m.heatDissMult !== 1.0)     lines.push(`│  heat diss:      x${m.heatDissMult.toFixed(2)}`);
+    if (m.chaingunHeatMult !== 1.0) lines.push(`│  chaingun heat:  x${m.chaingunHeatMult.toFixed(2)}`);
+    if (m.gimbalDriftMult !== 1.0)  lines.push(`│  gimbal drift:   x${m.gimbalDriftMult.toFixed(2)}`);
+    if (m.droneSpeedMult !== 1.0)   lines.push(`│  drone speed:    x${m.droneSpeedMult.toFixed(2)}`);
+    if (m.walkPhaseHarmonizer)      lines.push(`│  walk harmonizer: ACTIVE`);
+    if (m.voxModulator)             lines.push(`│  vox modulator:  ACTIVE`);
+    if (m.neuralFirewall)           lines.push(`│  neural firewall: ARMED`);
+    lines.push('└──────────────────────', '');
+    return { lines, cls: 'cyan' };
+  },
+};
+
+TERM_COMMANDS.trace = {
+  desc: 'Debug: advance GREENROOM session timer (call before/during connect)',
+  run: (args) => {
+    const mins = parseFloat(args && args[0] ? args[0] : '24');
+    if (isNaN(mins)) return { lines: ['Usage: trace <minutes>'], cls: 'error' };
+    if (greenroom.connected) {
+      greenroom.sessionStart -= mins * 60 * 1000;
+      const c = greenroomTraceConstants();
+      const elapsed = (performance.now() - greenroom.sessionStart) / 1000;
+      return { lines: ['', `▶ Session timer advanced by ${mins.toFixed(1)} min.`, `▶ Session elapsed: ${elapsed.toFixed(0)}s.`, `▶ Warning fires at: ${(c.warnAtMs/1000).toFixed(0)}s.`, ''], cls: 'success' };
+    }
+    // Not connected: store an offset to apply on next connect
+    greenroom._pendingTraceOffsetMs = mins * 60 * 1000;
+    return { lines: ['', `▶ On next GREENROOM connect, session will start ${mins.toFixed(1)} min in the past.`, '▶ Trace warning will fire shortly after connection.', ''], cls: 'success' };
+  },
+};
+
+
 
 // ----- Holotape tray UI helpers -----
 function refreshHolotapeTray() {
@@ -20081,6 +23170,50 @@ document.getElementById('start-btn').addEventListener('click', () => {
   }, 600);
 });
 
+// Wire the reset-all-saved-data flow on the start screen
+{
+  const resetLink = document.getElementById('start-reset-link');
+  const resetCancel = document.getElementById('reset-cancel');
+  const resetConfirmBtn = document.getElementById('reset-confirm-btn');
+  if (resetLink) {
+    resetLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      document.getElementById('reset-confirm').classList.add('show');
+    });
+  }
+  if (resetCancel) {
+    resetCancel.addEventListener('click', (e) => {
+      e.preventDefault();
+      document.getElementById('reset-confirm').classList.remove('show');
+    });
+  }
+  if (resetConfirmBtn) {
+    resetConfirmBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      // Wipe every known localStorage key used by the sim. Listed explicitly so
+      // we don't accidentally clobber keys belonging to other origins or scripts.
+      const keys = [
+        'titan7_pilot',
+        'titan7_progression',
+        'titan7_ambient_muted',
+        'greenroom',
+        'firmware',
+        'footstepMuffled',
+        'cpCollapsed',
+      ];
+      for (const k of keys) {
+        try { localStorage.removeItem(k); } catch (err) {}
+      }
+      // Visual confirmation flash before reload
+      const box = document.querySelector('#reset-confirm .rc-box');
+      if (box) {
+        box.innerHTML = '<div class="rc-title">DATA ERASED</div><div class="rc-body" style="text-align:center;">Reloading the sim with a fresh world...</div>';
+      }
+      setTimeout(() => { location.reload(); }, 800);
+    });
+  }
+}
+
 function runBootSequence() {
   const overlay = document.getElementById('boot-sequence');
   const lines = document.getElementById('boot-lines');
@@ -20129,6 +23262,8 @@ function runBootSequence() {
       row.innerHTML = `<span class="b-name">▸ ${it.n}</span><span class="b-state ${it.c}">${it.s}<span class="b-cursor">▍</span></span>`;
       lines.appendChild(row);
       lineEls.set(it.n, row);
+      // Keep the latest line in view on short viewports
+      lines.scrollTop = lines.scrollHeight;
     }, elapsed);
   });
 
