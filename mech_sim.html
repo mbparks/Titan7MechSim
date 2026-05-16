@@ -910,8 +910,158 @@
   .legend-dot.found { background: var(--green); }
   .legend-dot.unfound { background: var(--amber); border-radius: 50%; }
   .legend-dot.wp { background: transparent; border: 2px solid var(--green); border-radius: 50%; }
+  .legend-dot.place { background: #ffdc78; transform: rotate(45deg); }
+  .legend-dot.note { background: rgba(255, 170, 60, 0.85); border-radius: 50%; }
   .legend-dot.mech { background: var(--blue); }
   .legend-dot.drone { background: var(--amber); border: 1px solid var(--bg); }
+
+  /* ============================================================
+     PLACE NAME MODAL
+     ============================================================ */
+  #placename-modal {
+    position: fixed; inset: 0; z-index: 260;
+    display: none;
+    align-items: center; justify-content: center;
+    background: rgba(0, 0, 0, 0.7);
+    color: var(--amber);
+    font-family: 'Share Tech Mono', monospace;
+  }
+  #placename-modal.show { display: flex; }
+  .placename-box {
+    width: 440px;
+    max-width: 92vw;
+    background: rgba(10, 7, 4, 0.97);
+    border: 1px solid var(--amber);
+    box-shadow:
+      0 0 30px rgba(255, 154, 31, 0.25),
+      inset 0 0 50px rgba(255, 154, 31, 0.04);
+    padding: 22px 28px 20px;
+    position: relative;
+  }
+  .placename-box::before, .placename-box::after {
+    content: '';
+    position: absolute;
+    width: 14px; height: 14px;
+    border: 2px solid var(--amber);
+  }
+  .placename-box::before { top: -6px; left: -6px; border-right: none; border-bottom: none; }
+  .placename-box::after  { bottom: -6px; right: -6px; border-left: none; border-top: none; }
+  .placename-title {
+    font-family: 'Black Ops One', monospace;
+    font-size: 16px;
+    letter-spacing: 5px;
+    color: var(--amber);
+    text-shadow: 0 0 8px rgba(255, 154, 31, 0.45);
+    margin-bottom: 4px;
+  }
+  .placename-coords {
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--amber-dim);
+    margin-bottom: 14px;
+  }
+  #placename-input {
+    width: 100%;
+    background: rgba(5, 4, 2, 0.85);
+    border: 1px solid var(--amber-dim);
+    color: var(--amber);
+    font-family: inherit;
+    font-size: 14px;
+    letter-spacing: 1px;
+    padding: 10px 12px;
+    box-sizing: border-box;
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  #placename-input:focus {
+    border-color: var(--amber);
+    box-shadow: 0 0 8px rgba(255, 154, 31, 0.3), inset 0 0 8px rgba(255, 154, 31, 0.08);
+  }
+  #placename-input::placeholder { color: rgba(255, 154, 31, 0.3); font-style: italic; }
+  .placename-hint {
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: var(--amber-faint);
+    margin-top: 8px;
+  }
+  .placename-buttons {
+    margin-top: 18px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .placename-buttons-right { display: flex; gap: 10px; }
+  .placename-btn {
+    background: rgba(20, 14, 6, 0.8);
+    border: 1px solid var(--amber-dim);
+    color: var(--amber-dim);
+    font-family: inherit;
+    font-size: 11px;
+    letter-spacing: 3px;
+    padding: 8px 18px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .placename-btn:hover {
+    color: var(--amber);
+    border-color: var(--amber);
+  }
+  .placename-btn.primary {
+    background: rgba(255, 154, 31, 0.15);
+    border-color: var(--amber);
+    color: var(--amber);
+  }
+  .placename-btn.primary:hover {
+    background: rgba(255, 154, 31, 0.28);
+    box-shadow: 0 0 8px rgba(255, 154, 31, 0.4);
+  }
+  .placename-btn.danger {
+    border-color: rgba(255, 96, 80, 0.5);
+    color: rgba(255, 128, 100, 0.7);
+  }
+  .placename-btn.danger:hover {
+    border-color: #ff6050;
+    color: #ff8060;
+    background: rgba(255, 80, 64, 0.1);
+  }
+  /* Field note modal reuses the placename styles with a few additions */
+  #fieldnote-modal {
+    position: fixed; inset: 0; z-index: 260;
+    display: none;
+    align-items: center; justify-content: center;
+    background: rgba(0, 0, 0, 0.7);
+    color: var(--amber);
+    font-family: 'Share Tech Mono', monospace;
+  }
+  #fieldnote-modal.show { display: flex; }
+  .fieldnote-box { width: 520px; }
+  #fieldnote-input {
+    width: 100%;
+    background: rgba(5, 4, 2, 0.85);
+    border: 1px solid var(--amber-dim);
+    color: var(--amber);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 13px;
+    line-height: 1.65;
+    letter-spacing: 0.5px;
+    padding: 12px 14px;
+    box-sizing: border-box;
+    outline: none;
+    resize: vertical;
+    min-height: 96px;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  #fieldnote-input:focus {
+    border-color: var(--amber);
+    box-shadow: 0 0 8px rgba(255, 154, 31, 0.3), inset 0 0 8px rgba(255, 154, 31, 0.08);
+  }
+  #fieldnote-input:read-only {
+    cursor: default;
+    color: rgba(255, 230, 180, 0.92);
+    font-family: 'Georgia', 'Times New Roman', serif;
+    font-style: italic;
+  }
+  #fieldnote-input::placeholder { color: rgba(255, 154, 31, 0.3); font-style: italic; }
   .map-footer {
     display: flex; justify-content: space-between;
     padding: 6px 12px;
@@ -2020,6 +2170,25 @@
     color: rgba(255, 230, 180, 0.92);
     font-family: 'Share Tech Mono', monospace;
   }
+  .jrn-section-title {
+    font-family: 'Black Ops One', monospace;
+    font-size: 14px;
+    letter-spacing: 6px;
+    color: var(--amber);
+    text-shadow: 0 0 8px rgba(255, 154, 31, 0.4);
+    margin: 4px 0 14px 0;
+    padding-bottom: 6px;
+    border-bottom: 1px solid rgba(255, 154, 31, 0.3);
+  }
+  .jrn-fieldnote { border-bottom-style: dotted; }
+  .jrn-fieldnote-text {
+    color: rgba(220, 235, 200, 0.94);
+    font-family: 'Georgia', 'Times New Roman', serif !important;
+    font-style: italic;
+    font-size: 13.5px;
+    line-height: 1.7;
+    white-space: pre-wrap;
+  }
   .jrn-footer {
     display: flex; justify-content: space-between;
     padding: 10px 12px; margin-top: 12px;
@@ -2200,6 +2369,61 @@
     font-size: 12px;
     line-height: 1.75;
     letter-spacing: 0.3px;
+  }
+  /* Codex tabs (Build 2: Found Human Culture) */
+  .cdx-tabs {
+    display: flex;
+    gap: 0;
+    margin-bottom: 22px;
+    border-bottom: 1px solid rgba(255, 154, 31, 0.3);
+  }
+  .cdx-tab {
+    background: rgba(20, 14, 6, 0.5);
+    border: 1px solid rgba(255, 154, 31, 0.25);
+    border-bottom: none;
+    color: var(--amber-dim);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 4px;
+    padding: 10px 22px;
+    cursor: pointer;
+    margin-right: 4px;
+    margin-bottom: -1px;
+    transition: all 0.15s;
+  }
+  .cdx-tab:hover { color: var(--amber); border-color: var(--amber-dim); }
+  .cdx-tab.active {
+    background: rgba(255, 154, 31, 0.08);
+    color: var(--amber);
+    border-color: var(--amber);
+    box-shadow: inset 0 -1px 0 rgba(255, 154, 31, 0.08);
+    text-shadow: 0 0 6px rgba(255, 154, 31, 0.4);
+  }
+  .cdx-tab-count {
+    font-size: 9px;
+    margin-left: 8px;
+    color: var(--amber-faint);
+    letter-spacing: 2px;
+  }
+  .cdx-tab.active .cdx-tab-count { color: var(--amber-dim); }
+  .cdx-recovered-intro {
+    color: var(--amber-dim);
+    font-style: italic;
+    font-size: 11px;
+    line-height: 1.7;
+    padding: 0 4px 22px 4px;
+    letter-spacing: 0.5px;
+    border-bottom: 1px dashed rgba(255, 154, 31, 0.15);
+    margin-bottom: 22px;
+  }
+  .cdx-recovered .cdx-entry { border-left-color: rgba(180, 230, 255, 0.35); }
+  .cdx-recovered .cdx-entry-text {
+    white-space: pre-wrap;
+    color: rgba(220, 235, 200, 0.92);
+    font-style: normal;
+    font-size: 12.5px;
+    line-height: 1.85;
+    font-family: 'Georgia', 'Times New Roman', serif;
   }
   .cdx-empty {
     color: var(--amber-dim);
@@ -3065,10 +3289,21 @@
     border-radius: 50%;
   }
   /* Weather badge */
-  /* weather-badge is permanently hidden from main HUD - the forecast is on
-     the starboard side console. The element still exists so existing JS
-     that writes to #weather-current keeps working without throwing. */
-  #weather-badge { display: none !important; }
+  /* Restored to the main HUD per request: shows current weather, wind, and the
+     ambient-sound toggle. */
+  #weather-badge {
+    position: absolute;
+    right: 248px; top: 80px;
+    width: 220px;
+    border: 1px solid var(--amber-dim);
+    background: var(--panel);
+    padding: 8px 12px;
+    color: var(--amber);
+    font-size: 11px;
+    letter-spacing: 2px;
+    pointer-events: none;
+    z-index: 10;
+  }
 
   /* Biome badge */
   #biome-badge {
@@ -4989,6 +5224,9 @@
       <span>NEXT <span id="wx-forecast" style="color:var(--amber);">--</span></span>
       <span id="wx-forecast-time" style="color:var(--amber);">--:--</span>
     </div>
+    <div style="margin-top:6px;border-top:1px dashed rgba(255,154,31,0.18);padding-top:5px;text-align:center;">
+      <span id="hud-settings-btn" title="Open settings panel (O)" style="cursor:pointer;color:var(--amber);font-size:9px;letter-spacing:2px;padding:2px 8px;border:1px solid var(--amber-dim);user-select:none;pointer-events:auto;display:inline-block;">[O] SETTINGS</span>
+    </div>
   </div>
 
   <!-- Biome badge -->
@@ -5183,6 +5421,7 @@
     <span class="key">J</span><span>Open field journal</span>
     <span class="key">P</span><span>Photo mode</span>
     <span class="key">Z</span><span>Kneel / stand</span>
+    <span class="key">B</span><span>Write field note (at current spot)</span>
     <span class="key">E</span><span>Talk to person nearby</span>
     <span class="key">O</span><span>Settings menu</span>
     <span class="key">ESC</span><span>Pause / close panel</span>
@@ -5324,16 +5563,53 @@
     <span><span class="legend-dot found"></span>SURVEYED</span>
     <span><span class="legend-dot unfound"></span>UNCLASSIFIED</span>
     <span><span class="legend-dot wp"></span>WAYPOINT</span>
+    <span><span class="legend-dot place"></span>NAMED PLACE</span>
+    <span><span class="legend-dot note"></span>FIELD NOTE</span>
     <span><span class="legend-dot mech"></span>ALLIED MECH</span>
     <span><span class="legend-dot drone"></span>DRONE</span>
   </div>
   <div class="map-footer">
-    <span>LMB: ADD WAYPOINT</span>
+    <span>LMB: ADD WAYPOINT / READ NOTE</span>
     <span>SHIFT+LMB: DRONE PATH</span>
+    <span>RMB: NAME / EDIT PLACE</span>
+    <span>SHIFT+RMB: CLEAR ROUTE</span>
     <span>DRAG: PAN</span>
     <span>SCROLL: ZOOM</span>
-    <span>RMB: CLEAR ROUTE</span>
     <span>M / ESC: CLOSE</span>
+  </div>
+</div>
+
+<!-- Place name modal (opens from map right-click) -->
+<div id="placename-modal">
+  <div class="placename-box">
+    <div class="placename-title" id="placename-title">▶ NAME THIS PLACE</div>
+    <div class="placename-coords" id="placename-coords">at +0000 / +0000</div>
+    <input id="placename-input" type="text" maxlength="48" placeholder="give this place a name..." autocomplete="off" spellcheck="false">
+    <div class="placename-hint">up to 48 characters. ENTER to save. ESC to cancel.</div>
+    <div class="placename-buttons">
+      <button id="placename-delete-btn" class="placename-btn danger">DELETE</button>
+      <div class="placename-buttons-right">
+        <button id="placename-cancel-btn" class="placename-btn">CANCEL</button>
+        <button id="placename-save-btn" class="placename-btn primary">SAVE</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Field note modal (opens from B key in cockpit, or from map click on a note marker) -->
+<div id="fieldnote-modal">
+  <div class="placename-box fieldnote-box">
+    <div class="placename-title">▶ FIELD NOTE</div>
+    <div class="placename-coords" id="fieldnote-coords">at +0000 / +0000</div>
+    <textarea id="fieldnote-input" maxlength="280" placeholder="what's worth remembering about this place..." spellcheck="false" rows="5"></textarea>
+    <div class="placename-hint">up to 280 characters. CTRL+ENTER to save. ESC to close.</div>
+    <div class="placename-buttons">
+      <button id="fieldnote-delete-btn" class="placename-btn danger" style="display:none;">DELETE</button>
+      <div class="placename-buttons-right">
+        <button id="fieldnote-cancel-btn" class="placename-btn">CANCEL</button>
+        <button id="fieldnote-save-btn" class="placename-btn primary">SAVE</button>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -7906,6 +8182,10 @@ const ITEMS = {
   data_fragment: { name: 'DATA FRAGMENT', weight: 0.2, value: 6,  icon: '⌬', desc: 'Recovered storage media. Partially decrypted.' },
   ammo_chaingun: { name: 'CHAINGUN BELT', weight: 2,   value: 4,  icon: '┊', desc: 'Linked 30mm rounds. Match-grade.' },
   ammo_missile:  { name: 'MISSILE TUBE',  weight: 6,   value: 15, icon: '▼', desc: 'Smart guided ordnance. Single-use.' },
+  // Found Human Culture items. On first pickup, unlocks one random unread
+  // RECOVERED codex entry. The item itself stays in cargo as a memento.
+  recovered_text: { name: 'PRESERVED WRITING', weight: 0.1, value: 0, icon: '✎', rare: true,
+    desc: 'A scrap of human writing that survived the collapse. A letter, a poem, a recipe, a school essay. Recovered to the codex.' },
   // Anomaly rewards (unique, not stackable on trade)
   strange_compass: { name: 'STRANGE COMPASS', weight: 1, value: 0, icon: '☉', rare: true, desc: 'The needle does not point north. It points somewhere.' },
   freq_receiver:   { name: 'UNKNOWN FREQ',    weight: 2, value: 0, icon: '⎈', rare: true, desc: 'Receives a signal that does not originate from this hemisphere.' },
@@ -7957,6 +8237,25 @@ function addItem(id, count = 1) {
       }
     }
   }
+  // Build 2: every recovered_text pickup unlocks one random unread RECOVERED
+  // codex entry. The item itself stays in cargo as a memento of the find.
+  if (id === 'recovered_text' && typeof CODEX_ENTRIES !== 'undefined' && typeof codex !== 'undefined') {
+    const recoveredAll = CODEX_ENTRIES.filter(e => e.category === 'recovered');
+    const unread = recoveredAll.filter(e => !codex.unlocked.has(e.id));
+    if (unread.length > 0) {
+      const pick = unread[Math.floor(Math.random() * unread.length)];
+      if (typeof unlockCodexEntry === 'function') unlockCodexEntry(pick.id);
+      else codex.unlocked.add(pick.id);
+      if (typeof addComm === 'function') {
+        addComm('TITAN-7', `Recovered: "${pick.title}". Catalogued.`, true);
+      }
+      if (typeof noteJournalEvent === 'function') {
+        noteJournalEvent('discovery', `Recovered preserved writing: ${pick.title}`);
+      }
+    } else if (typeof addComm === 'function') {
+      addComm('TITAN-7', `Another scrap of preserved writing. Already in the archive.`, true);
+    }
+  }
   return true;
 }
 
@@ -7987,22 +8286,22 @@ const POI_YIELDS = {
   vault:     [{ id: 'scrap_alloy',   chance: 1.00, min: 2, max: 4 }, { id: 'circuit_board', chance: 0.70, min: 1, max: 3 }, { id: 'data_fragment', chance: 0.50, min: 1, max: 3 }, { id: 'fuel_cell', chance: 0.15, min: 1, max: 1 }],
   bunker:    [{ id: 'scrap_alloy',   chance: 1.00, min: 2, max: 5 }, { id: 'circuit_board', chance: 0.60, min: 1, max: 2 }, { id: 'ammo_chaingun', chance: 0.40, min: 1, max: 3 }, { id: 'ammo_missile', chance: 0.10, min: 1, max: 1 }, { id: 'fuel_cell', chance: 0.08, min: 1, max: 1 }],
   // Heavy wreckage, all about scrap
-  wreck:     [{ id: 'scrap_alloy',   chance: 1.00, min: 3, max: 7 }, { id: 'circuit_board', chance: 0.45, min: 1, max: 2 }, { id: 'ammo_chaingun', chance: 0.25, min: 1, max: 2 }],
+  wreck:     [{ id: 'scrap_alloy',   chance: 1.00, min: 3, max: 7 }, { id: 'circuit_board', chance: 0.45, min: 1, max: 2 }, { id: 'ammo_chaingun', chance: 0.25, min: 1, max: 2 }, { id: 'recovered_text', chance: 0.12, min: 1, max: 1 }],
   // Comms equipment - electronics
   tower:     [{ id: 'circuit_board', chance: 1.00, min: 1, max: 3 }, { id: 'scrap_alloy',   chance: 0.65, min: 1, max: 2 }, { id: 'data_fragment', chance: 0.55, min: 1, max: 3 }, { id: 'tarnished_modem_cable', chance: 0.08, min: 1, max: 1 }],
-  lighthouse:[{ id: 'circuit_board', chance: 0.80, min: 1, max: 2 }, { id: 'scrap_alloy',   chance: 0.70, min: 1, max: 2 }, { id: 'data_fragment', chance: 0.45, min: 1, max: 2 }, { id: 'green_phosphor_fuse', chance: 0.06, min: 1, max: 1 }],
+  lighthouse:[{ id: 'circuit_board', chance: 0.80, min: 1, max: 2 }, { id: 'scrap_alloy',   chance: 0.70, min: 1, max: 2 }, { id: 'data_fragment', chance: 0.45, min: 1, max: 2 }, { id: 'green_phosphor_fuse', chance: 0.06, min: 1, max: 1 }, { id: 'recovered_text', chance: 0.15, min: 1, max: 1 }],
   // Service stations - mix
-  station:   [{ id: 'scrap_alloy',   chance: 1.00, min: 1, max: 3 }, { id: 'circuit_board', chance: 0.35, min: 1, max: 1 }, { id: 'fuel_cell', chance: 0.20, min: 1, max: 1 }, { id: 'tarnished_modem_cable', chance: 0.10, min: 1, max: 1 }],
+  station:   [{ id: 'scrap_alloy',   chance: 1.00, min: 1, max: 3 }, { id: 'circuit_board', chance: 0.35, min: 1, max: 1 }, { id: 'fuel_cell', chance: 0.20, min: 1, max: 1 }, { id: 'tarnished_modem_cable', chance: 0.10, min: 1, max: 1 }, { id: 'recovered_text', chance: 0.14, min: 1, max: 1 }],
   // Civilian remnants - bio + scraps
-  trailers:  [{ id: 'scrap_alloy',   chance: 0.85, min: 1, max: 2 }, { id: 'bio_sample',    chance: 0.40, min: 1, max: 1 }, { id: 'data_fragment', chance: 0.30, min: 1, max: 1 }, { id: 'muddied_address_paper', chance: 0.08, min: 1, max: 1 }],
+  trailers:  [{ id: 'scrap_alloy',   chance: 0.85, min: 1, max: 2 }, { id: 'bio_sample',    chance: 0.40, min: 1, max: 1 }, { id: 'data_fragment', chance: 0.30, min: 1, max: 1 }, { id: 'muddied_address_paper', chance: 0.08, min: 1, max: 1 }, { id: 'recovered_text', chance: 0.18, min: 1, max: 1 }],
   // Natural anomaly - rare earths and weirdness
   henge:     [{ id: 'rare_earth',    chance: 1.00, min: 1, max: 3 }, { id: 'data_fragment', chance: 0.30, min: 1, max: 1 }],
   // Scenic overlooks - mostly bio samples (plants, lichens)
-  overlook:  [{ id: 'bio_sample',    chance: 0.70, min: 1, max: 2 }, { id: 'data_fragment', chance: 0.20, min: 1, max: 1 }],
+  overlook:  [{ id: 'bio_sample',    chance: 0.70, min: 1, max: 2 }, { id: 'data_fragment', chance: 0.20, min: 1, max: 1 }, { id: 'recovered_text', chance: 0.08, min: 1, max: 1 }],
   // Mines - rare earths
   mine:      [{ id: 'rare_earth',    chance: 1.00, min: 2, max: 4 }, { id: 'scrap_alloy',   chance: 0.55, min: 1, max: 2 }, { id: 'fuel_cell', chance: 0.10, min: 1, max: 1 }],
   // Lakes - bio sample territory
-  lake:      [{ id: 'bio_sample',    chance: 1.00, min: 1, max: 3 }, { id: 'data_fragment', chance: 0.15, min: 1, max: 1 }],
+  lake:      [{ id: 'bio_sample',    chance: 1.00, min: 1, max: 3 }, { id: 'data_fragment', chance: 0.15, min: 1, max: 1 }, { id: 'recovered_text', chance: 0.10, min: 1, max: 1 }],
   // Anomaly POI is the catch-all weird one
   anomaly:   [{ id: 'rare_earth',    chance: 0.70, min: 1, max: 2 }, { id: 'data_fragment', chance: 0.80, min: 1, max: 2 }, { id: 'fuel_cell', chance: 0.20, min: 1, max: 1 }],
 };
@@ -8064,6 +8363,45 @@ const CODEX_ENTRIES = [
   { id: 'pirate_pirate_conspiracy', title: 'Band 12',               source: 'Radio drift broadcast', text: "A male voice broadcasting from somewhere fixed, claiming a copper Faraday cage shields him from triangulation. His patterns are wrong in interesting ways: he claims the numbers 4, 8, 15, 16, 23, 42 are not the full sequence and adds 37, 51, 89. He claims the lighthouse keeper is not real. He claims his brother went east and came back as someone else. I cannot tell which of his claims, if any, are correct." },
   { id: 'pirate_pirate_child',      title: 'Bedtime',               source: 'Radio drift broadcast', text: "A young girl, perhaps six or seven, broadcasting in the evening hours. She reads from a book called The Lighthouse Girl. She is clearly not alone. An adult voice in the background occasionally tells her to wrap up. She has asked twice now for me to tell her mother she is okay. She did not give a last name. I do not know who her mother is." },
   { id: 'pirate_pirate_familiar',   title: 'Unidentified',          source: 'Radio drift broadcast', text: "A male voice on irregular frequencies who addresses me by my first name. He claims to have walked this valley three times, and to have seen me make specific choices that I made unobserved. He has told me Coral knows things I do not yet, and that I should ask Kailey about her brother. He says he is not Marcus. He gave no name and refuses requests for one. I do not know who he is. I do not know how he knows me." },
+
+  // ============================================================
+  // RECOVERED HUMAN CULTURE
+  // ============================================================
+  // Public-domain artifacts of the world that was. Found in the wreckage of
+  // ordinary life: paperbacks, sheet music, recipes, letters, schoolbook
+  // exercises. These are not lore. They are what the wasteland preserved of
+  // people who lived before it. Each is tagged category: 'recovered' so the
+  // codex can show them in their own tab.
+  { id: 'rec_frost_woods', category: 'recovered', title: 'Stopping by Woods on a Snowy Evening', source: 'Paperback, glove compartment, abandoned sedan',
+    text: "Whose woods these are I think I know.\nHis house is in the village though;\nHe will not see me stopping here\nTo watch his woods fill up with snow.\n\nMy little horse must think it queer\nTo stop without a farmhouse near\nBetween the woods and frozen lake\nThe darkest evening of the year.\n\nHe gives his harness bells a shake\nTo ask if there is some mistake.\nThe only other sound's the sweep\nOf easy wind and downy flake.\n\nThe woods are lovely, dark and deep,\nBut I have promises to keep,\nAnd miles to go before I sleep,\nAnd miles to go before I sleep.\n\nRobert Frost (1923). The book had a bus transfer for July 9 used as a bookmark on this page." },
+  { id: 'rec_frost_road', category: 'recovered', title: 'The Road Not Taken', source: 'Laminated index card, taped to a dashboard',
+    text: "Two roads diverged in a yellow wood,\nAnd sorry I could not travel both\nAnd be one traveler, long I stood\nAnd looked down one as far as I could\nTo where it bent in the undergrowth;\n\nThen took the other, as just as fair,\nAnd having perhaps the better claim,\nBecause it was grassy and wanted wear;\nThough as for that the passing there\nHad worn them really about the same.\n\nAnd both that morning equally lay\nIn leaves no step had trodden black.\nOh, I kept the first for another day!\nYet knowing how way leads on to way,\nI doubted if I should ever come back.\n\nI shall be telling this with a sigh\nSomewhere ages and ages hence:\nTwo roads diverged in a wood, and I,\nI took the one less traveled by,\nAnd that has made all the difference.\n\nRobert Frost (1916). The card was laminated by someone who clearly drove this car a long way." },
+  { id: 'rec_dickinson_hope', category: 'recovered', title: '"Hope" is the thing with feathers', source: 'Pressed in a Bible, motel nightstand',
+    text: "\"Hope\" is the thing with feathers —\nThat perches in the soul —\nAnd sings the tune without the words —\nAnd never stops — at all —\n\nAnd sweetest — in the Gale — is heard —\nAnd sore must be the storm —\nThat could abash the little Bird\nThat kept so many warm —\n\nI've heard it in the chillest land —\nAnd on the strangest Sea —\nYet — never — in Extremity,\nIt asked a crumb — of me.\n\nEmily Dickinson, circa 1861. The page was dog-eared." },
+  { id: 'rec_whitman_song', category: 'recovered', title: 'Song of Myself (excerpt)', source: 'Schoolbook, classroom floor',
+    text: "I celebrate myself, and sing myself,\nAnd what I assume you shall assume,\nFor every atom belonging to me as good belongs to you.\n\nI loafe and invite my soul,\nI lean and loafe at my ease observing a spear of summer grass.\n\nMy tongue, every atom of my blood, form'd from this soil, this air,\nBorn here of parents born here from parents the same, and their parents the same,\nI, now thirty-seven years old in perfect health begin,\nHoping to cease not till death.\n\nWalt Whitman, 1855. A student's pencil had underlined 'every atom belonging to me as good belongs to you' three times." },
+  { id: 'rec_shenandoah', category: 'recovered', title: 'Shenandoah (lyrics)', source: 'Sheet music, ruined Methodist church',
+    text: "Oh Shenandoah, I long to hear you,\nAway, you rolling river.\nOh Shenandoah, I long to hear you,\nAway, I'm bound away,\n'Cross the wide Missouri.\n\nOh Shenandoah, I love your daughter,\nAway, you rolling river.\nFor her I'd cross your roaming waters,\nAway, I'm bound away,\n'Cross the wide Missouri.\n\nFor seven long years I've been a rover,\nAway, you rolling river.\nFor seven long years I've been a rover,\nAway, I'm bound away,\n'Cross the wide Missouri.\n\nTraditional. American river song, anonymous, mid-1800s. The sheet music was water-damaged at the bottom but the melody was still readable." },
+  { id: 'rec_amazing_grace', category: 'recovered', title: 'Amazing Grace (verses 1, 4, 6)', source: 'Hymnal, pew of a flooded church',
+    text: "Amazing grace, how sweet the sound\nThat saved a wretch like me.\nI once was lost, but now am found,\nWas blind, but now I see.\n\nThrough many dangers, toils, and snares,\nI have already come.\n'Tis grace hath brought me safe thus far,\nAnd grace will lead me home.\n\nWhen we've been there ten thousand years,\nBright shining as the sun,\nWe've no less days to sing God's praise\nThan when we'd first begun.\n\nJohn Newton, 1779. Verse 6 is the verse most folks did not know existed until the church flooded and the hymnals had nowhere to go." },
+  { id: 'rec_sir_patrick', category: 'recovered', title: 'Sir Patrick Spens (opening)', source: 'Hand-written, tea shop chalkboard',
+    text: "The king sits in Dunfermline town\n  Drinking the blude-red wine:\n\"O whaur will I get a skeely skipper\n  To sail this new ship o' mine?\"\n\nO up and spak an eldern knight,\n  Sat at the king's right knee:\n\"Sir Patrick Spens is the best sailor\n  That ever sailed the sea.\"\n\nThe king has written a braid letter\n  And sealed it wi' his hand,\nAnd sent it to Sir Patrick Spens\n  Was walking on the strand.\n\nTraditional Scots ballad, anonymous, late medieval. The writer of the chalkboard had stopped here. Whoever they were, they knew the rest." },
+  { id: 'rec_biscuit_recipe', category: 'recovered', title: 'Mom\'s Biscuits', source: 'Index card, taped inside a kitchen cabinet',
+    text: "2 cups flour (sift twice if you have time)\n1 tablespoon baking powder\n1 teaspoon salt\n1/2 stick butter, cold and cut small\n3/4 cup buttermilk, sometimes a splash more\n\n400 degrees, 12 to 14 minutes.\n\nCut the butter in with a fork until the flour looks like coarse meal. Pour in the buttermilk, stir twice, no more. The dough should be shaggy. Pat it out, fold it three times, pat it out again. Cut. Bake on the upper rack.\n\nDon't twist the cutter. Just press.\n\nThe card was written in pencil and re-traced in pen at some point. It had flour ground into the creases." },
+  { id: 'rec_grocery_list', category: 'recovered', title: 'Grocery List', source: 'Folded paper, found behind a refrigerator',
+    text: "bread\neggs\nmilk - whole, not skim\nsugar\nbutter\nthe purple jam Sarah likes\napples for lunches\ncoffee\nDOG FOOD\ntoilet paper\nLIGHTBULBS x 4\nbatteries for the smoke alarm (the one in the kitchen, not the upstairs one)\n\nKISS DAD GOODNIGHT\n\nThe last line was written in a different hand, in crayon." },
+  { id: 'rec_child_lighthouse', category: 'recovered', title: 'A Child\'s Drawing of a Lighthouse', source: 'Pinned to a tree stump',
+    text: "A red bicycle is drawn at the base of a yellow lighthouse. A stick figure with a triangle skirt waves from the top. Above the lighthouse, in careful block letters: HELLO. Below the lighthouse: I AM OK. To the right of the lighthouse, a smaller stick figure with four legs: COCO.\n\nThe paper has not weathered. The pencil marks have not faded. The drawing was not new when it was pinned here. The bicycle is still at the base of the tree." },
+  { id: 'rec_postcard_lake', category: 'recovered', title: 'Greetings from Deep Creek', source: 'Postcard, gas station counter',
+    text: "Front: A 1960s color-saturated photograph of a lake at sunset. Tourist boats. Pine forest in the background. Bold script across the top reads GREETINGS FROM DEEP CREEK LAKE, MARYLAND.\n\nBack, in a careful hand:\n\n'Mom, the cabin is just like you said it would be. The water is cold. The blueberries are early this year. The dog has decided she lives here now. Tell Daddy I will call from the diner on Tuesday. Love, Linnie. July 9.'\n\nThe postcard was stamped but never mailed." },
+  { id: 'rec_typewriter_letter', category: 'recovered', title: 'Letter, never sent', source: 'Still in a typewriter, abandoned office',
+    text: "Dear Margaret,\n\nI am writing this from the office at the lighthouse, on the machine you used to call the Iron Cricket. It still works. Everything in this building still works in some way. The light goes on at dusk. The kettle boils when I plug it in. The radio picks up two stations, and one of them is just static at the right times of day.\n\nI keep thinking I will hear from you. I keep checking the mail clip outside. Nothing comes. I don't expect it to. I am writing this because if I do not write to someone, I will go quiet, and I have started to be afraid of being quiet.\n\nI am not asking you to write back. I know better. I just wanted to say I am still here. The light is on tonight. It is on every night.\n\nWith love still,\nGus\n\nThe letter ended mid-page. The typewriter carriage was halfway through the next line." },
+  { id: 'rec_recipe_bread', category: 'recovered', title: 'A Recipe for Bread, Annotated', source: 'Cookbook margin, Appalachian farmhouse',
+    text: "(printed): SIMPLE WHITE BREAD. 4 cups flour, 1 tsp salt, 1 tbsp sugar, 1 packet yeast, 1 1/2 cups warm water, 2 tbsp oil...\n\n(in the margin, pencil): Mom said the secret is to let it rise twice. She said you can tell the dough is done rising when it dimples and doesn't spring back. She said you can tell the bread is done baking when it sounds hollow if you tap the bottom. She said you should never bake when you are angry because the bread will know.\n\n(below, in different ink): I made this today. I was angry. The bread knew." },
+  { id: 'rec_pressed_flower', category: 'recovered', title: 'A Pressed Flower', source: 'Between pages 142 and 143 of a hardcover novel',
+    text: "A single pressed wildflower, possibly a wood violet, pale lavender turning to brown. The flower is sandwiched between two pages of THE GREAT GATSBY, F. Scott Fitzgerald, 1925.\n\nThe two pages it sits between contain the line:\n\n'So we beat on, boats against the current, borne back ceaselessly into the past.'\n\nThe page corners are dog-eared. The book is annotated in the margin three pages later in a young hand, perhaps a student's: 'why ceaselessly. why not just always.' The handwriting trails off." },
+  { id: 'rec_school_essay', category: 'recovered', title: 'A Fourth-Grader\'s Essay', source: 'Schoolroom desk, water-damaged at the edge',
+    text: "MY DOG by Sarah G., Mrs. Patterson's 4th Grade.\n\nMy dog's name is Coco. She is a brown dog with one white foot. She is six years old which is forty-two in dog years. She likes peanut butter and not chicken. She is afraid of the vacuum cleaner and bicycles. She is not afraid of bears even though she has never met one.\n\nMy mom says Coco knows when I am sad. I do not know how she knows. She just comes and puts her head on my knee and that means she knows. I do not have to tell her.\n\nWhen I grow up I want to be a vet. Or a writer. Or maybe both. I would write about animals and then fix them.\n\nThe end.\n\nThere is a teacher's note in red pen at the bottom: 'Sarah, this is lovely. You have a writer's eye. Mrs. P.'" },
 ];
 
 const CODEX_ENTRIES_BY_ID = Object.fromEntries(CODEX_ENTRIES.map(e => [e.id, e]));
@@ -8071,6 +8409,7 @@ const CODEX_ENTRIES_BY_ID = Object.fromEntries(CODEX_ENTRIES.map(e => [e.id, e])
 const codex = {
   unlocked: new Set(),    // entry IDs the player has found
   byStory: new Map(),     // storyId -> [entryIds unlocked in order]
+  activeTab: 'archive',   // 'archive' = lore/scan-derived, 'recovered' = human culture
 };
 
 function unlockCodexEntry(id) {
@@ -10787,6 +11126,19 @@ document.addEventListener('keydown', (e) => {
     if (!mapOpen && !diagOpen && !logbookOpen) deployDrone();
   } else if (e.code === 'KeyN') {
     if (!mapOpen && !diagOpen && !logbookOpen) toggleNVG();
+  } else if (e.code === 'KeyB') {
+    // Build 3: Field Notes. Open a quick freeform note input pinned to current
+    // coordinates. Blocked when any panel is open or when in GREENROOM/dialog.
+    if (!mapOpen && !diagOpen && !logbookOpen && !journalOpen && !invOpen && !codexOpen &&
+        !(typeof greenroom !== 'undefined' && greenroom.connected) &&
+        !document.getElementById('npc-dialog').classList.contains('show') &&
+        !document.getElementById('settings-overlay').classList.contains('show') &&
+        !document.getElementById('reset-confirm').classList.contains('show') &&
+        !document.getElementById('placename-modal').classList.contains('show') &&
+        !document.getElementById('fieldnote-modal').classList.contains('show')) {
+      openFieldNoteModal();
+      e.preventDefault();
+    }
   } else if (e.code === 'KeyF') {
     if (!mapOpen && !diagOpen && !logbookOpen) {
       const now = performance.now();
@@ -13565,6 +13917,54 @@ function drawMap() {
   mapCtx.fill();
   mapCtx.restore();
 
+  // Place names: hand-named locations the player has marked on the map.
+  // Drawn between the chunks/POIs and the player marker so they read clearly
+  // but don't obscure the pilot's own position.
+  if (typeof placeNames !== 'undefined' && placeNames.entries) {
+    for (const p of placeNames.entries) {
+      const pt = worldToMap(p.x, p.z);
+      // Skip if off-canvas (rough culling)
+      if (pt.x < -40 || pt.y < -40 || pt.x > mapCanvas.width + 40 || pt.y > mapCanvas.height + 40) continue;
+      // Diamond marker
+      mapCtx.save();
+      mapCtx.translate(pt.x, pt.y);
+      mapCtx.rotate(Math.PI / 4);
+      mapCtx.fillStyle = 'rgba(255, 200, 100, 0.85)';
+      mapCtx.strokeStyle = '#ffdc78';
+      mapCtx.lineWidth = 1;
+      mapCtx.fillRect(-3, -3, 6, 6);
+      mapCtx.strokeRect(-3, -3, 6, 6);
+      mapCtx.restore();
+      // Label: small text in cream-amber, with a tiny dark shadow for legibility over varied terrain
+      mapCtx.font = '10px "Share Tech Mono", monospace';
+      mapCtx.textBaseline = 'middle';
+      mapCtx.textAlign = 'left';
+      mapCtx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+      mapCtx.fillText(p.name, pt.x + 8, pt.y + 1);
+      mapCtx.fillStyle = '#ffdc78';
+      mapCtx.fillText(p.name, pt.x + 7, pt.y);
+    }
+  }
+
+  // Field notes: small amber dots, smaller and dimmer than place name diamonds,
+  // since they represent passing observations rather than landmarks.
+  if (typeof fieldNotes !== 'undefined' && fieldNotes.entries) {
+    for (const n of fieldNotes.entries) {
+      const pt = worldToMap(n.x, n.z);
+      if (pt.x < -20 || pt.y < -20 || pt.x > mapCanvas.width + 20 || pt.y > mapCanvas.height + 20) continue;
+      // Small filled circle with a thin ring
+      mapCtx.beginPath();
+      mapCtx.arc(pt.x, pt.y, 2, 0, Math.PI * 2);
+      mapCtx.fillStyle = 'rgba(255, 170, 60, 0.85)';
+      mapCtx.fill();
+      mapCtx.beginPath();
+      mapCtx.arc(pt.x, pt.y, 4, 0, Math.PI * 2);
+      mapCtx.strokeStyle = 'rgba(255, 170, 60, 0.35)';
+      mapCtx.lineWidth = 1;
+      mapCtx.stroke();
+    }
+  }
+
   // header info
   document.getElementById('map-coords').textContent =
     `X ${player.pos.x >= 0 ? '+' : '-'}${String(Math.abs(Math.round(player.pos.x))).padStart(4, '0')} // ` +
@@ -13572,8 +13972,307 @@ function drawMap() {
     `ZOOM ${mapZoom.toFixed(1)}x`;
 }
 
-// Map mouse interaction: drag to pan, click (without drag) to set waypoint,
-// right-click to clear route, wheel to zoom.
+// ============================================================
+// PLACE NAMES (Build 1: Player Leaves Marks)
+// ============================================================
+// Right-click an empty spot on the map to name that place. The name persists
+// across sessions. Right-click an existing place to rename or delete it.
+const placeNames = {
+  entries: [],   // [{ id, x, z, name, createdAt }]
+  nextId: 1,
+  load() {
+    try {
+      const j = localStorage.getItem('titan7_placeNames');
+      if (!j) return;
+      const data = JSON.parse(j);
+      if (Array.isArray(data.entries)) this.entries = data.entries;
+      if (typeof data.nextId === 'number') this.nextId = data.nextId;
+    } catch (e) {}
+  },
+  save() {
+    try {
+      localStorage.setItem('titan7_placeNames', JSON.stringify({
+        entries: this.entries,
+        nextId: this.nextId,
+      }));
+    } catch (e) {}
+  },
+  add(x, z, name) {
+    const trimmed = (name || '').trim();
+    if (!trimmed) return null;
+    const entry = {
+      id: this.nextId++,
+      x, z,
+      name: trimmed.slice(0, 48),  // length cap
+      createdAt: Date.now(),
+    };
+    this.entries.push(entry);
+    this.save();
+    return entry;
+  },
+  rename(id, newName) {
+    const e = this.entries.find(x => x.id === id);
+    if (!e) return false;
+    const trimmed = (newName || '').trim();
+    if (!trimmed) return false;
+    e.name = trimmed.slice(0, 48);
+    this.save();
+    return true;
+  },
+  remove(id) {
+    const idx = this.entries.findIndex(x => x.id === id);
+    if (idx < 0) return false;
+    this.entries.splice(idx, 1);
+    this.save();
+    return true;
+  },
+  // Find a place name within `radius` world units of (x, z).
+  findNear(x, z, radius = 60) {
+    let best = null;
+    let bestD = radius;
+    for (const e of this.entries) {
+      const d = Math.hypot(e.x - x, e.z - z);
+      if (d < bestD) { best = e; bestD = d; }
+    }
+    return best;
+  },
+};
+placeNames.load();
+
+// ----- PLACE NAME MODAL (shown when right-clicking on the map) -----
+function openPlaceNameModal(opts) {
+  // opts: { mode: 'add'|'edit', x, z, entry? }
+  const modal = document.getElementById('placename-modal');
+  const titleEl = document.getElementById('placename-title');
+  const subEl = document.getElementById('placename-coords');
+  const inputEl = document.getElementById('placename-input');
+  const deleteBtn = document.getElementById('placename-delete-btn');
+  const saveBtn = document.getElementById('placename-save-btn');
+  const cancelBtn = document.getElementById('placename-cancel-btn');
+  if (!modal) return;
+  const fmt = (v) => `${v >= 0 ? '+' : '-'}${String(Math.abs(Math.round(v))).padStart(4, '0')}`;
+  if (opts.mode === 'add') {
+    titleEl.textContent = '▶ NAME THIS PLACE';
+    subEl.textContent = `at ${fmt(opts.x)} / ${fmt(opts.z)}`;
+    inputEl.value = '';
+    deleteBtn.style.display = 'none';
+    saveBtn.dataset.action = 'add';
+    saveBtn.dataset.x = String(opts.x);
+    saveBtn.dataset.z = String(opts.z);
+  } else {
+    titleEl.textContent = '▶ EDIT PLACE NAME';
+    subEl.textContent = `at ${fmt(opts.entry.x)} / ${fmt(opts.entry.z)}`;
+    inputEl.value = opts.entry.name;
+    deleteBtn.style.display = '';
+    deleteBtn.dataset.id = String(opts.entry.id);
+    saveBtn.dataset.action = 'edit';
+    saveBtn.dataset.id = String(opts.entry.id);
+  }
+  modal.classList.add('show');
+  setTimeout(() => { inputEl.focus(); inputEl.select(); }, 30);
+}
+
+function closePlaceNameModal() {
+  const modal = document.getElementById('placename-modal');
+  if (modal) modal.classList.remove('show');
+}
+
+// Wire the modal buttons (executed once on script eval)
+(function wirePlaceNameModal() {
+  const saveBtn = document.getElementById('placename-save-btn');
+  const cancelBtn = document.getElementById('placename-cancel-btn');
+  const deleteBtn = document.getElementById('placename-delete-btn');
+  const inputEl = document.getElementById('placename-input');
+  const modal = document.getElementById('placename-modal');
+  if (!saveBtn || !cancelBtn || !modal) return;
+  saveBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    const action = saveBtn.dataset.action;
+    const name = inputEl.value;
+    if (action === 'add') {
+      const x = parseFloat(saveBtn.dataset.x);
+      const z = parseFloat(saveBtn.dataset.z);
+      const entry = placeNames.add(x, z, name);
+      if (entry && typeof addComm === 'function') {
+        addComm('TITAN-7', `Marked: ${entry.name}.`, true);
+      }
+    } else if (action === 'edit') {
+      const id = parseInt(saveBtn.dataset.id, 10);
+      placeNames.rename(id, name);
+    }
+    closePlaceNameModal();
+  });
+  cancelBtn.addEventListener('click', (e) => { e.preventDefault(); closePlaceNameModal(); });
+  deleteBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    const id = parseInt(deleteBtn.dataset.id, 10);
+    placeNames.remove(id);
+    if (typeof addComm === 'function') addComm('TITAN-7', 'Marker removed.', true);
+    closePlaceNameModal();
+  });
+  inputEl.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') { e.preventDefault(); saveBtn.click(); }
+    if (e.key === 'Escape') { e.preventDefault(); closePlaceNameModal(); }
+    e.stopPropagation();  // don't let M / J / ESC bubble to game handlers
+  });
+  // Click on the dim backdrop closes
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) closePlaceNameModal();
+  });
+})();
+
+// ============================================================
+// FIELD NOTES (Build 3: Player Leaves Marks)
+// ============================================================
+// Press B (in-cockpit) to write a freeform note pinned to current coordinates.
+// Field notes render as small amber circles on the map (smaller and dimmer
+// than place names, since they're passing observations not landmarks).
+// Click a note marker on the map to read it. Notes also accumulate in the
+// journal as a chronological "Field Notes" section.
+const fieldNotes = {
+  entries: [],   // [{ id, x, z, text, createdAt }]
+  nextId: 1,
+  load() {
+    try {
+      const j = localStorage.getItem('titan7_fieldNotes');
+      if (!j) return;
+      const data = JSON.parse(j);
+      if (Array.isArray(data.entries)) this.entries = data.entries;
+      if (typeof data.nextId === 'number') this.nextId = data.nextId;
+    } catch (e) {}
+  },
+  save() {
+    try {
+      localStorage.setItem('titan7_fieldNotes', JSON.stringify({
+        entries: this.entries,
+        nextId: this.nextId,
+      }));
+    } catch (e) {}
+  },
+  add(x, z, text) {
+    const trimmed = (text || '').trim();
+    if (!trimmed) return null;
+    const entry = {
+      id: this.nextId++,
+      x, z,
+      text: trimmed.slice(0, 280),  // tweet-length cap
+      createdAt: Date.now(),
+    };
+    this.entries.push(entry);
+    this.save();
+    return entry;
+  },
+  remove(id) {
+    const idx = this.entries.findIndex(x => x.id === id);
+    if (idx < 0) return false;
+    this.entries.splice(idx, 1);
+    this.save();
+    return true;
+  },
+  findNear(x, z, radius = 60) {
+    let best = null;
+    let bestD = radius;
+    for (const e of this.entries) {
+      const d = Math.hypot(e.x - x, e.z - z);
+      if (d < bestD) { best = e; bestD = d; }
+    }
+    return best;
+  },
+};
+fieldNotes.load();
+
+function openFieldNoteModal() {
+  const modal = document.getElementById('fieldnote-modal');
+  if (!modal) return;
+  const inputEl = document.getElementById('fieldnote-input');
+  const coordsEl = document.getElementById('fieldnote-coords');
+  const fmt = (v) => `${v >= 0 ? '+' : '-'}${String(Math.abs(Math.round(v))).padStart(4, '0')}`;
+  coordsEl.textContent = `at ${fmt(player.pos.x)} / ${fmt(player.pos.z)}, ${formatGreenroomClock ? formatGreenroomClock() : ''}`;
+  inputEl.value = '';
+  modal.classList.add('show');
+  // Soft pause so the world doesn't run while typing
+  fieldNotes._wasPaused = (typeof paused !== 'undefined' && paused);
+  if (typeof paused !== 'undefined' && !paused) paused = true;
+  setTimeout(() => inputEl.focus(), 30);
+}
+
+function closeFieldNoteModal() {
+  const modal = document.getElementById('fieldnote-modal');
+  if (modal) modal.classList.remove('show');
+  if (!fieldNotes._wasPaused && typeof paused !== 'undefined' && paused) paused = false;
+}
+
+function openFieldNoteViewer(entry) {
+  // Read-only view + delete option. Reuses the modal in view mode.
+  const modal = document.getElementById('fieldnote-modal');
+  if (!modal) return;
+  const inputEl = document.getElementById('fieldnote-input');
+  const coordsEl = document.getElementById('fieldnote-coords');
+  const fmt = (v) => `${v >= 0 ? '+' : '-'}${String(Math.abs(Math.round(v))).padStart(4, '0')}`;
+  const when = new Date(entry.createdAt);
+  const whenStr = when.toLocaleDateString() + ' ' + when.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  coordsEl.textContent = `at ${fmt(entry.x)} / ${fmt(entry.z)} on ${whenStr}`;
+  inputEl.value = entry.text;
+  inputEl.readOnly = true;
+  modal.classList.add('show');
+  modal.dataset.viewingId = String(entry.id);
+  // Show delete button, hide save
+  document.getElementById('fieldnote-save-btn').style.display = 'none';
+  document.getElementById('fieldnote-delete-btn').style.display = '';
+  document.getElementById('fieldnote-delete-btn').dataset.id = String(entry.id);
+}
+
+(function wireFieldNoteModal() {
+  const modal = document.getElementById('fieldnote-modal');
+  if (!modal) return;
+  const inputEl = document.getElementById('fieldnote-input');
+  const saveBtn = document.getElementById('fieldnote-save-btn');
+  const cancelBtn = document.getElementById('fieldnote-cancel-btn');
+  const deleteBtn = document.getElementById('fieldnote-delete-btn');
+  saveBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    const text = inputEl.value;
+    const entry = fieldNotes.add(player.pos.x, player.pos.z, text);
+    if (entry) {
+      if (typeof addComm === 'function') addComm('TITAN-7', `Field note logged.`, true);
+      if (typeof noteJournalEvent === 'function') noteJournalEvent('discovery', `Logged a field note.`);
+    }
+    closeFieldNoteModal();
+  });
+  cancelBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    closeFieldNoteModal();
+    // Reset to write-mode for next time
+    inputEl.readOnly = false;
+    saveBtn.style.display = '';
+    deleteBtn.style.display = 'none';
+    delete modal.dataset.viewingId;
+  });
+  deleteBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    const id = parseInt(deleteBtn.dataset.id, 10);
+    fieldNotes.remove(id);
+    if (typeof addComm === 'function') addComm('TITAN-7', 'Field note deleted.', true);
+    closeFieldNoteModal();
+    inputEl.readOnly = false;
+    saveBtn.style.display = '';
+    deleteBtn.style.display = 'none';
+    delete modal.dataset.viewingId;
+  });
+  inputEl.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+      e.preventDefault();
+      saveBtn.click();
+    }
+    if (e.key === 'Escape') { e.preventDefault(); cancelBtn.click(); }
+    e.stopPropagation();
+  });
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) cancelBtn.click();
+  });
+})();
+
+
 const mapDrag = {
   isDown: false,
   startX: 0, startY: 0,
@@ -13628,6 +14327,16 @@ window.addEventListener('mouseup', (e) => {
   const wx = (mx - cx) / scale + mapCenter.x;
   const wz = (my - cy) / scale + mapCenter.z;
   const point = { x: wx, z: wz };
+  // Build 3: if the click is very close to a field note, open it instead of
+  // setting a waypoint. Radius scales with zoom so the hit zone is small in
+  // world units when zoomed in.
+  if (!e.shiftKey && typeof fieldNotes !== 'undefined') {
+    const noteHit = fieldNotes.findNear(wx, wz, 10 / scale);
+    if (noteHit) {
+      openFieldNoteViewer(noteHit);
+      return;
+    }
+  }
   // Shift+click: add drone path waypoint instead of pilot waypoint
   if (e.shiftKey) {
     if (!drone.active) {
@@ -13658,11 +14367,32 @@ window.addEventListener('mouseup', (e) => {
 mapCanvas.addEventListener('contextmenu', (e) => {
   e.preventDefault();
   if (!mapOpen) return;
-  if (waypoint || waypointQueue.length > 0) {
-    waypoint = null;
-    waypointQueue.length = 0;
-    autoWalk = false;
-    addComm('TITAN-7', 'Route cleared.', true);
+  // Compute world coords under the cursor
+  const rect = mapCanvas.getBoundingClientRect();
+  const mx = e.clientX - rect.left;
+  const my = e.clientY - rect.top;
+  const cx = mapCanvas.width / 2, cy = mapCanvas.height / 2;
+  const scale = 0.5 * mapZoom;
+  const wx = (mx - cx) / scale + mapCenter.x;
+  const wz = (my - cy) / scale + mapCenter.z;
+  // SHIFT+RMB: legacy clear-route behavior
+  if (e.shiftKey) {
+    if (waypoint || waypointQueue.length > 0) {
+      waypoint = null;
+      waypointQueue.length = 0;
+      autoWalk = false;
+      addComm('TITAN-7', 'Route cleared.', true);
+    }
+    return;
+  }
+  // Plain RMB: place-name management. Check radius scales with zoom so it's
+  // easier to click an existing marker when zoomed in.
+  const radius = 12 / scale;
+  const existing = placeNames.findNear(wx, wz, radius);
+  if (existing) {
+    openPlaceNameModal({ mode: 'edit', entry: existing });
+  } else {
+    openPlaceNameModal({ mode: 'add', x: wx, z: wz });
   }
 });
 
@@ -17414,19 +18144,40 @@ function closeJournal() {
 function renderJournal() {
   const list = document.getElementById('journal-entries');
   if (!list) return;
-  if (journal.entries.length === 0) {
-    list.innerHTML = '<div class="jrn-empty">No entries yet. Entries are written at each phase transition (dawn, day, dusk, evening, night).</div>';
-    return;
+  let html = '';
+  // Field notes section (most recent first)
+  if (typeof fieldNotes !== 'undefined' && fieldNotes.entries && fieldNotes.entries.length) {
+    const sorted = fieldNotes.entries.slice().sort((a, b) => b.createdAt - a.createdAt);
+    html += '<div class="jrn-section-title">▶ FIELD NOTES</div>';
+    for (const n of sorted) {
+      const when = new Date(n.createdAt);
+      const whenStr = when.toLocaleDateString() + ' ' + when.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      const fmt = (v) => `${v >= 0 ? '+' : '-'}${String(Math.abs(Math.round(v))).padStart(4, '0')}`;
+      html += `<div class="jrn-entry jrn-fieldnote">
+        <div class="jrn-head">
+          <span class="jrn-time">${whenStr}</span>
+          <span class="jrn-phase">${fmt(n.x)} / ${fmt(n.z)}</span>
+        </div>
+        <div class="jrn-text jrn-fieldnote-text">${escapeHtml(n.text)}</div>
+      </div>`;
+    }
+    html += '<div class="jrn-section-title" style="margin-top: 24px;">▶ FIELD JOURNAL</div>';
   }
-  list.innerHTML = journal.entries.map(e =>
-    `<div class="jrn-entry">
-      <div class="jrn-head">
-        <span class="jrn-time">${e.timeLabel}</span>
-        <span class="jrn-phase">${e.phase}</span>
-      </div>
-      <div class="jrn-text">${e.text}</div>
-    </div>`
-  ).join('');
+  // Regular journal entries
+  if (journal.entries.length === 0) {
+    html += '<div class="jrn-empty">No entries yet. Entries are written at each phase transition (dawn, day, dusk, evening, night).</div>';
+  } else {
+    html += journal.entries.map(e =>
+      `<div class="jrn-entry">
+        <div class="jrn-head">
+          <span class="jrn-time">${e.timeLabel}</span>
+          <span class="jrn-phase">${e.phase}</span>
+        </div>
+        <div class="jrn-text">${e.text}</div>
+      </div>`
+    ).join('');
+  }
+  list.innerHTML = html;
 }
 
 // ============================================================
@@ -17526,17 +18277,46 @@ function closeCodex() {
 function renderCodex() {
   const body = document.getElementById('codex-body');
   if (!body) return;
-  if (codex.unlocked.size === 0) {
-    body.innerHTML = '<div class="cdx-empty">No archives recovered yet.<br><br>Scan points of interest to recover lore fragments.<br>Some stories are scattered across multiple sites.</div>';
-    document.getElementById('codex-counter').textContent = '0 ENTRIES // 0 STORIES';
-    return;
-  }
-  // Group unlocked entries by storyId; standalone entries have no storyId.
-  const stories = new Map();
-  const standalones = [];
+  // Categorize all unlocked entries
+  const unlockedArchive = [];
+  const unlockedRecovered = [];
   for (const entryId of codex.unlocked) {
     const e = CODEX_ENTRIES_BY_ID[entryId];
     if (!e) continue;
+    if (e.category === 'recovered') unlockedRecovered.push(e);
+    else unlockedArchive.push(e);
+  }
+  const totalRecovered = CODEX_ENTRIES.filter(e => e.category === 'recovered').length;
+  // Tab strip
+  let html = `<div class="cdx-tabs">
+    <button class="cdx-tab ${codex.activeTab === 'archive' ? 'active' : ''}" data-tab="archive">▶ ARCHIVES <span class="cdx-tab-count">${unlockedArchive.length}</span></button>
+    <button class="cdx-tab ${codex.activeTab === 'recovered' ? 'active' : ''}" data-tab="recovered">▶ RECOVERED <span class="cdx-tab-count">${unlockedRecovered.length} / ${totalRecovered}</span></button>
+  </div>`;
+  if (codex.activeTab === 'archive') {
+    html += renderCodexArchiveTab(unlockedArchive);
+  } else {
+    html += renderCodexRecoveredTab(unlockedRecovered);
+  }
+  body.innerHTML = html;
+  // Wire tab buttons
+  body.querySelectorAll('.cdx-tab').forEach(btn => {
+    btn.addEventListener('click', () => {
+      codex.activeTab = btn.dataset.tab;
+      renderCodex();
+    });
+  });
+  document.getElementById('codex-counter').textContent =
+    `${codex.unlocked.size} ENTRIES // ${codex.byStory.size} STORIES // ${unlockedRecovered.length} RECOVERED`;
+}
+
+function renderCodexArchiveTab(unlockedArchive) {
+  if (unlockedArchive.length === 0) {
+    return '<div class="cdx-empty">No archives recovered yet.<br><br>Scan points of interest to recover lore fragments.<br>Some stories are scattered across multiple sites.</div>';
+  }
+  // Group by storyId; standalones have no storyId.
+  const stories = new Map();
+  const standalones = [];
+  for (const e of unlockedArchive) {
     if (e.storyId) {
       if (!stories.has(e.storyId)) stories.set(e.storyId, []);
       stories.get(e.storyId).push(e);
@@ -17544,12 +18324,13 @@ function renderCodex() {
       standalones.push(e);
     }
   }
-  // For each multi-part story, count total parts
   const storyTotals = new Map();
-  for (const e of CODEX_ENTRIES) if (e.storyId) storyTotals.set(e.storyId, (storyTotals.get(e.storyId) || 0) + 1);
-
+  for (const e of CODEX_ENTRIES) {
+    if (e.storyId && e.category !== 'recovered') {
+      storyTotals.set(e.storyId, (storyTotals.get(e.storyId) || 0) + 1);
+    }
+  }
   let html = '';
-  // Multi-part stories first
   for (const [storyId, entries] of stories.entries()) {
     const total = storyTotals.get(storyId) || entries.length;
     const title = entries[0].title;
@@ -17557,7 +18338,6 @@ function renderCodex() {
       <div class="cdx-story-title">${title}
         <span class="cdx-story-progress">FRAGMENT ${entries.length} OF ${total}${entries.length < total ? ' // INCOMPLETE' : ' // COMPLETE'}</span>
       </div>`;
-    // Preserve order by canonical index in CODEX_ENTRIES
     entries.sort((a, b) => CODEX_ENTRIES.indexOf(a) - CODEX_ENTRIES.indexOf(b));
     for (const e of entries) {
       html += `<div class="cdx-entry">
@@ -17570,7 +18350,6 @@ function renderCodex() {
     }
     html += '</div>';
   }
-  // Standalones
   for (const e of standalones) {
     html += `<div class="cdx-story">
       <div class="cdx-story-title">${e.title}</div>
@@ -17580,8 +18359,26 @@ function renderCodex() {
       </div>
     </div>`;
   }
-  body.innerHTML = html;
-  document.getElementById('codex-counter').textContent = `${codex.unlocked.size} ENTRIES // ${codex.byStory.size} STORIES`;
+  return html;
+}
+
+function renderCodexRecoveredTab(unlockedRecovered) {
+  if (unlockedRecovered.length === 0) {
+    return '<div class="cdx-empty">No human culture recovered yet.<br><br>The wasteland preserved fragments of the world that was: poems pressed in paperbacks, sheet music in ruined churches, recipes taped inside cabinets, postcards never mailed.<br><br>Look in the small places. Glove compartments. Kitchen drawers. The margins of cookbooks. The bookmarks of books no one finished.</div>';
+  }
+  // Sort by canonical order
+  unlockedRecovered.sort((a, b) => CODEX_ENTRIES.indexOf(a) - CODEX_ENTRIES.indexOf(b));
+  let html = '<div class="cdx-recovered-intro">What the wasteland kept. Found in glove compartments, on church pews, taped inside kitchen cabinets, pressed in paperbacks.</div>';
+  for (const e of unlockedRecovered) {
+    html += `<div class="cdx-story cdx-recovered">
+      <div class="cdx-story-title">${e.title}</div>
+      <div class="cdx-entry">
+        <div class="cdx-entry-head"><span class="cdx-entry-title">${e.title}</span><span>${e.source}</span></div>
+        <div class="cdx-entry-text cdx-recovered-text">${e.text}</div>
+      </div>
+    </div>`;
+  }
+  return html;
 }
 
 // ============================================================
@@ -23828,32 +24625,37 @@ function collectResupply() {
 }
 
 function toggleAmbientAudio() {
-  audio.ambientMuted = !audio.ambientMuted;
-  const el = document.getElementById('ambient-toggle');
-  if (el) {
-    el.textContent = audio.ambientMuted ? '✕' : '♪';
-    el.style.color = audio.ambientMuted ? 'var(--amber-dim)' : 'var(--amber)';
-    el.style.textDecoration = audio.ambientMuted ? 'line-through' : 'none';
-    el.title = audio.ambientMuted ? 'Ambient noise muted (click to restore)' : 'Toggle ambient noise (wind, rain, hum)';
+  // Phase 6 follow-up: route through the centralized settings system so the
+  // weather badge button, the side panel button, and the settings panel all
+  // stay in sync.
+  if (typeof settings !== 'undefined' && settings.current) {
+    settings.set('ambient', !settings.current.ambient);
+    updateAmbientToggleGlyph();
+    return;
   }
-  // Save preference across sessions
+  // Fallback for the very early-load case (settings not initialized yet)
+  audio.ambientMuted = !audio.ambientMuted;
+  updateAmbientToggleGlyph();
   try { localStorage.setItem('titan7_ambient_muted', audio.ambientMuted ? '1' : '0'); } catch (e) {}
 }
 
-// Wire click handler and load saved preference on first frame
+function updateAmbientToggleGlyph() {
+  const el = document.getElementById('ambient-toggle');
+  if (!el) return;
+  const muted = (typeof settings !== 'undefined' && settings.current)
+    ? !settings.current.ambient
+    : audio.ambientMuted;
+  el.textContent = muted ? '✕' : '♪';
+  el.style.color = muted ? 'var(--amber-dim)' : 'var(--amber)';
+  el.style.textDecoration = muted ? 'line-through' : 'none';
+  el.title = muted ? 'Ambient noise muted (click to restore)' : 'Toggle ambient noise (wind, rain, hum)';
+}
+
+// Wire click handler and sync glyph from saved settings on first frame
 setTimeout(() => {
   const el = document.getElementById('ambient-toggle');
   if (el) el.addEventListener('click', toggleAmbientAudio);
-  try {
-    if (localStorage.getItem('titan7_ambient_muted') === '1') {
-      audio.ambientMuted = true;
-      if (el) {
-        el.textContent = '✕';
-        el.style.color = 'var(--amber-dim)';
-        el.style.textDecoration = 'line-through';
-      }
-    }
-  } catch (e) {}
+  updateAmbientToggleGlyph();
 }, 0);
 
 // ============================================================
@@ -24224,6 +25026,8 @@ document.getElementById('start-btn').addEventListener('click', () => {
         'cpCollapsed',
         'titan7_settings',
         'titan7_npcs',
+        'titan7_placeNames',
+        'titan7_fieldNotes',
       ];
       for (const k of keys) {
         try { localStorage.removeItem(k); } catch (err) {}
@@ -24333,6 +25137,8 @@ const settings = {
       sideToggle.classList.toggle('on', c.ambient);
       sideToggle.textContent = c.ambient ? '♪ AMBIENT ON' : '♪ AMBIENT OFF';
     }
+    // Sync the weather-badge ambient glyph too
+    if (typeof updateAmbientToggleGlyph === 'function') updateAmbientToggleGlyph();
   },
   set(key, value) {
     this.current[key] = value;
@@ -24396,6 +25202,19 @@ settings.apply();
   // Open buttons
   if (openFromStart) {
     openFromStart.addEventListener('click', (e) => { e.preventDefault(); openSettings(); });
+  }
+  // HUD settings button on the weather badge (always reachable in-game)
+  const hudBtn = document.getElementById('hud-settings-btn');
+  if (hudBtn) {
+    hudBtn.addEventListener('click', (e) => { e.preventDefault(); openSettings(); });
+    hudBtn.addEventListener('mouseenter', () => {
+      hudBtn.style.background = 'rgba(255, 154, 31, 0.15)';
+      hudBtn.style.boxShadow = '0 0 6px rgba(255, 154, 31, 0.4)';
+    });
+    hudBtn.addEventListener('mouseleave', () => {
+      hudBtn.style.background = '';
+      hudBtn.style.boxShadow = '';
+    });
   }
   if (closeBtn) {
     closeBtn.addEventListener('click', (e) => { e.preventDefault(); closeSettings(); });
