@@ -6129,26 +6129,6 @@ function removeAndDispose(obj) {
   disposeObject(obj);
 }
 
-// WebGL context loss detection - log when this happens so we can diagnose
-// freezes and the "outside goes black" symptom.
-function attachContextLossHandlers(renderer) {
-  const canvas = renderer && renderer.domElement;
-  if (!canvas) return;
-  canvas.addEventListener('webglcontextlost', (e) => {
-    e.preventDefault();
-    console.warn('[WEBGL] Context lost. The scene will go black until restored.');
-    if (typeof addComm === 'function') {
-      addComm('TITAN-7', 'WARNING: graphics context interrupted. Holding position.', true);
-    }
-  }, false);
-  canvas.addEventListener('webglcontextrestored', () => {
-    console.warn('[WEBGL] Context restored.');
-    if (typeof addComm === 'function') {
-      addComm('TITAN-7', 'Graphics context restored.', true);
-    }
-  }, false);
-}
-
 const camera = new THREE.PerspectiveCamera(74, window.innerWidth / window.innerHeight, 0.1, 4000);
 // Second camera used to render the drone POV monitor as picture-in-picture.
 const droneCamera = new THREE.PerspectiveCamera(58, 280/160, 0.5, 4000);
@@ -6424,6 +6404,13 @@ scene.add(grid);
 
 // ==================== POINTS OF INTEREST ====================
 const obstacles = []; // {x, z, r} for collision
+
+// Perf: registry of meshes that should blink on/off every frame. Walking the
+// entire scene every frame to find these is expensive once the world has many
+// chunks loaded. Push to this array when creating a blink mesh; the chunk
+// unloader splices entries out when their containing group is disposed.
+const blinkers = [];          // red tower lights
+const resupplyStrobes = [];   // white parachute strobes (usually 0 or 1)
 const pois = []; // {name, type, pos, discovered, range, mesh}
 
 function addObstacle(x, z, r) { obstacles.push({ x, z, r }); }
@@ -6600,6 +6587,7 @@ function buildRadioTower() {
   const blink = new THREE.Mesh(blinkGeo, blinkMat);
   blink.position.y = h + 8;
   blink.userData.isBlink = true;
+  blinkers.push(blink);
   lattice.add(blink);
   g.add(lattice);
   addObstacle(0, 0, 3.5);
@@ -7514,12 +7502,17 @@ function unloadChunk(cx, cz) {
   if (!data) return;
   // remove group from scene
   scene.remove(data.group);
-  // dispose geometries/materials
+  // dispose geometries/materials, AND remove any blink-tagged meshes from the
+  // global blinkers registry so the per-frame blink loop stays accurate.
   data.group.traverse(o => {
     if (o.geometry) o.geometry.dispose();
     if (o.material) {
       if (Array.isArray(o.material)) o.material.forEach(m => m.dispose());
       else o.material.dispose();
+    }
+    if (o.userData && o.userData.isBlink) {
+      const idx = blinkers.indexOf(o);
+      if (idx >= 0) blinkers.splice(idx, 1);
     }
   });
   // remove obstacles belonging to this chunk (those within chunk bounds)
@@ -8087,6 +8080,7 @@ const totalPois = () => pois.length;
 let screenShake = 0;
 let trauma = 0; // higher-order screen shake for hits
 const recentDiscoveries = []; // last few discovered POI names
+let recentDiscoveriesDirty = true;  // set whenever recentDiscoveries changes; consumed by updateHud
 let discoveryBannerT = 0; // seconds remaining showing banner
 let chunkUpdateT = 0; // timer for chunk streaming
 
@@ -8271,12 +8265,6 @@ function removeItem(id, count = 1) {
 }
 
 function itemCount(id) { return inventory.items.get(id) || 0; }
-
-function inventoryTotalItems() {
-  let n = 0;
-  inventory.items.forEach(c => n += c);
-  return n;
-}
 
 // POI type -> resource yield rolls. Each entry rolls independently.
 // chance is the probability the entry hits at all; min/max is the count range.
@@ -8697,35 +8685,52 @@ function maybeMarkAsOutpost(poi) {
   outposts.push({ poi });
 }
 
-// Spawn the garrison once the player gets within streaming range (<400m)
+// Spawn the garrison once the player gets within streaming range (<400m).
+// Sentinels are spawned ONE PER FRAME via a small queue rather than all at
+// once. Even with shared drone materials, spawning 5 drones in one frame
+// still creates 5 Groups + 30+ Meshes + 5 enemies entries together, which
+// shows up as a 20-50ms hitch. Spreading them over 5 consecutive frames
+// keeps each frame smooth and the player almost never notices the staging
+// because they're walking toward the outpost anyway.
 function maybeSpawnOutpostGarrison(poi) {
   if (!poi.outpost || poi.outpost.spawned) return;
   const d = Math.hypot(poi.pos.x - player.pos.x, poi.pos.z - player.pos.z);
   if (d > 400) return;
   poi.outpost.spawned = true;
-  // 3-5 sentinels in a loose ring around the POI center
+  // Queue spawns; the main loop drains one per frame via drainGarrisonQueue().
   const count = 3 + Math.floor(Math.random() * 3);
   for (let i = 0; i < count; i++) {
-    const ang = (i / count) * Math.PI * 2 + Math.random() * 0.4;
-    const r = 18 + Math.random() * 14;
-    const built = makeDrone();
-    const x = poi.pos.x + Math.cos(ang) * r;
-    const z = poi.pos.z + Math.sin(ang) * r;
-    built.g.position.set(x, 22 + Math.random() * 14, z);
-    scene.add(built.g);
-    const sentinel = {
-      mesh: built.g, body: built.body, eye: built.eye, rotors: built.rotors,
-      hp: 30, vel: new THREE.Vector3(),
-      fireT: Math.random() * 3, fireRate: 3.0 + Math.random() * 2.0,
-      desiredDist: 50 + Math.random() * 25,
-      strafeDir: Math.random() < 0.5 ? 1 : -1, strafeT: Math.random() * 5,
-      bobPhase: Math.random() * Math.PI * 2, aggro: false,
-      wanderTarget: null, wanderT: 0,
-      _outpostPoi: poi,             // back-ref so we know which outpost they belong to
-    };
-    enemies.push(sentinel);
-    poi.outpost.sentinels.push(sentinel);
+    garrisonSpawnQueue.push({ poi, index: i, total: count });
   }
+}
+
+const garrisonSpawnQueue = [];
+
+function drainGarrisonQueue() {
+  if (!garrisonSpawnQueue.length) return;
+  const job = garrisonSpawnQueue.shift();
+  const poi = job.poi;
+  // If the outpost was already cleared or removed, skip.
+  if (!poi.outpost) return;
+  const ang = (job.index / job.total) * Math.PI * 2 + Math.random() * 0.4;
+  const r = 18 + Math.random() * 14;
+  const built = makeDrone();
+  const x = poi.pos.x + Math.cos(ang) * r;
+  const z = poi.pos.z + Math.sin(ang) * r;
+  built.g.position.set(x, 22 + Math.random() * 14, z);
+  scene.add(built.g);
+  const sentinel = {
+    mesh: built.g, body: built.body, eye: built.eye, rotors: built.rotors,
+    hp: 30, vel: new THREE.Vector3(),
+    fireT: Math.random() * 3, fireRate: 3.0 + Math.random() * 2.0,
+    desiredDist: 50 + Math.random() * 25,
+    strafeDir: Math.random() < 0.5 ? 1 : -1, strafeT: Math.random() * 5,
+    bobPhase: Math.random() * Math.PI * 2, aggro: false,
+    wanderTarget: null, wanderT: 0,
+    _outpostPoi: poi,             // back-ref so we know which outpost they belong to
+  };
+  enemies.push(sentinel);
+  poi.outpost.sentinels.push(sentinel);
 }
 
 // Check after each sentinel kill: if every garrison member is dead, liberate.
@@ -8973,11 +8978,6 @@ const tapes = {
 };
 
 const TAPE_PLAYBACK_FREQ = 87.5;  // dedicated playback channel (off the normal band)
-
-function findTapeAtFreq() {
-  // Only available when there's a tape selected. Inserts a "channel" at 87.5
-  return Math.abs(radio.freq - TAPE_PLAYBACK_FREQ) < 0.15 ? tapes.selectedId : null;
-}
 
 function addHolotape(tapeId) {
   if (!HOLOTAPES_BY_ID[tapeId]) return false;
@@ -9611,9 +9611,17 @@ function updateOutpostFires(dt) {
     // Spawn outposts also act as caravan halt magnets - boost halt chance
     // when a caravan passes near (handled in caravan update naturally)
   }
-  // Spawn garrisons for occupied POIs we walked within range of
+  // Spawn garrisons for occupied POIs we walked within range of. Spawn at
+  // most ONE outpost per frame so two or three overlapping outposts coming
+  // into range together don't cascade into 10-15 simultaneous drone creates,
+  // which would spike frame time even with shared materials (each garrison
+  // still allocates Mesh + Group instances and pushes to enemies / scene).
+  // The next eligible outpost picks up next frame.
   for (const poi of pois) {
-    if (poi.outpost && !poi.outpost.spawned) maybeSpawnOutpostGarrison(poi);
+    if (poi.outpost && !poi.outpost.spawned) {
+      maybeSpawnOutpostGarrison(poi);
+      break;
+    }
   }
   // Track Kailey day count from time-of-day; check threshold-based milestones
   if (typeof tod !== 'undefined') {
@@ -10700,40 +10708,54 @@ function spawnTrailPatch(cx, cz, visits) {
 
 
 const enemies = [];
+// Shared materials and geometries used by every drone enemy. Previously each
+// call to makeDrone() created ~7 new MeshStandardMaterial / MeshBasicMaterial
+// instances and 4 fresh geometries; spawning 10+ drones in one frame (which
+// happens when several outposts come into streaming range together) forced
+// Three.js to compile a fresh shader for each material, producing frame-time
+// spikes well past 500ms. Sharing the materials means the GPU pipeline only
+// has to compile each program once at script load.
+const DRONE_GEOM = {
+  body: new THREE.IcosahedronGeometry(1.6, 0),
+  eye:  new THREE.SphereGeometry(0.32, 10, 10),
+  arm:  new THREE.BoxGeometry(2.2, 0.2, 0.3),
+  rotor: new THREE.CylinderGeometry(0.9, 0.9, 0.05, 12),
+  muzzle: new THREE.CylinderGeometry(0.15, 0.25, 0.6, 6),
+};
+const DRONE_MAT = {
+  body:   new THREE.MeshStandardMaterial({ color: 0x6a1a1a, emissive: 0x220000, roughness: 0.5, metalness: 0.6 }),
+  eye:    new THREE.MeshBasicMaterial({ color: 0xff2020 }),
+  arm:    new THREE.MeshStandardMaterial({ color: 0x2a2a2a, roughness: 0.6 }),
+  rotor:  new THREE.MeshBasicMaterial({ color: 0x444444, transparent: true, opacity: 0.5 }),
+  muzzle: new THREE.MeshStandardMaterial({ color: 0x111111 }),
+};
+
 function makeDrone() {
   const g = new THREE.Group();
 
-  // body: chunky angular module
-  const bodyGeo = new THREE.IcosahedronGeometry(1.6, 0);
-  const bodyMat = new THREE.MeshStandardMaterial({
-    color: 0x6a1a1a, emissive: 0x220000, roughness: 0.5, metalness: 0.6
-  });
-  const body = new THREE.Mesh(bodyGeo, bodyMat);
+  // body: chunky angular module (shared geom + mat)
+  const body = new THREE.Mesh(DRONE_GEOM.body, DRONE_MAT.body);
   body.castShadow = true;
   g.add(body);
 
-  // single red eye
-  const eyeMat = new THREE.MeshBasicMaterial({ color: 0xff2020 });
-  const eye = new THREE.Mesh(new THREE.SphereGeometry(0.32, 10, 10), eyeMat);
+  // single red eye (shared geom + mat). The previous eye glow PointLight was
+  // removed; spawning 5-15 drones together used to add 5-15 PointLights to
+  // the scene in one frame, which forced a shader recompile of every lit
+  // material in the world. The eye's emissive material reads convincingly red
+  // by itself, especially with bloom-style nighttime lighting.
+  const eye = new THREE.Mesh(DRONE_GEOM.eye, DRONE_MAT.eye);
   eye.position.set(0, 0.2, 1.4);
   g.add(eye);
-  const eyeGlow = new THREE.PointLight(0xff3030, 1.5, 8);
-  eyeGlow.position.copy(eye.position);
-  g.add(eyeGlow);
 
-  // four rotor arms with spinning disks
+  // four rotor arms with spinning disks (shared geom + mat)
   const rotors = [];
   for (let i = 0; i < 4; i++) {
     const arm = new THREE.Group();
     const angle = (i / 4) * Math.PI * 2 + Math.PI / 4;
-    const armGeo = new THREE.BoxGeometry(2.2, 0.2, 0.3);
-    const armMat = new THREE.MeshStandardMaterial({ color: 0x2a2a2a, roughness: 0.6 });
-    const armMesh = new THREE.Mesh(armGeo, armMat);
+    const armMesh = new THREE.Mesh(DRONE_GEOM.arm, DRONE_MAT.arm);
     armMesh.position.x = 1.1;
     arm.add(armMesh);
-    const rotGeo = new THREE.CylinderGeometry(0.9, 0.9, 0.05, 12);
-    const rotMat = new THREE.MeshBasicMaterial({ color: 0x444444, transparent: true, opacity: 0.5 });
-    const rot = new THREE.Mesh(rotGeo, rotMat);
+    const rot = new THREE.Mesh(DRONE_GEOM.rotor, DRONE_MAT.rotor);
     rot.position.set(2.2, 0.3, 0);
     arm.add(rot);
     arm.rotation.y = angle;
@@ -10741,10 +10763,8 @@ function makeDrone() {
     rotors.push(rot);
   }
 
-  // muzzle on bottom
-  const muzzleGeo = new THREE.CylinderGeometry(0.15, 0.25, 0.6, 6);
-  const muzzleMat = new THREE.MeshStandardMaterial({ color: 0x111111 });
-  const muzzle = new THREE.Mesh(muzzleGeo, muzzleMat);
+  // muzzle on bottom (shared geom + mat)
+  const muzzle = new THREE.Mesh(DRONE_GEOM.muzzle, DRONE_MAT.muzzle);
   muzzle.position.set(0, -1.0, 0.8);
   muzzle.rotation.x = Math.PI / 2.4;
   g.add(muzzle);
@@ -10783,6 +10803,16 @@ function spawnEnemy(distHint = null) {
 
 // ==================== PROJECTILES ====================
 const projectiles = [];
+
+// Shared temporary Vector3 instances for hot-path loops. The enemy AI and
+// projectile loops in update() used to call .clone() 10-20 times per frame
+// across all active entities; with multiple bullets in flight and a few
+// sentinels around, that added up to thousands of short-lived Vector3
+// allocations per second over a long session. Using these scratch vectors
+// instead is functionally identical and produces zero garbage.
+const _tmpV3a = new THREE.Vector3();
+const _tmpV3b = new THREE.Vector3();
+const _tmpV3c = new THREE.Vector3();
 
 function getAimDir() {
   // Aim from camera through the cursor's normalized device coords
@@ -11340,12 +11370,14 @@ function update(dt) {
 
   if (moving) {
     // Walk in the direction the mech is facing (forward = -Z rotated by yaw).
-    // Speed can be negative; the direction vector then flips, producing
-    // proper backward walking.
-    const dir = new THREE.Vector3(0, 0, -1);
-    dir.applyEuler(new THREE.Euler(0, player.yaw, 0));
-    player.vel.x = dir.x * speed;
-    player.vel.z = dir.z * speed;
+    // Speed can be negative; the dir components flip, producing proper
+    // backward walking. Scalar trig is used here instead of allocating a
+    // Vector3 + Euler per frame: dir = (-sin(yaw), 0, -cos(yaw)) is the same
+    // result as new Vector3(0,0,-1).applyEuler(new Euler(0,yaw,0)).
+    const dirX = -Math.sin(player.yaw);
+    const dirZ = -Math.cos(player.yaw);
+    player.vel.x = dirX * speed;
+    player.vel.z = dirZ * speed;
   } else {
     player.vel.x *= Math.pow(0.0001, dt);
     player.vel.z *= Math.pow(0.0001, dt);
@@ -11567,6 +11599,7 @@ function update(dt) {
       discoveries++;
       recentDiscoveries.unshift(poi.name);
       if (recentDiscoveries.length > 5) recentDiscoveries.pop();
+      recentDiscoveriesDirty = true;
       showDiscoveryBanner(poi);
     }
   }
@@ -11592,7 +11625,7 @@ function update(dt) {
     if (p.kind === 'missile') {
       // homing
       if (p.target && p.target.hp > 0) {
-        const toT = p.target.mesh.position.clone().sub(p.mesh.position).normalize();
+        const toT = _tmpV3a.copy(p.target.mesh.position).sub(p.mesh.position).normalize();
         const curSpd = p.vel.length();
         p.vel.lerp(toT.multiplyScalar(Math.min(curSpd + 35 * dt, 80)), Math.min(1, dt * 3.5));
       } else {
@@ -11600,7 +11633,7 @@ function update(dt) {
         const cur = p.vel.length();
         p.vel.setLength(Math.min(cur + 35 * dt, 80));
       }
-      p.mesh.lookAt(p.mesh.position.clone().add(p.vel));
+      p.mesh.lookAt(_tmpV3a.copy(p.mesh.position).add(p.vel));
       p.mesh.rotateX(Math.PI / 2);
       p.trailT -= dt;
       if (p.trailT <= 0) {
@@ -11609,7 +11642,9 @@ function update(dt) {
       }
     }
 
-    p.mesh.position.add(p.vel.clone().multiplyScalar(dt));
+    p.mesh.position.x += p.vel.x * dt;
+    p.mesh.position.y += p.vel.y * dt;
+    p.mesh.position.z += p.vel.z * dt;
     p.life -= dt;
 
     let consumed = false;
@@ -11711,7 +11746,7 @@ function update(dt) {
     e.bobPhase += dt * 2;
     e.wanderT -= dt;
 
-    const toP = player.pos.clone().sub(e.mesh.position);
+    const toP = _tmpV3a.copy(player.pos).sub(e.mesh.position);
     const dist = toP.length();
     toP.normalize();
 
@@ -11730,13 +11765,15 @@ function update(dt) {
         e.strafeT = 2 + Math.random() * 3;
         e.strafeDir *= -1;
       }
-      const strafe = new THREE.Vector3(-toP.z, 0, toP.x).multiplyScalar(e.strafeDir);
-      if (dist > e.desiredDist + 15) desired = toP.clone().multiplyScalar(12);
-      else if (dist < e.desiredDist - 10) desired = toP.clone().multiplyScalar(-9);
+      // Strafe = perpendicular to toP, in the xz plane. Build into temp vec b.
+      const strafe = _tmpV3b.set(-toP.z, 0, toP.x).multiplyScalar(e.strafeDir);
+      if (dist > e.desiredDist + 15) desired = _tmpV3c.copy(toP).multiplyScalar(12);
+      else if (dist < e.desiredDist - 10) desired = _tmpV3c.copy(toP).multiplyScalar(-9);
       else desired = strafe.multiplyScalar(10);
     } else {
       // wander mode - drift to a random nearby point
       if (e.wanderT <= 0 || !e.wanderTarget) {
+        // wanderTarget is a long-lived property, so allocate normally here
         e.wanderTarget = new THREE.Vector3(
           e.mesh.position.x + (Math.random() - 0.5) * 80,
           22 + Math.random() * 14,
@@ -11744,7 +11781,7 @@ function update(dt) {
         );
         e.wanderT = 6 + Math.random() * 8;
       }
-      const toWander = e.wanderTarget.clone().sub(e.mesh.position);
+      const toWander = _tmpV3b.copy(e.wanderTarget).sub(e.mesh.position);
       const wd = toWander.length();
       if (wd < 4) { e.wanderTarget = null; e.wanderT = 0; }
       desired = toWander.normalize().multiplyScalar(5);
@@ -11757,12 +11794,16 @@ function update(dt) {
     const targetY = 18 + Math.sin(e.bobPhase) * 2;
     e.vel.y = (targetY - e.mesh.position.y) * 1.4;
 
-    e.mesh.position.add(e.vel.clone().multiplyScalar(dt));
+    e.mesh.position.x += e.vel.x * dt;
+    e.mesh.position.y += e.vel.y * dt;
+    e.mesh.position.z += e.vel.z * dt;
     if (e.aggro) {
       e.mesh.lookAt(player.pos);
     } else {
-      // face direction of travel
-      const look = e.mesh.position.clone().add(e.vel.clone().setY(0));
+      // face direction of travel (ignore Y so the drone stays level)
+      const look = _tmpV3a.copy(e.mesh.position);
+      look.x += e.vel.x;
+      look.z += e.vel.z;
       e.mesh.lookAt(look);
     }
 
@@ -11792,11 +11833,15 @@ function update(dt) {
     const ef = effects[i];
     ef.life -= dt;
     if (ef.type === 'particle' || ef.type === 'spark') {
-      ef.mesh.position.add(ef.vel.clone().multiplyScalar(dt));
+      ef.mesh.position.x += ef.vel.x * dt;
+      ef.mesh.position.y += ef.vel.y * dt;
+      ef.mesh.position.z += ef.vel.z * dt;
       ef.vel.y -= 22 * dt;
       ef.mesh.material.opacity = Math.max(0, ef.life / ef.maxLife);
     } else if (ef.type === 'smoke') {
-      ef.mesh.position.add(ef.vel.clone().multiplyScalar(dt));
+      ef.mesh.position.x += ef.vel.x * dt;
+      ef.mesh.position.y += ef.vel.y * dt;
+      ef.mesh.position.z += ef.vel.z * dt;
       ef.vel.y *= 0.96;
       ef.mesh.scale.multiplyScalar(1 + dt * 0.5);
       ef.mesh.material.opacity = Math.max(0, (ef.life / ef.maxLife) * 0.6);
@@ -11874,6 +11919,10 @@ const tVel = document.getElementById('t-vel');
 const tHos = document.getElementById('t-hos');
 const tFps = document.getElementById('t-fps');
 const compassStrip = document.getElementById('compass-strip');
+// Perf: cache the compass container element and its measured width so we
+// don't query the DOM and force a layout reflow every frame in updateHud.
+const compassEl = document.querySelector('.compass');
+let cachedCompassWidth = compassEl ? compassEl.offsetWidth : 380;
 const statusMsg = document.getElementById('status-msg');
 const discoveryBanner = document.getElementById('discovery-banner');
 const discoveryNameEl = document.getElementById('discovery-name');
@@ -11973,12 +12022,17 @@ function updateHud() {
     poiDistEl.textContent = '----m';
   }
 
-  // recent discoveries list
-  if (recentDiscoveries.length === 0) {
-    poiRecentEl.innerHTML = '<div style="opacity:0.4">[ NO ENTRIES ]</div>';
-  } else {
-    poiRecentEl.innerHTML = recentDiscoveries
-      .map((n, i) => `<div style="opacity:${1 - i * 0.18}">▣ ${n}</div>`).join('');
+  // recent discoveries list. Rebuilds via innerHTML used to run every frame
+  // (~1ms over a busy panel); now we only rebuild when the array actually
+  // changed since the last update.
+  if (recentDiscoveriesDirty) {
+    if (recentDiscoveries.length === 0) {
+      poiRecentEl.innerHTML = '<div style="opacity:0.4">[ NO ENTRIES ]</div>';
+    } else {
+      poiRecentEl.innerHTML = recentDiscoveries
+        .map((n, i) => `<div style="opacity:${1 - i * 0.18}">▣ ${n}</div>`).join('');
+    }
+    recentDiscoveriesDirty = false;
   }
 
   const speedKph = Math.round(Math.sqrt(player.vel.x * player.vel.x + player.vel.z * player.vel.z) * 3.6);
@@ -12040,15 +12094,16 @@ function updateHud() {
   tHos.textContent = String(enemies.length).padStart(2, '0');
   tFps.textContent = String(Math.round(fpsValue)).padStart(2, '0');
 
-  // compass strip: center on current bearing
-  // each span is 60px wide, every 15deg => 60px per 15deg = 4px/deg
+  // compass strip: center on current bearing.
+  // Each span is 60px wide, every 15deg => 60px per 15deg = 4px/deg.
   // We want bearing 0 (N) at center; strip starts at -180 deg.
-  // strip width covers (540 - -180)/15 + 1 = 49 spans = 49 * 60 = 2940px
-  // Offset = -(bearing + 180) * 4 + halfStripVisible? Simpler: shift so that current bearing aligns to center.
-  const compassWidth = document.querySelector('.compass').offsetWidth;
+  // strip width covers (540 - -180)/15 + 1 = 49 spans = 49 * 60 = 2940px.
+  // Offset = -(bearing + 180) * 4 + halfStripVisible? Simpler: shift so that
+  // current bearing aligns to center. The container width used to be read via
+  // querySelector + offsetWidth every frame, which forces a layout reflow.
+  // It's now cached and updated only on window resize.
   const pxPerDeg = 60 / 15;
-  // Position of bearing B in strip: (B - (-180)) / 15 * 60 = (B + 180) * 4
-  const stripX = compassWidth / 2 - (bearing + 180) * pxPerDeg;
+  const stripX = cachedCompassWidth / 2 - (bearing + 180) * pxPerDeg;
   compassStrip.style.transform = `translateX(${stripX}px)`;
 
   // Lock marker over closest enemy in aim cone
@@ -12060,11 +12115,12 @@ function updateLockMarker() {
   const aim = getAimDir();
   let best = null, bestDot = 0.85;
   for (const e of enemies) {
-    const to = e.mesh.position.clone().sub(player.pos);
-    const dist = to.length();
+    // toP = enemy - player (reuse shared temp instead of allocating a clone)
+    _tmpV3a.copy(e.mesh.position).sub(player.pos);
+    const dist = _tmpV3a.length();
     if (dist > 200) continue;
-    to.normalize();
-    const dot = to.dot(aim);
+    _tmpV3a.normalize();
+    const dot = _tmpV3a.dot(aim);
     if (dot > bestDot) { bestDot = dot; best = e; }
   }
   // Manage marker element
@@ -12075,10 +12131,11 @@ function updateLockMarker() {
     document.getElementById('hud').appendChild(lockMarkerEl);
   }
   if (best) {
-    const v = best.mesh.position.clone().project(camera);
-    if (v.z < 1) {
-      const x = (v.x * 0.5 + 0.5) * window.innerWidth - 28;
-      const y = (-v.y * 0.5 + 0.5) * window.innerHeight - 28;
+    // Project enemy position to screen space via the shared temp vec
+    _tmpV3a.copy(best.mesh.position).project(camera);
+    if (_tmpV3a.z < 1) {
+      const x = (_tmpV3a.x * 0.5 + 0.5) * window.innerWidth - 28;
+      const y = (-_tmpV3a.y * 0.5 + 0.5) * window.innerHeight - 28;
       lockMarkerEl.style.left = x + 'px';
       lockMarkerEl.style.top = y + 'px';
       lockMarkerEl.style.opacity = 0.85;
@@ -13594,6 +13651,7 @@ function updateDrone(dt) {
         discoveries++;
         recentDiscoveries.unshift(poi.name + ' (DRONE)');
         if (recentDiscoveries.length > 5) recentDiscoveries.pop();
+        recentDiscoveriesDirty = true;
         showDiscoveryBanner(poi);
       }
     }
@@ -14504,8 +14562,6 @@ function readoutsFor(sys) {
   }
   return [];
 }
-
-function renderDiag_OLD_UNUSED() {}
 
 // ============================================================
 // Diagnostic schematic - the visual mech with clickable subsystems
@@ -17266,12 +17322,6 @@ function applyVisionMode() {
   document.getElementById('thermal-overlay').classList.toggle('active', isThm);
   document.getElementById('thermal-noise').classList.toggle('active', isThm);
   document.getElementById('thermal-vignette').classList.toggle('active', isThm);
-}
-
-function setNVG(on) {
-  // Back-compat shim: turn NVG on or off without touching thermal
-  nvgState.mode = on ? 'nvg' : 'normal';
-  applyVisionMode();
 }
 
 function setVisionMode(mode) {
@@ -20305,15 +20355,6 @@ async function grTypeLine(line, cps) {
     body.scrollTop = body.scrollHeight;
     await grSleep(delay + (ch === '\n' ? 30 : 0) + (ch === '.' ? 60 : 0));
   }
-}
-
-function grPrintRaw(html) {
-  // Print pre-formatted HTML (for the splash art etc) without typewriter.
-  const body = document.getElementById('gr-body');
-  const div = document.createElement('div');
-  div.innerHTML = html;
-  body.appendChild(div);
-  body.scrollTop = body.scrollHeight;
 }
 
 function grPrintLine(text, cls) {
@@ -24535,6 +24576,7 @@ function updateResupply(dt) {
           if (o.material) o.material.dispose();
         });
         resupply.crate = null;
+        resupplyStrobes.length = 0;
         addComm('KAILEY', 'Resupply window closed. Maintenance team will retrieve.', false, 'kailey');
       }
     }
@@ -24563,6 +24605,7 @@ function spawnResupplyCrate(x, z) {
   );
   strobe.position.y = 1.05;
   strobe.userData.isResupplyStrobe = true;
+  resupplyStrobes.push(strobe);
   group.add(strobe);
   // Parachute (removed on landing)
   const parachute = new THREE.Group();
@@ -24606,6 +24649,7 @@ function collectResupply() {
     if (o.material) o.material.dispose();
   });
   resupply.crate = null;
+  resupplyStrobes.length = 0; // strobe mesh was inside c.mesh, now disposed
   // Restore drone battery and patch the worst-damaged subsystem
   drone.battery = drone.batteryMax;
   let worst = null;
@@ -24735,17 +24779,21 @@ function _loopBody() {
       puff.scale.setScalar(1 + Math.sin(t * 0.5 + s) * 0.1);
     });
   }
-  // tower red blinks (only on loaded chunks - scene.traverse is fine since we dispose)
-  scene.traverse((obj) => {
-    if (obj.userData && obj.userData.isBlink) {
-      const on = Math.floor(now / 700) % 2 === 0;
-      obj.material.color.setHex(on ? 0xff3030 : 0x2a0808);
+  // Tower red blinks and resupply strobes. Previously this used scene.traverse
+  // every frame, which walked thousands of chunk meshes looking for a handful
+  // of blink lights. Now we iterate the explicit blinkers registry instead.
+  const blinkOn = Math.floor(now / 700) % 2 === 0;
+  const blinkColor = blinkOn ? 0xff3030 : 0x2a0808;
+  for (const b of blinkers) {
+    b.material.color.setHex(blinkColor);
+  }
+  if (resupplyStrobes.length) {
+    const strobeOn = Math.floor(now / 350) % 2 === 0;
+    const strobeColor = strobeOn ? 0xffeecc : 0x402810;
+    for (const s of resupplyStrobes) {
+      s.material.color.setHex(strobeColor);
     }
-    if (obj.userData && obj.userData.isResupplyStrobe) {
-      const on = Math.floor(now / 350) % 2 === 0;
-      obj.material.color.setHex(on ? 0xffeecc : 0x402810);
-    }
-  });
+  }
 
   // ambient subsystems
   if (gameStarted && !paused && !player.dead) {
@@ -24769,6 +24817,7 @@ function _loopBody() {
     if (typeof updateCockpitAmbient === 'function') updateCockpitAmbient(dt);
     trackJournalMovement(dt);
     updatePlayerMech(dt);
+    drainGarrisonQueue();
     updateCaravans(dt);
     updateAnomalies(dt);
     updateSalvageToast(dt);
@@ -24850,6 +24899,8 @@ window.addEventListener('resize', () => {
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
   renderer.setSize(window.innerWidth, window.innerHeight);
+  // Refresh cached layout measurements
+  if (compassEl) cachedCompassWidth = compassEl.offsetWidth;
 });
 
 // ==================== START / RESTART ====================
@@ -25504,6 +25555,7 @@ document.getElementById('restart-btn').addEventListener('click', () => {
   player.vertVel = 0;
   kills = 0; discoveries = 0;
   recentDiscoveries.length = 0;
+  recentDiscoveriesDirty = true;
 
   // Regenerate world around origin
   updateChunks(0, 0);
