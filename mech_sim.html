@@ -891,6 +891,30 @@
     font-size: 14px; letter-spacing: 4px;
   }
   .map-header .right { color: var(--amber-dim); }
+  .map-contracts {
+    display: none;
+    border: 1px solid rgba(255, 90, 120, 0.4);
+    border-left: 3px solid rgba(255, 90, 120, 0.8);
+    background: rgba(40, 12, 18, 0.5);
+    padding: 8px 14px;
+    margin-bottom: 12px;
+    font-size: 11px;
+    letter-spacing: 1px;
+    color: rgba(255, 150, 165, 0.9);
+  }
+  .map-contracts.show { display: block; }
+  .map-contracts .mc-title {
+    color: rgba(255, 110, 135, 0.95);
+    letter-spacing: 3px;
+    font-size: 10px;
+    margin-bottom: 5px;
+  }
+  .map-contracts .mc-row {
+    display: flex; justify-content: space-between;
+    padding: 2px 0;
+  }
+  .map-contracts .mc-name { color: rgba(255, 170, 180, 0.95); }
+  .map-contracts .mc-bearing { color: rgba(255, 130, 150, 0.7); }
   #map-canvas {
     flex: 1; width: 100%;
     border: 1px solid var(--amber-dim);
@@ -912,6 +936,8 @@
   .legend-dot.wp { background: transparent; border: 2px solid var(--green); border-radius: 50%; }
   .legend-dot.place { background: #ffdc78; transform: rotate(45deg); }
   .legend-dot.note { background: rgba(255, 170, 60, 0.85); border-radius: 50%; }
+  .legend-dot.cache { background: rgba(120, 220, 200, 0.85); }
+  .legend-dot.contract { background: rgba(255, 90, 120, 0.85); border-radius: 50%; }
   .legend-dot.mech { background: var(--blue); }
   .legend-dot.drone { background: var(--amber); border: 1px solid var(--bg); }
 
@@ -2189,6 +2215,27 @@
     line-height: 1.7;
     white-space: pre-wrap;
   }
+  .jrn-things-intro {
+    color: var(--amber-dim);
+    font-style: italic;
+    font-size: 11px;
+    line-height: 1.6;
+    margin: -6px 0 14px 0;
+    letter-spacing: 0.5px;
+  }
+  .jrn-thing { border-bottom-style: dotted; }
+  .jrn-thing .jrn-time {
+    color: var(--amber);
+    letter-spacing: 1px;
+  }
+  .jrn-thing-text {
+    color: rgba(220, 235, 200, 0.9);
+    font-family: 'Georgia', 'Times New Roman', serif !important;
+    font-style: italic;
+    font-size: 12.5px;
+    line-height: 1.65;
+    margin-top: 3px;
+  }
   .jrn-footer {
     display: flex; justify-content: space-between;
     padding: 10px 12px; margin-top: 12px;
@@ -2273,6 +2320,29 @@
   }
   .inv-detail .nm { display: block; color: var(--amber); font-size: 13px; letter-spacing: 2px; margin-bottom: 6px; }
   .inv-detail .desc { color: var(--amber-dim); font-style: italic; }
+  .inv-stash-btn {
+    background: rgba(255, 154, 31, 0.12);
+    border: 1px solid var(--amber-dim);
+    color: var(--amber);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 3px;
+    padding: 8px 16px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .inv-stash-btn:hover {
+    border-color: var(--amber);
+    background: rgba(255, 154, 31, 0.22);
+    box-shadow: 0 0 8px rgba(255, 154, 31, 0.35);
+  }
+  .inv-stash-hint {
+    margin-top: 6px;
+    font-size: 9px;
+    letter-spacing: 1px;
+    color: var(--amber-faint);
+    font-style: italic;
+  }
   .inv-empty {
     color: var(--amber-dim);
     font-style: italic;
@@ -3709,6 +3779,34 @@
   }
   body:not(.playing) #cockpit-frame { display: none; }
 
+  /* Hanging decoration (personalization): swings gently from the top bezel,
+     like something tied to the canopy frame. The swing is suppressed under
+     reduced-motion. */
+  #cf-decoration {
+    position: absolute;
+    top: 28px;
+    left: 50%;
+    margin-left: 120px;
+    font-size: 26px;
+    transform-origin: 50% -8px;
+    animation: cfDecoSwing 4.5s ease-in-out infinite;
+    filter: drop-shadow(0 2px 3px rgba(0,0,0,0.6));
+    z-index: 6;
+  }
+  #cf-decoration::before {
+    /* the cord it hangs from */
+    content: '';
+    position: absolute;
+    top: -16px; left: 50%;
+    width: 1px; height: 16px;
+    background: linear-gradient(180deg, rgba(120,90,50,0.7), rgba(160,120,70,0.9));
+  }
+  @keyframes cfDecoSwing {
+    0%, 100% { transform: rotate(-7deg); }
+    50%      { transform: rotate(7deg); }
+  }
+  body.reduced-motion #cf-decoration { animation: none; transform: rotate(0deg); }
+
   /* Top bezel: brushed steel beam with caution stripes and stencils */
   .cf-bezel-top {
     position: absolute; top: 0; left: 0; right: 0;
@@ -4817,6 +4915,25 @@
     box-shadow: 0 0 6px rgba(255, 154, 31, 0.4), inset 0 0 6px rgba(255, 154, 31, 0.15);
   }
   .s-options button:hover { color: var(--amber); border-color: var(--amber); }
+  .s-text {
+    flex: 1;
+    width: 100%;
+    background: rgba(5, 4, 2, 0.85);
+    border: 1px solid var(--amber-dim);
+    color: var(--amber);
+    font-family: inherit;
+    font-size: 12px;
+    letter-spacing: 2px;
+    padding: 7px 10px;
+    box-sizing: border-box;
+    outline: none;
+    text-transform: uppercase;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  .s-text:focus {
+    border-color: var(--amber);
+    box-shadow: 0 0 8px rgba(255, 154, 31, 0.3), inset 0 0 8px rgba(255, 154, 31, 0.08);
+  }
   .settings-footer {
     margin-top: 16px;
     padding-top: 14px;
@@ -4911,6 +5028,16 @@
     padding: 0 0 40px 0;
   }
   #npc-dialog.show { display: flex; }
+  #bounty-dialog {
+    position: fixed; inset: 0; z-index: 240;
+    display: none;
+    align-items: flex-end; justify-content: center;
+    background: rgba(0, 0, 0, 0.55);
+    color: var(--amber);
+    font-family: 'Share Tech Mono', monospace;
+    padding: 0 0 40px 0;
+  }
+  #bounty-dialog.show { display: flex; }
   .npc-dialog-box {
     width: 100%;
     max-width: 780px;
@@ -5026,6 +5153,8 @@
   <div class="cf-sticker tape" style="top: 36px; left: 80px; transform: rotate(-4deg);">K. WUZ HERE</div>
   <div class="cf-sticker red" style="top: 38px; right: 80px; transform: rotate(3deg);">⚠ NO STEP</div>
   <div class="cf-sticker" style="top: 36px; left: 50%; transform: translateX(-50%) rotate(-1deg); font-size: 10px;">INSP 04 AUG // OK ✓</div>
+  <!-- Hanging decoration (personalization). Swings subtly via CSS animation. -->
+  <div id="cf-decoration" style="display:none;"></div>
 </div>
 
 <!-- Hail menu overlay -->
@@ -5070,7 +5199,7 @@
   <div id="damage-flash"></div>
   <div id="heat-flash"></div>
 
-  <div class="bracket tl"><div class="bracket-tag">TITAN-7 // RECON</div></div>
+  <div class="bracket tl"><div class="bracket-tag" id="hud-stencil-tag">TITAN-7 // RECON</div></div>
   <div class="bracket tr"><div class="bracket-tag">ZONE 4-8-15 // APPALACHIAN</div></div>
   <div class="bracket bl"></div>
   <div class="bracket br"></div>
@@ -5478,6 +5607,19 @@
   </div>
 </div>
 
+<!-- Bounty resolution dialog (reuses npc-dialog styling) -->
+<div id="bounty-dialog">
+  <div class="npc-dialog-box">
+    <div class="npc-dialog-head">
+      <span class="npc-dialog-speaker" id="bounty-speaker">CONTRACT TARGET</span>
+      <span class="npc-dialog-close" id="bounty-dialog-close">[ESC] close</span>
+    </div>
+    <div class="npc-intro" id="bounty-intro"></div>
+    <div class="npc-dialog-text" id="bounty-text"></div>
+    <div class="npc-options" id="bounty-options"></div>
+  </div>
+</div>
+
 <!-- Settings overlay -->
 <div id="settings-overlay">
   <div class="settings-box">
@@ -5543,6 +5685,36 @@
       </div>
     </div>
 
+    <div class="settings-section">
+      <div class="settings-section-title">▶ MECH</div>
+      <div class="settings-row">
+        <span class="s-label">Accent Color</span>
+        <div class="s-options" id="s-accent">
+          <button data-value="amber" class="active">AMBER</button>
+          <button data-value="green">GREEN</button>
+          <button data-value="blue">BLUE</button>
+          <button data-value="coral">CORAL</button>
+        </div>
+        <span class="s-value">&nbsp;</span>
+      </div>
+      <div class="settings-row">
+        <span class="s-label">Cockpit Charm</span>
+        <div class="s-options" id="s-decoration">
+          <button data-value="none" class="active">NONE</button>
+          <button data-value="tag">TAG</button>
+          <button data-value="charm">CHARM</button>
+          <button data-value="flag">FLAG</button>
+          <button data-value="bone">BONE</button>
+        </div>
+        <span class="s-value">&nbsp;</span>
+      </div>
+      <div class="settings-row">
+        <span class="s-label">Chest Stencil</span>
+        <input id="s-stencil" class="s-text" type="text" maxlength="16" value="TITAN-7" autocomplete="off" spellcheck="false">
+        <span class="s-value">&nbsp;</span>
+      </div>
+    </div>
+
     <div class="settings-footer">
       <span>changes save automatically</span>
       <button class="settings-close" id="settings-close-btn">▸ CLOSE</button>
@@ -5558,6 +5730,7 @@
     <div>▶ RECON MAP // ZONE 4-8-15</div>
     <div class="right" id="map-coords">X +0000 // Z +0000 // ZOOM 1.0x</div>
   </div>
+  <div id="map-contracts" class="map-contracts"></div>
   <canvas id="map-canvas"></canvas>
   <div class="map-legend">
     <span><span class="legend-dot found"></span>SURVEYED</span>
@@ -5565,6 +5738,8 @@
     <span><span class="legend-dot wp"></span>WAYPOINT</span>
     <span><span class="legend-dot place"></span>NAMED PLACE</span>
     <span><span class="legend-dot note"></span>FIELD NOTE</span>
+    <span><span class="legend-dot cache"></span>CACHE</span>
+    <span><span class="legend-dot contract"></span>CONTRACT</span>
     <span><span class="legend-dot mech"></span>ALLIED MECH</span>
     <span><span class="legend-dot drone"></span>DRONE</span>
   </div>
@@ -6307,7 +6482,7 @@ const playerMech = (() => {
   g.add(vent);
 
   scene.add(g);
-  return { group: g, left, right, reactor };
+  return { group: g, left, right, reactor, accentMat };
 })();
 
 function updatePlayerMech(dt) {
@@ -8017,8 +8192,9 @@ function updateMeteors(dt) {
 // Aurora animation (called from main loop)
 function updateAurora(dt, nightAmount) {
   const now = performance.now() * 0.0004;
+  const boost = (typeof rareMomentsAuroraBoost !== 'undefined') ? rareMomentsAuroraBoost : 0;
   aurora.children.forEach((mesh) => {
-    mesh.material.opacity = 0.30 * nightAmount;
+    mesh.material.opacity = (0.30 + boost) * nightAmount;
     if (nightAmount < 0.05) return;
     const ud = mesh.userData;
     const pos = mesh.geometry.attributes.position;
@@ -8045,6 +8221,154 @@ function updateAurora(dt, nightAmount) {
     pos.needsUpdate = true;
   });
 }
+
+// ============================================================
+// RARE MOMENTS (E1): once-in-a-while world surprises
+// ============================================================
+// A dispatch table of low-frequency, high-feeling events that fire at most
+// once per real-world hour, gated by conditions (time of day, weather,
+// biome). They are NOT logged anywhere; they happen and pass. The point is
+// the private "did you see that" feeling when one occurs during a long
+// session. Most reuse existing systems (meteor shower, aurora boost, the
+// deer model); a couple add tiny one-off visuals.
+const rareMoments = {
+  // Global cooldown: at least this many ms between ANY two rare moments.
+  globalCooldownMs: 60 * 60 * 1000,   // one hour
+  lastFiredAt: 0,
+  // Per-frame check accumulator so we're not testing every single frame.
+  checkT: 0,
+  checkInterval: 20,   // seconds between eligibility rolls
+  // Once eligible and rolled, this is the per-roll chance to actually fire.
+  fireChance: 0.18,
+  active: null,        // currently-running moment state, if any
+
+  events: [
+    {
+      id: 'meteor_shower',
+      // Deep night, clear-ish sky.
+      eligible: () => tod && (tod.phase === 'night') &&
+                      (!weather || ['clear', 'overcast', 'dusk'].includes(weather.current)),
+      fire() {
+        // A sustained shower: many meteors over ~25 seconds.
+        let n = 0;
+        const burst = () => {
+          if (n++ > 30) return;
+          if (typeof spawnMeteor === 'function') spawnMeteor();
+          setTimeout(burst, 500 + Math.random() * 900);
+        };
+        burst();
+        if (typeof addComm === 'function') {
+          setTimeout(() => addComm('KAILEY', 'Look up. Whole sky is falling tonight. Wish I could see it from here.', false), 4000);
+        }
+      },
+    },
+    {
+      id: 'bright_aurora',
+      eligible: () => tod && (tod.phase === 'night' || tod.phase === 'evening'),
+      fire() {
+        // Temporarily boost aurora opacity for ~40 seconds.
+        if (typeof aurora === 'undefined') return;
+        rareMoments.active = { id: 'bright_aurora', t: 0, dur: 40 };
+        if (typeof addComm === 'function') {
+          setTimeout(() => addComm('KAILEY', 'The lights are out tonight. The green ones. Tell me you are somewhere you can see them.', false), 3000);
+        }
+      },
+    },
+    {
+      id: 'deer_in_road',
+      // Daylight, in or near forest/meadow biomes.
+      eligible: () => tod && (tod.phase === 'day' || tod.phase === 'dawn' || tod.phase === 'dusk'),
+      fire() {
+        if (typeof spawnWildlife !== 'function') return;
+        // Spawn a single deer a short distance ahead, standing in the path.
+        const ahead = 22;
+        const fx = player.pos.x - Math.sin(player.yaw) * ahead;
+        const fz = player.pos.z - Math.cos(player.yaw) * ahead;
+        const w = spawnWildlife('deer', fx, fz);
+        if (w) {
+          // Make it stand and watch rather than flee immediately.
+          w.state = 'alert';
+          w.stateT = 30;   // holds for 30s
+          w._rareWatcher = true;
+          // Face the player.
+          const dx = player.pos.x - fx, dz = player.pos.z - fz;
+          w.yaw = Math.atan2(-dx, -dz);
+          w.mesh.rotation.y = w.yaw;
+        }
+      },
+    },
+    {
+      id: 'coral_stares_east',
+      eligible: () => true,   // any time
+      fire() {
+        // Coral fixates on something east that the pilot cannot see.
+        if (typeof coral === 'undefined') return;
+        if (typeof coralReact === 'function') coralReact('alert', 14);
+        if (typeof setCoralNote === 'function') {
+          setCoralNote('Coral has turned to face east. She is staring at something I cannot see. She will not look away.');
+        } else if (typeof addComm === 'function') {
+          addComm('TITAN-7', 'Coral is staring east at nothing. She has not moved in half a minute.', true);
+        }
+      },
+    },
+    {
+      id: 'crows_lift',
+      eligible: () => tod && tod.phase !== 'night',
+      fire() {
+        // A burst of ravens lifting off all at once nearby.
+        if (typeof spawnWildlife !== 'function') return;
+        const count = 5 + Math.floor(Math.random() * 4);
+        for (let i = 0; i < count; i++) {
+          const a = Math.random() * Math.PI * 2;
+          const r = 18 + Math.random() * 30;
+          const x = player.pos.x + Math.cos(a) * r;
+          const z = player.pos.z + Math.sin(a) * r;
+          const w = spawnWildlife('raven', x, z);
+          if (w) { w.state = 'flee'; w.flightY = 6 + Math.random() * 10; w.stateT = 12; }
+        }
+        if (typeof addComm === 'function') {
+          addComm('TITAN-7', 'A whole stand of crows just lifted at once. Nothing spooked them that I can see.', true);
+        }
+      },
+    },
+  ],
+
+  update(dt) {
+    // Animate any active timed moment (e.g. aurora boost).
+    if (this.active) {
+      this.active.t += dt;
+      if (this.active.id === 'bright_aurora') {
+        // Drive a boost factor consumed by updateAurora via a global.
+        const p = this.active.t / this.active.dur;
+        // ease in then out: triangular envelope, peak boost +0.5 opacity
+        const env = p < 0.5 ? (p / 0.5) : (1 - (p - 0.5) / 0.5);
+        rareMomentsAuroraBoost = Math.max(0, env) * 0.5;
+        if (this.active.t >= this.active.dur) {
+          rareMomentsAuroraBoost = 0;
+          this.active = null;
+        }
+      }
+    }
+    // Eligibility roll on an interval.
+    this.checkT += dt;
+    if (this.checkT < this.checkInterval) return;
+    this.checkT = 0;
+    const now = Date.now();
+    if (now - this.lastFiredAt < this.globalCooldownMs) return;
+    if (Math.random() > this.fireChance) return;
+    // Gather eligible events and pick one.
+    const eligible = this.events.filter(e => {
+      try { return e.eligible(); } catch (err) { return false; }
+    });
+    if (!eligible.length) return;
+    const pick = eligible[Math.floor(Math.random() * eligible.length)];
+    try { pick.fire(); this.lastFiredAt = now; } catch (err) {}
+  },
+};
+// Consumed by updateAurora to temporarily brighten the lights during a
+// bright_aurora rare moment.
+let rareMomentsAuroraBoost = 0;
+
 
 // ==================== PLAYER ====================
 const player = {
@@ -8248,6 +8572,16 @@ function addItem(id, count = 1) {
       }
     } else if (typeof addComm === 'function') {
       addComm('TITAN-7', `Another scrap of preserved writing. Already in the archive.`, true);
+    }
+  }
+  // Build 2 (B2): record the pickup in the Things Found travelogue. Log the
+  // first time the pilot ever picks up a given item type, plus every
+  // recovered_text find (each is a distinct discovery even though they share
+  // an item id). Routine restocking of scrap/ammo after the first time is
+  // not logged, to keep the travelogue meaningful rather than a spam feed.
+  if (typeof thingsFound !== 'undefined') {
+    if (!hadBefore || id === 'recovered_text') {
+      thingsFound.record(id, count);
     }
   }
   return true;
@@ -11010,7 +11344,9 @@ function fireMissile(opts) {
 
 function enemyFire(e) {
   const origin = e.mesh.position.clone();
-  origin.y -= 0.8;
+  // Ground mechs fire from torso height (~8m up); flying drones fire from
+  // their mesh origin minus a small offset.
+  origin.y += e._isGroundMech ? 8 : -0.8;
   const aim = player.pos.clone().sub(origin).normalize();
   // lead lightly
   aim.x += (Math.random() - 0.5) * 0.06;
@@ -11170,6 +11506,7 @@ document.addEventListener('keydown', (e) => {
     e.preventDefault();
     // Closing any menu via ESC should NOT pause the game. Force-unpause to be safe.
     if (photo.active)  { exitPhotoMode(); return; }
+    if (document.getElementById('bounty-dialog') && document.getElementById('bounty-dialog').classList.contains('show')) { closeBountyResolution(); return; }
     if (keymapOpen)   { closeKeymap();     return; }
     if (terminal && terminal.open) { closeTerminal(); return; }
     if (decryptGame && decryptGame.active) { finishDecrypt(false); return; }
@@ -11243,16 +11580,41 @@ document.addEventListener('keydown', (e) => {
   } else if (e.code === 'KeyK' && !mapOpen && !diagOpen && !logbookOpen && !journalOpen && !invOpen) {
     if (codexOpen) closeCodex(); else openCodex();
   } else if (e.code === 'KeyE') {
-    // Passphrase NPC interaction (Phase 6 follow-up)
+    // Bounty resolution OR passphrase NPC OR cache collection
     if (!mapOpen && !diagOpen && !logbookOpen && !journalOpen && !invOpen && !codexOpen) {
       const promptEl = document.getElementById('npc-prompt');
       const dialogEl = document.getElementById('npc-dialog');
-      if (dialogEl && dialogEl.classList.contains('show')) {
-        // Already in a dialog, ignore (close via ESC or option button)
-      } else if (promptEl && promptEl.classList.contains('show')) {
-        const id = promptEl.dataset.npcId;
-        if (id && typeof npcOpenDialog === 'function') npcOpenDialog(id);
-        e.preventDefault();
+      const bountyDlg = document.getElementById('bounty-dialog');
+      if (bountyDlg && bountyDlg.classList.contains('show')) {
+        // In bounty dialog; ignore E (choose via option button or ESC)
+      } else if (dialogEl && dialogEl.classList.contains('show')) {
+        // Already in NPC dialog, ignore
+      } else {
+        // Highest priority: a confirmed bounty target within reach.
+        const bid = (typeof nearestResolvableBounty === 'function') ? nearestResolvableBounty(18) : null;
+        if (bid) {
+          openBountyResolution(bid);
+          e.preventDefault();
+        } else if (promptEl && promptEl.classList.contains('show')) {
+          // Cache pickup takes priority if the prompt is showing one.
+          if (promptEl.dataset.cacheId && typeof caches !== 'undefined') {
+            const collected = caches.collectNearest();
+            if (collected) {
+              const def = ITEMS[collected.itemId];
+              if (typeof addComm === 'function') {
+                addComm('TITAN-7', `Collected cache: ${def ? def.name : 'item'}${collected.count > 1 ? ' x' + collected.count : ''}.`, true);
+              }
+              if (typeof sfxClick === 'function') sfxClick();
+              promptEl.classList.remove('show');
+              promptEl.dataset.cacheId = '';
+            }
+            e.preventDefault();
+          } else {
+            const id = promptEl.dataset.npcId;
+            if (id && typeof npcOpenDialog === 'function') npcOpenDialog(id);
+            e.preventDefault();
+          }
+        }
       }
     }
   } else if (e.code === 'KeyH') {
@@ -11798,7 +12160,18 @@ function update(dt) {
       // vs enemies
       for (const e of enemies) {
         if (e.hp <= 0) continue;
-        if (p.mesh.position.distanceTo(e.mesh.position) < 2.8) {
+        // Drones sit at their mesh origin (~chest height); ground mechs (bounty
+        // targets reusing the allied chassis) have their body up around y=8
+        // with the group origin at ground level, so test against a raised
+        // point and a larger radius for them.
+        let hitRadius = 2.8;
+        let targetPt = e.mesh.position;
+        if (e._isGroundMech) {
+          hitRadius = 7.5;
+          _tmpV3a.copy(e.mesh.position); _tmpV3a.y += 8;
+          targetPt = _tmpV3a;
+        }
+        if (p.mesh.position.distanceTo(targetPt) < hitRadius) {
           e.hp -= p.damage;
           e.aggro = true;
           // alert nearby allies
@@ -11819,6 +12192,18 @@ function update(dt) {
             createSpark(p.mesh.position);
           }
           if (e.hp <= 0) {
+            // Bounty mech targets do NOT auto-destroy on reaching 0 hp. The
+            // contract is closed through the resolution dialog instead (which
+            // offers destroy or, if crippled below 30%, disable). Clamp the
+            // mech at 1 hp, stop it, and let the player walk up and press E.
+            if (e._bountyId) {
+              e.hp = 1;
+              e.aggro = false;
+              e.vel.set(0, e.vel.y, 0);
+              createSpark(e.mesh.position);
+              if (bountyTargets[e._bountyId]) bountyTargets[e._bountyId].confirmed = true;
+              continue;
+            }
             createExplosion(e.mesh.position, 2);
             removeAndDispose(e.mesh);
             kills++;
@@ -11884,6 +12269,45 @@ function update(dt) {
   for (let i = enemies.length - 1; i >= 0; i--) {
     const e = enemies[i];
     if (e.hp <= 0) { enemies.splice(i, 1); continue; }
+
+    // Ground mech bounty targets reuse the allied chassis and walk on the
+    // ground rather than fly. They get a simplified pursuit AI: approach to a
+    // standoff distance, face the player by yaw only (no pitch tilt), and
+    // never change altitude. They have no rotors to spin.
+    if (e._isGroundMech) {
+      e.bobPhase += dt * 2;
+      const gd = Math.hypot(player.pos.x - e.mesh.position.x, player.pos.z - e.mesh.position.z);
+      if (!e.aggro && gd < 60) e.aggro = true;
+      // Move toward a standoff ring around the player.
+      let mvx = 0, mvz = 0;
+      const dirx = (player.pos.x - e.mesh.position.x) / (gd || 1);
+      const dirz = (player.pos.z - e.mesh.position.z) / (gd || 1);
+      if (e.aggro) {
+        if (gd > e.desiredDist + 8)      { mvx = dirx * 9;  mvz = dirz * 9; }
+        else if (gd < e.desiredDist - 8) { mvx = -dirx * 7; mvz = -dirz * 7; }
+        else { // strafe
+          e.strafeT -= dt;
+          if (e.strafeT <= 0) { e.strafeT = 2 + Math.random() * 3; e.strafeDir *= -1; }
+          mvx = -dirz * 6 * e.strafeDir; mvz = dirx * 6 * e.strafeDir;
+        }
+      }
+      e.vel.x += (mvx - e.vel.x) * Math.min(1, dt * 1.5);
+      e.vel.z += (mvz - e.vel.z) * Math.min(1, dt * 1.5);
+      e.mesh.position.x += e.vel.x * dt;
+      e.mesh.position.z += e.vel.z * dt;
+      e.mesh.position.y = 0;   // stays grounded
+      // Face the player by yaw only.
+      e.mesh.rotation.y = Math.atan2(player.pos.x - e.mesh.position.x, player.pos.z - e.mesh.position.z);
+      // Fire when aggro and roughly facing.
+      if (e.aggro) {
+        e.fireT -= dt;
+        if (e.fireT <= 0 && gd < 120) {
+          e.fireT = e.fireRate;
+          if (typeof enemyFire === 'function') enemyFire(e);
+        }
+      }
+      continue;
+    }
 
     // rotors spin
     for (const r of e.rotors) r.rotation.y += dt * 40;
@@ -14187,11 +14611,94 @@ function drawMap() {
     }
   }
 
+  // Bounty search rings: dashed magenta-red circles marking the area where
+  // an active contract target can be found. Drawn under the markers.
+  if (typeof bounties !== 'undefined') {
+    for (const { id, def, s } of bounties.activeList()) {
+      if (s.ringX == null) continue;
+      const c = worldToMap(s.ringX, s.ringZ);
+      const rPx = s.ringR * scale;
+      mapCtx.save();
+      mapCtx.setLineDash([6, 5]);
+      mapCtx.strokeStyle = 'rgba(255, 90, 120, 0.7)';
+      mapCtx.lineWidth = 1.5;
+      mapCtx.beginPath();
+      mapCtx.arc(c.x, c.y, rPx, 0, Math.PI * 2);
+      mapCtx.stroke();
+      mapCtx.setLineDash([]);
+      // Center crosshair
+      mapCtx.strokeStyle = 'rgba(255, 90, 120, 0.5)';
+      mapCtx.beginPath();
+      mapCtx.moveTo(c.x - 5, c.y); mapCtx.lineTo(c.x + 5, c.y);
+      mapCtx.moveTo(c.x, c.y - 5); mapCtx.lineTo(c.x, c.y + 5);
+      mapCtx.stroke();
+      // Label (only if the ring center is roughly on-canvas)
+      if (c.x > -60 && c.y > -60 && c.x < mapCanvas.width + 60 && c.y < mapCanvas.height + 60) {
+        mapCtx.font = '10px "Share Tech Mono", monospace';
+        mapCtx.textAlign = 'center';
+        mapCtx.textBaseline = 'bottom';
+        mapCtx.fillStyle = 'rgba(0,0,0,0.7)';
+        mapCtx.fillText(def.name, c.x + 1, c.y - rPx - 3);
+        mapCtx.fillStyle = 'rgba(255, 130, 150, 0.95)';
+        mapCtx.fillText(def.name, c.x, c.y - rPx - 4);
+        mapCtx.textAlign = 'left';
+      }
+      mapCtx.restore();
+    }
+  }
+
+  // Caches: stashed items, drawn as a small box-with-lid glyph in a cool
+  // cyan-green so they read distinctly from amber place markers and notes.
+  if (typeof caches !== 'undefined' && caches.entries) {
+    for (const c of caches.entries) {
+      const pt = worldToMap(c.x, c.z);
+      if (pt.x < -20 || pt.y < -20 || pt.x > mapCanvas.width + 20 || pt.y > mapCanvas.height + 20) continue;
+      mapCtx.save();
+      mapCtx.translate(pt.x, pt.y);
+      // little crate: filled square + lid line
+      mapCtx.fillStyle = 'rgba(120, 220, 200, 0.85)';
+      mapCtx.strokeStyle = 'rgba(180, 255, 235, 0.9)';
+      mapCtx.lineWidth = 1;
+      mapCtx.fillRect(-4, -3, 8, 6);
+      mapCtx.strokeRect(-4, -3, 8, 6);
+      mapCtx.beginPath();
+      mapCtx.moveTo(-4, -1); mapCtx.lineTo(4, -1);
+      mapCtx.stroke();
+      mapCtx.restore();
+    }
+  }
+
   // header info
   document.getElementById('map-coords').textContent =
     `X ${player.pos.x >= 0 ? '+' : '-'}${String(Math.abs(Math.round(player.pos.x))).padStart(4, '0')} // ` +
     `Z ${player.pos.z >= 0 ? '+' : '-'}${String(Math.abs(Math.round(player.pos.z))).padStart(4, '0')} // ` +
     `ZOOM ${mapZoom.toFixed(1)}x`;
+
+  // Active contracts bar
+  const mc = document.getElementById('map-contracts');
+  if (mc && typeof bounties !== 'undefined') {
+    const active = bounties.activeList();
+    if (active.length === 0) {
+      mc.classList.remove('show');
+      mc.innerHTML = '';
+    } else {
+      const compass = ['N','NE','E','SE','S','SW','W','NW'];
+      let h = `<div class="mc-title">▶ ACTIVE CONTRACTS (${active.length}/${bounties.maxActive})</div>`;
+      for (const { def, s } of active) {
+        const dx = s.ringX - player.pos.x, dz = s.ringZ - player.pos.z;
+        const dist = Math.hypot(dx, dz);
+        // bearing: world -Z is north, +X is east
+        let ang = Math.atan2(dx, -dz) * 180 / Math.PI;
+        if (ang < 0) ang += 360;
+        const dir = compass[Math.round(ang / 45) % 8];
+        const inRing = dist <= s.ringR;
+        const distLabel = inRing ? 'INSIDE SEARCH RING' : `${Math.round(dist)}m ${dir}`;
+        h += `<div class="mc-row"><span class="mc-name">${def.name}</span><span class="mc-bearing">${distLabel}</span></div>`;
+      }
+      mc.innerHTML = h;
+      mc.classList.add('show');
+    }
+  }
 }
 
 // ============================================================
@@ -14402,6 +14909,618 @@ const fieldNotes = {
   },
 };
 fieldNotes.load();
+
+// ============================================================
+// MECH PERSONALIZATION (A3)
+// ============================================================
+// Three small choices that make the mech specifically the player's:
+// an accent color (recolors the mech's accent material and the cockpit
+// stencil/decoration tints), a hanging cockpit decoration, and a chest
+// stencil string. Persisted under titan7_personalize.
+const ACCENT_PRESETS = {
+  amber:  { hex: 0xff9a1f, css: '#ff9a1f', name: 'AMBER' },
+  green:  { hex: 0x6abf4b, css: '#6abf4b', name: 'FOREST GREEN' },
+  blue:   { hex: 0x4aa3d4, css: '#4aa3d4', name: 'DUST BLUE' },
+  coral:  { hex: 0xff6f5e, css: '#ff6f5e', name: 'CORAL' },
+};
+const DECORATION_PRESETS = {
+  none:  { name: 'NONE',         glyph: '' },
+  tag:   { name: 'DOG TAG',      glyph: '🏷' },
+  charm: { name: 'LUCKY CHARM',  glyph: '🍀' },
+  flag:  { name: 'SMALL FLAG',   glyph: '⚑' },
+  bone:  { name: "CORAL'S BONE", glyph: '🦴' },
+};
+
+const personalize = {
+  defaults: {
+    accent: 'amber',
+    decoration: 'none',
+    stencil: 'TITAN-7',
+  },
+  current: null,
+  load() {
+    let saved = {};
+    try { saved = JSON.parse(localStorage.getItem('titan7_personalize') || '{}'); } catch (e) {}
+    this.current = Object.assign({}, this.defaults, saved);
+    // Sanitize
+    if (!ACCENT_PRESETS[this.current.accent]) this.current.accent = 'amber';
+    if (!DECORATION_PRESETS[this.current.decoration]) this.current.decoration = 'none';
+    this.current.stencil = String(this.current.stencil || 'TITAN-7').slice(0, 16);
+  },
+  save() {
+    try { localStorage.setItem('titan7_personalize', JSON.stringify(this.current)); } catch (e) {}
+  },
+  apply() {
+    const c = this.current;
+    const accent = ACCENT_PRESETS[c.accent] || ACCENT_PRESETS.amber;
+    // Recolor the mech's accent material (the shin stripes, vents, etc).
+    if (typeof playerMech !== 'undefined' && playerMech.accentMat) {
+      playerMech.accentMat.color.setHex(accent.hex);
+    }
+    // Recolor the reactor seam glow point light if present (kept amber-ish
+    // for the reactor itself, so we DON'T tint that; only the accent mat).
+    // Update the cockpit chest stencil text.
+    const stencilEl = document.querySelector('.cf-stencil.left');
+    if (stencilEl) stencilEl.textContent = c.stencil || 'TITAN-7';
+    // Tint the cockpit stencils to the accent color so the personalization
+    // reads from inside the cockpit too.
+    document.querySelectorAll('.cf-stencil').forEach(el => {
+      el.style.color = accent.css;
+      el.style.opacity = '0.5';
+    });
+    // Update the top-left HUD bracket tag to lead with the stencil string.
+    const brTag = document.getElementById('hud-stencil-tag');
+    if (brTag) brTag.textContent = (c.stencil || 'TITAN-7') + ' // RECON';
+    // Hanging decoration in the cockpit.
+    const deco = DECORATION_PRESETS[c.decoration] || DECORATION_PRESETS.none;
+    let decoEl = document.getElementById('cf-decoration');
+    if (decoEl) {
+      if (deco.glyph) {
+        decoEl.textContent = deco.glyph;
+        decoEl.style.display = '';
+      } else {
+        decoEl.style.display = 'none';
+      }
+    }
+  },
+  set(key, value) {
+    this.current[key] = value;
+    this.save();
+    this.apply();
+  },
+};
+personalize.load();
+// Apply once at load so any saved accent/stencil is reflected as soon as the
+// DOM is ready. The mech material recolor also runs here if playerMech exists.
+if (document.readyState !== 'loading') { try { personalize.apply(); } catch (e) {} }
+else document.addEventListener('DOMContentLoaded', () => { try { personalize.apply(); } catch (e) {} });
+
+// ============================================================
+// THINGS FOUND LOG (B2)
+// ============================================================
+// A passive travelogue. Every time the pilot picks up an item, a compact
+// record is appended: what it was, when (in-game day + clock), where (place
+// name if the spot is named, else coordinates), and the item's flavor/desc.
+// Not lore, not codex. Just a chronological diary of what was stumbled
+// across, surfaced in its own journal section. Persisted to titan7_thingsFound.
+const thingsFound = {
+  entries: [],   // [{ id, name, desc, x, z, place, day, clock, ts }]
+  maxEntries: 200,
+  load() {
+    try {
+      const j = localStorage.getItem('titan7_thingsFound');
+      if (!j) return;
+      const data = JSON.parse(j);
+      if (Array.isArray(data.entries)) this.entries = data.entries;
+    } catch (e) {}
+  },
+  save() {
+    try {
+      localStorage.setItem('titan7_thingsFound', JSON.stringify({ entries: this.entries }));
+    } catch (e) {}
+  },
+  record(id, count) {
+    const def = (typeof ITEMS !== 'undefined') ? ITEMS[id] : null;
+    if (!def) return;
+    // Resolve location: prefer a named place within 60 units, else coordinates.
+    let place = null;
+    if (typeof placeNames !== 'undefined' && placeNames.findNear) {
+      const near = placeNames.findNear(player.pos.x, player.pos.z, 60);
+      if (near) place = near.name;
+    }
+    // In-game time, if available
+    let day = 0, clock = '';
+    if (typeof tod !== 'undefined') {
+      day = tod.day || 0;
+      const hh = Math.floor(tod.hour || 0);
+      const mm = Math.floor(((tod.hour || 0) - hh) * 60);
+      clock = String(hh).padStart(2, '0') + ':' + String(mm).padStart(2, '0');
+    }
+    this.entries.unshift({
+      id,
+      name: def.name || id,
+      desc: def.flavor || def.desc || '',
+      count: count || 1,
+      x: Math.round(player.pos.x),
+      z: Math.round(player.pos.z),
+      place,
+      day,
+      clock,
+      ts: Date.now(),
+    });
+    if (this.entries.length > this.maxEntries) this.entries.length = this.maxEntries;
+    this.save();
+  },
+};
+thingsFound.load();
+
+// ============================================================
+// CACHES (C2): the pilot can stash items in the world
+// ============================================================
+// At any point the pilot can drop one of an inventory item as a "cache" at
+// their current position. The cache persists by world COORDINATE (not by
+// chunk, since chunks regenerate). It shows on the map as a small icon and
+// can be picked up again by walking within range. The fiction: you found
+// something you cannot carry home now, so you tuck it into a specific spot
+// and the world remembers it is there. Persisted to titan7_caches.
+const caches = {
+  entries: [],   // [{ id, itemId, count, x, z, day, ts, note }]
+  nextId: 1,
+  pickupRadius: 14,   // world units to pick a cache back up
+  load() {
+    try {
+      const j = localStorage.getItem('titan7_caches');
+      if (!j) return;
+      const data = JSON.parse(j);
+      if (Array.isArray(data.entries)) this.entries = data.entries;
+      if (typeof data.nextId === 'number') this.nextId = data.nextId;
+    } catch (e) {}
+  },
+  save() {
+    try {
+      localStorage.setItem('titan7_caches', JSON.stringify({
+        entries: this.entries,
+        nextId: this.nextId,
+      }));
+    } catch (e) {}
+  },
+  // Stash `count` of itemId at the player's current position.
+  stash(itemId, count) {
+    const def = (typeof ITEMS !== 'undefined') ? ITEMS[itemId] : null;
+    if (!def) return null;
+    const have = (typeof itemCount === 'function') ? itemCount(itemId) : 0;
+    const n = Math.min(count || 1, have);
+    if (n <= 0) return null;
+    // Remove from inventory
+    if (typeof removeItem === 'function') removeItem(itemId, n);
+    // If a cache for the same item already exists very close by, merge into it
+    const existing = this.findNear(player.pos.x, player.pos.z, 8);
+    if (existing && existing.itemId === itemId) {
+      existing.count += n;
+      this.save();
+      return existing;
+    }
+    let day = 0;
+    if (typeof tod !== 'undefined') day = tod.day || 0;
+    const entry = {
+      id: this.nextId++,
+      itemId,
+      count: n,
+      x: Math.round(player.pos.x),
+      z: Math.round(player.pos.z),
+      day,
+      ts: Date.now(),
+    };
+    this.entries.push(entry);
+    this.save();
+    return entry;
+  },
+  // Pick up the nearest cache within pickupRadius. Returns the entry or null.
+  collectNearest() {
+    const c = this.findNear(player.pos.x, player.pos.z, this.pickupRadius);
+    if (!c) return null;
+    const def = (typeof ITEMS !== 'undefined') ? ITEMS[c.itemId] : null;
+    if (def && typeof addItem === 'function') {
+      // addItem logs to thingsFound on first-of-kind; that's fine, a recovered
+      // cache is a legitimate "found" moment.
+      addItem(c.itemId, c.count);
+    }
+    const idx = this.entries.findIndex(e => e.id === c.id);
+    if (idx >= 0) this.entries.splice(idx, 1);
+    this.save();
+    return c;
+  },
+  findNear(x, z, radius) {
+    let best = null, bestD = radius;
+    for (const e of this.entries) {
+      const d = Math.hypot(e.x - x, e.z - z);
+      if (d < bestD) { best = e; bestD = d; }
+    }
+    return best;
+  },
+};
+caches.load();
+
+// ============================================================
+// BOUNTY RUNTIME (Direction 1)
+// ============================================================
+// Tracks which contracts are posted, accepted (active, max 3), and closed.
+// Active contracts get a search-ring center chosen relative to the player
+// at accept time. The target spawns inside the ring when the player gets
+// close (handled by updateBounties). Persisted to titan7_bounties.
+const bounties = {
+  maxActive: 3,
+  // Per-bounty state keyed by bounty id:
+  //   status: 'posted' | 'active' | 'closed'
+  //   ringX, ringZ, ringR : search ring (set on accept)
+  //   spawned : bool (target instantiated in world)
+  //   resolvedWith : resolution id (when closed)
+  state: {},
+  load() {
+    try {
+      const j = localStorage.getItem('titan7_bounties');
+      if (j) {
+        const data = JSON.parse(j);
+        if (data && data.state) this.state = data.state;
+      }
+    } catch (e) {}
+    // Ensure every defined bounty has a state entry; default to 'posted'.
+    for (const id of Object.keys(BOUNTIES)) {
+      if (!this.state[id]) this.state[id] = { status: 'posted' };
+    }
+  },
+  save() {
+    try { localStorage.setItem('titan7_bounties', JSON.stringify({ state: this.state })); } catch (e) {}
+  },
+  activeCount() {
+    return Object.values(this.state).filter(s => s.status === 'active').length;
+  },
+  isActive(id)  { return this.state[id] && this.state[id].status === 'active'; },
+  isClosed(id)  { return this.state[id] && this.state[id].status === 'closed'; },
+  isPosted(id)  { return this.state[id] && this.state[id].status === 'posted'; },
+  // Accept a contract: choose a search ring and mark active. Returns
+  // {ok:true} or {ok:false, reason}.
+  accept(id) {
+    const def = BOUNTIES[id];
+    if (!def) return { ok: false, reason: 'unknown contract' };
+    const s = this.state[id];
+    if (!s || s.status === 'closed') return { ok: false, reason: 'this contract is closed' };
+    if (s.status === 'active') return { ok: false, reason: 'already accepted' };
+    if (this.activeCount() >= this.maxActive) {
+      return { ok: false, reason: 'contract backlog full (max ' + this.maxActive + ')' };
+    }
+    // Choose a ring center 400-900m from the player in a random direction,
+    // radius 150-250m.
+    const ang = Math.random() * Math.PI * 2;
+    const dist = 400 + Math.random() * 500;
+    s.ringX = Math.round(player.pos.x + Math.cos(ang) * dist);
+    s.ringZ = Math.round(player.pos.z + Math.sin(ang) * dist);
+    s.ringR = 150 + Math.round(Math.random() * 100);
+    s.spawned = false;
+    s.status = 'active';
+    this.save();
+    return { ok: true };
+  },
+  abandon(id) {
+    const s = this.state[id];
+    if (!s || s.status !== 'active') return false;
+    // Despawn any live target for this bounty.
+    despawnBountyTarget(id);
+    s.status = 'posted';
+    s.spawned = false;
+    delete s.ringX; delete s.ringZ; delete s.ringR;
+    this.save();
+    return true;
+  },
+  close(id, resolutionId) {
+    const s = this.state[id];
+    if (!s) return;
+    despawnBountyTarget(id);
+    s.status = 'closed';
+    s.resolvedWith = resolutionId;
+    s.spawned = false;
+    this.save();
+  },
+  activeList() {
+    return Object.keys(this.state)
+      .filter(id => this.state[id].status === 'active')
+      .map(id => ({ id, def: BOUNTIES[id], s: this.state[id] }));
+  },
+};
+
+// Live target entities for active bounties, keyed by bounty id.
+// { id, type, mesh, enemyRef?, pos, confirmed }
+const bountyTargets = {};
+
+function despawnBountyTarget(id) {
+  const t = bountyTargets[id];
+  if (!t) return;
+  // If it's a mech target tracked in enemies[], remove it there.
+  if (t.enemyRef && typeof enemies !== 'undefined') {
+    const idx = enemies.indexOf(t.enemyRef);
+    if (idx >= 0) enemies.splice(idx, 1);
+  }
+  if (t.mesh && typeof removeAndDispose === 'function') removeAndDispose(t.mesh);
+  else if (t.mesh && typeof scene !== 'undefined') scene.remove(t.mesh);
+  delete bountyTargets[id];
+}
+
+// Build the WANTED board post list from BOUNTIES + current status. Closed
+// contracts show with a [CLOSED] tag; active ones with [ACCEPTED].
+function buildWantedPosts() {
+  const posts = [];
+  // Intro post from HALLORAN, always first.
+  posts.push({
+    id: 'wanted_intro',
+    author: 'HALLORAN',
+    subject: 'how this board works',
+    daysAgo: 30,
+    body: "I post work here. You take it or you don't. The pay is real and it clears to your account when the job closes.\n\nRules, such as they are:\n\nYou can carry three contracts at once. No more. A hunter spread thin is a hunter who gets people killed.\n\nHow a contract closes is your business. I post what the client wants. What you actually do out there, I do not see and do not ask. The pay reflects the outcome.\n\nI am not your friend and I am not your conscience. I am the man who knows who is looking for whom. That is all.\n\n// halloran",
+    _wantedMeta: true,
+  });
+  for (const id of Object.keys(BOUNTIES)) {
+    const def = BOUNTIES[id];
+    const s = bounties.state[id] || { status: 'posted' };
+    let tag = '';
+    if (s.status === 'active') tag = '[ACCEPTED] ';
+    else if (s.status === 'closed') tag = '[CLOSED] ';
+    posts.push({
+      id: 'wanted_' + id,
+      author: def.post.author,
+      subject: tag + def.post.subject,
+      daysAgo: 1,
+      body: def.post.body,
+      _bountyId: id,
+    });
+  }
+  return posts;
+}
+
+// ----- Bounty target spawning + tracking -----
+// Called every frame from the main loop. When an active contract's search
+// ring comes within streaming range, spawn its target somewhere inside the
+// ring. Targets persist until resolved or the player leaves far enough that
+// we despawn to save resources (they respawn when the player returns).
+const BOUNTY_STREAM_RANGE = 700;   // start spawning when ring center is this close
+function updateBounties(dt) {
+  if (typeof bounties === 'undefined') return;
+  for (const { id, def, s } of bounties.activeList()) {
+    if (s.ringX == null) continue;
+    const d = Math.hypot(s.ringX - player.pos.x, s.ringZ - player.pos.z);
+    const exists = !!bountyTargets[id];
+    if (d < BOUNTY_STREAM_RANGE && !exists) {
+      spawnBountyTarget(id);
+    } else if (d > BOUNTY_STREAM_RANGE + 200 && exists) {
+      // Player wandered well away; despawn to free resources. The contract
+      // stays active and the target respawns when they come back.
+      despawnBountyTarget(id);
+    }
+    // Drive a mech target's AI position into the enemies system already
+    // (handled by the shared enemy update loop). Nothing extra needed here.
+    // For figure/machine targets, add character: the machine turns slowly in
+    // its broken loop; the figure faces the player when close.
+    const t = bountyTargets[id];
+    if (t && t.mesh) {
+      if (t.type === 'machine') {
+        t.spinPhase = (t.spinPhase || 0) + dt * 0.6;
+        t.mesh.rotation.y = t.spinPhase;
+        // also drift slightly in the broken loop
+        t.mesh.position.x = (t.pos ? t.pos.x : t.mesh.position.x) + Math.cos(t.spinPhase) * 3;
+        t.mesh.position.z = (t.pos ? t.pos.z : t.mesh.position.z) + Math.sin(t.spinPhase) * 3;
+      } else if (t.type === 'figure') {
+        const dx = player.pos.x - t.mesh.position.x;
+        const dz = player.pos.z - t.mesh.position.z;
+        if (dx * dx + dz * dz < 3600) {  // within 60m, turn to face
+          t.mesh.rotation.y = Math.atan2(-dx, -dz);
+        }
+      }
+    }
+  }
+}
+
+function spawnBountyTarget(id) {
+  const def = BOUNTIES[id];
+  const s = bounties.state[id];
+  if (!def || !s) return;
+  // Choose a point inside the ring (biased toward center so it's findable).
+  const ang = Math.random() * Math.PI * 2;
+  const rr = Math.sqrt(Math.random()) * s.ringR * 0.8;
+  const tx = s.ringX + Math.cos(ang) * rr;
+  const tz = s.ringZ + Math.sin(ang) * rr;
+
+  if (def.targetType === 'mech') {
+    // Reuse the allied-mech chassis but flag it hostile and register it in
+    // the enemies system so the existing AI engages.
+    const built = buildAlliedMech();
+    built.group.position.set(tx, 0, tz);
+    // Tint it hostile: deep red accents if the chassis exposes materials.
+    built.group.traverse(o => {
+      if (o.material && o.material.emissive) {
+        try { o.material = o.material.clone(); o.material.emissive.setHex(0x330000); } catch (e) {}
+      }
+    });
+    scene.add(built.group);
+    // Build an enemy record compatible with the existing enemy AI loop.
+    const enemyRef = {
+      mesh: built.group,
+      hp: 90, maxHp: 90,
+      vel: new THREE.Vector3(),
+      fireT: 2 + Math.random() * 2, fireRate: 3.5,
+      desiredDist: 45, strafeDir: Math.random() < 0.5 ? 1 : -1, strafeT: 0,
+      bobPhase: 0, aggro: false, wanderTarget: null, wanderT: 0,
+      _bountyId: id, _isGroundMech: true,
+    };
+    if (typeof enemies !== 'undefined') enemies.push(enemyRef);
+    bountyTargets[id] = { id, type: 'mech', mesh: built.group, enemyRef, confirmed: false };
+  } else {
+    // figure / machine: a passive standing entity to find and scan.
+    const g = new THREE.Group();
+    if (def.targetType === 'figure') {
+      // A person: small humanoid (cylinder body, sphere head), drab coat color.
+      const body = new THREE.Mesh(new THREE.CylinderGeometry(0.4, 0.5, 1.7, 8),
+        new THREE.MeshStandardMaterial({ color: 0x4a4036, roughness: 0.9 }));
+      body.position.y = 0.85; g.add(body);
+      const head = new THREE.Mesh(new THREE.SphereGeometry(0.28, 10, 10),
+        new THREE.MeshStandardMaterial({ color: 0x8a6a52, roughness: 0.8 }));
+      head.position.y = 1.9; g.add(head);
+    } else {
+      // machine: a squat broken maintenance unit (boxy, dull, slowly turning).
+      const body = new THREE.Mesh(new THREE.BoxGeometry(2.2, 1.8, 2.2),
+        new THREE.MeshStandardMaterial({ color: 0x55504a, roughness: 0.7, metalness: 0.5 }));
+      body.position.y = 1.4; g.add(body);
+      const dome = new THREE.Mesh(new THREE.SphereGeometry(0.7, 10, 8, 0, Math.PI * 2, 0, Math.PI / 2),
+        new THREE.MeshStandardMaterial({ color: 0x6a4040, roughness: 0.6, emissive: 0x200000 }));
+      dome.position.y = 2.3; g.add(dome);
+    }
+    g.position.set(tx, 0, tz);
+    g.userData.skipScan = false;   // we WANT it scannable
+    scene.add(g);
+    bountyTargets[id] = { id, type: def.targetType, mesh: g, pos: new THREE.Vector3(tx, 0, tz), confirmed: false, spinPhase: 0 };
+  }
+}
+
+// ----- Bounty resolution -----
+// Returns the nearest confirmed bounty target within `radius`, or null.
+function nearestResolvableBounty(radius = 18) {
+  let best = null, bestD = radius;
+  for (const id of Object.keys(bountyTargets)) {
+    const t = bountyTargets[id];
+    if (!t.confirmed) continue;
+    const m = t.mesh;
+    if (!m) continue;
+    const d = Math.hypot(m.position.x - player.pos.x, m.position.z - player.pos.z);
+    if (d < bestD) { best = id; bestD = d; }
+  }
+  return best;
+}
+
+function openBountyResolution(bountyId) {
+  const def = BOUNTIES[bountyId];
+  const t = bountyTargets[bountyId];
+  if (!def || !t) return;
+  const dlg = document.getElementById('bounty-dialog');
+  if (!dlg) return;
+  if (typeof paused !== 'undefined') paused = true;
+  document.getElementById('bounty-speaker').textContent = def.name;
+  // Context line varies by target type.
+  let intro = '';
+  if (def.targetType === 'mech') {
+    const hpPct = t.enemyRef ? Math.round((t.enemyRef.hp / (t.enemyRef.maxHp || 90)) * 100) : 100;
+    intro = `The mech stands before you. Integrity ${hpPct}%. The cockpit is sealed. Whatever is inside has not answered a hail in nine weeks.`;
+  } else if (def.targetType === 'figure') {
+    intro = 'He has stopped walking. He knows why you are here. He does not run. There would be no point, and you both know it.';
+  } else {
+    intro = 'The machine turns in its slow broken circle, indifferent to you. There is no malice in it. There is no anything in it. Just the loop.';
+  }
+  document.getElementById('bounty-intro').textContent = intro;
+  document.getElementById('bounty-intro').style.display = 'block';
+  document.getElementById('bounty-text').textContent = 'How do you close this contract?';
+  const optsEl = document.getElementById('bounty-options');
+  optsEl.innerHTML = '';
+  def.resolutions.forEach((res, idx) => {
+    // Gate: 'lowhp' resolutions require the mech to be brought below 30% first.
+    let locked = false, lockReason = '';
+    if (res.requires === 'lowhp') {
+      const hp = t.enemyRef ? (t.enemyRef.hp / (t.enemyRef.maxHp || 90)) : 1;
+      if (hp > 0.3) { locked = true; lockReason = ' (cripple it first: integrity must be under 30%)'; }
+    }
+    const btn = document.createElement('button');
+    btn.className = 'npc-opt';
+    btn.textContent = `${idx + 1}. ${res.label}` + (locked ? lockReason : '');
+    if (locked) {
+      btn.style.opacity = '0.5';
+      btn.style.cursor = 'not-allowed';
+    } else {
+      btn.addEventListener('click', () => resolveBounty(bountyId, res.id));
+    }
+    optsEl.appendChild(btn);
+    // Sub-description line under each option.
+    const desc = document.createElement('div');
+    desc.style.cssText = 'font-size:11px;color:var(--amber-dim);font-style:italic;margin:-4px 0 10px 14px;letter-spacing:1px;';
+    let rewardBits = [];
+    if (res.caps) rewardBits.push(res.caps + ' caps');
+    if (res.items) for (const it of res.items) rewardBits.push('+' + it.count + ' ' + (ITEMS[it.id] ? ITEMS[it.id].name : it.id));
+    if (res.caps === 0 && rewardBits.length === 0) rewardBits.push('no pay');
+    desc.textContent = res.desc + ' [' + rewardBits.join(', ') + ']';
+    optsEl.appendChild(desc);
+  });
+  dlg.classList.add('show');
+}
+
+function closeBountyResolution() {
+  const dlg = document.getElementById('bounty-dialog');
+  if (dlg) dlg.classList.remove('show');
+  if (typeof paused !== 'undefined') paused = false;
+}
+
+function resolveBounty(bountyId, resolutionId) {
+  const def = BOUNTIES[bountyId];
+  if (!def) return;
+  const res = def.resolutions.find(r => r.id === resolutionId);
+  if (!res) return;
+  const rewardLines = [];
+  // Caps
+  if (res.caps && typeof wallet !== 'undefined') {
+    wallet.caps += res.caps;
+    rewardLines.push({ id: '__caps__', count: res.caps, label: 'CAPS', icon: '¢' });
+  }
+  // Items
+  if (res.items && typeof addItem === 'function') {
+    for (const it of res.items) {
+      addItem(it.id, it.count);
+      rewardLines.push({ id: it.id, count: it.count });
+    }
+  }
+  // Caravan faction reputation
+  if (res.repFaction && typeof TRADER_FACTIONS !== 'undefined') {
+    if (res.repFaction === 'random') {
+      const facs = Object.values(TRADER_FACTIONS);
+      if (facs.length) facs[Math.floor(Math.random() * facs.length)].reputation += (res.repDelta || 1);
+    } else if (TRADER_FACTIONS[res.repFaction]) {
+      TRADER_FACTIONS[res.repFaction].reputation += (res.repDelta || 1);
+    }
+  }
+  // GREENROOM rapport
+  if (res.rapportDelta && typeof greenroom !== 'undefined' && greenroom.adjustRep) {
+    // Spread the rapport across a couple of regulars who'd care.
+    const handle = (res.comm && res.comm !== 'TITAN-7' && res.comm !== 'HOLLOWAY') ? res.comm : 'HALLORAN';
+    greenroom.adjustRep(handle, res.rapportDelta);
+  }
+  // Comm line from the relevant voice
+  if (res.comm && res.commText && typeof addComm === 'function') {
+    const isPlayer = res.comm === 'TITAN-7';
+    addComm(res.comm, res.commText, isPlayer);
+  }
+  // Salvage toast for the tangible rewards
+  if (rewardLines.length && typeof showSalvageToast === 'function') {
+    showSalvageToast(rewardLines);
+  }
+  // Codex CONTRACTS entry
+  if (res.codexLine && typeof CODEX_ENTRIES !== 'undefined') {
+    const entryId = 'contract_' + bountyId;
+    if (!CODEX_ENTRIES_BY_ID[entryId]) {
+      const fmt = (v) => `${v >= 0 ? '+' : '-'}${String(Math.abs(Math.round(v))).padStart(4, '0')}`;
+      const where = `${fmt(player.pos.x)} / ${fmt(player.pos.z)}`;
+      const entry = {
+        id: entryId,
+        category: 'contracts',
+        title: def.name,
+        source: 'Contract closed at ' + where,
+        text: res.codexLine,
+      };
+      CODEX_ENTRIES.push(entry);
+      CODEX_ENTRIES_BY_ID[entryId] = entry;
+      if (typeof codex !== 'undefined' && codex.unlocked) codex.unlocked.add(entryId);
+    }
+  }
+  // Journal note
+  if (typeof noteJournalEvent === 'function') {
+    noteJournalEvent('discovery', `Closed contract: ${def.name}.`);
+  }
+  // Close out the bounty (despawns the target).
+  bounties.close(bountyId, resolutionId);
+  closeBountyResolution();
+}
 
 function openFieldNoteModal() {
   const modal = document.getElementById('fieldnote-modal');
@@ -15216,10 +16335,25 @@ function identifyScanTarget(hit) {
       return makePoiScan(poi, hit);
     }
   }
+  // Bounty mech target (registered in enemies[] but flagged with _bountyId).
+  for (const e of enemies) {
+    if (e.mesh && ancestors.includes(e.mesh) && e._bountyId) {
+      return makeBountyScan(e._bountyId, hit, e);
+    }
+  }
   // Sentinel
   for (const e of enemies) {
     if (e.mesh && ancestors.includes(e.mesh)) {
       return makeSentinelScan(e, hit);
+    }
+  }
+  // Bounty figure/machine targets (passive, tracked in bountyTargets).
+  if (typeof bountyTargets !== 'undefined') {
+    for (const id of Object.keys(bountyTargets)) {
+      const t = bountyTargets[id];
+      if (t.mesh && ancestors.includes(t.mesh)) {
+        return makeBountyScan(id, hit, null);
+      }
     }
   }
   // Allied mech
@@ -15322,6 +16456,36 @@ function makePoiScan(poi, hit) {
     name: poi.name + (poi.discovered ? '' : ' (UNCATALOGED)'),
     rows: baseRows,
     note: notes[poi.type] || 'Kailey: Pretty thing. Log it.',
+  };
+}
+
+function makeBountyScan(bountyId, hit, enemyRef) {
+  const def = BOUNTIES[bountyId];
+  if (!def) return null;
+  // Mark target confirmed so the resolution prompt becomes available.
+  if (bountyTargets[bountyId]) bountyTargets[bountyId].confirmed = true;
+  const classByType = {
+    mech: 'ROGUE MECH (CONTRACT TARGET)',
+    figure: 'PERSON (CONTRACT TARGET)',
+    machine: 'PRE-WAR MACHINE (CONTRACT TARGET)',
+  };
+  const rows = [
+    ['CONTRACT', def.name],
+    ['DISTANCE', hit.distance.toFixed(1) + ' m'],
+    ['CLASS', classByType[def.targetType] || 'CONTRACT TARGET'],
+  ];
+  if (def.targetType === 'mech' && enemyRef) {
+    const hpPct = Math.round((enemyRef.hp / (enemyRef.maxHp || 90)) * 100);
+    rows.push(['INTEGRITY', hpPct + '%']);
+    rows.push(['STATE', enemyRef.aggro ? 'HOSTILE' : 'UNAWARE']);
+  } else {
+    rows.push(['STATE', 'DOES NOT RESPOND']);
+  }
+  return {
+    name: def.name + ' // CONTRACT TARGET CONFIRMED',
+    rows,
+    note: 'Target identified. Approach and press [E] to resolve the contract.',
+    _bountyId: bountyId,
   };
 }
 
@@ -18359,14 +19523,15 @@ function renderJournal() {
   const list = document.getElementById('journal-entries');
   if (!list) return;
   let html = '';
-  // Field notes section (most recent first)
+  const fmt = (v) => `${v >= 0 ? '+' : '-'}${String(Math.abs(Math.round(v))).padStart(4, '0')}`;
+
+  // 1) Field notes section (most recent first)
   if (typeof fieldNotes !== 'undefined' && fieldNotes.entries && fieldNotes.entries.length) {
     const sorted = fieldNotes.entries.slice().sort((a, b) => b.createdAt - a.createdAt);
     html += '<div class="jrn-section-title">▶ FIELD NOTES</div>';
     for (const n of sorted) {
       const when = new Date(n.createdAt);
       const whenStr = when.toLocaleDateString() + ' ' + when.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-      const fmt = (v) => `${v >= 0 ? '+' : '-'}${String(Math.abs(Math.round(v))).padStart(4, '0')}`;
       html += `<div class="jrn-entry jrn-fieldnote">
         <div class="jrn-head">
           <span class="jrn-time">${whenStr}</span>
@@ -18375,9 +19540,36 @@ function renderJournal() {
         <div class="jrn-text jrn-fieldnote-text">${escapeHtml(n.text)}</div>
       </div>`;
     }
+  }
+
+  // 2) Things Found travelogue (B2): chronological record of pickups.
+  if (typeof thingsFound !== 'undefined' && thingsFound.entries && thingsFound.entries.length) {
+    html += '<div class="jrn-section-title" style="margin-top: 24px;">▶ THINGS FOUND</div>';
+    html += '<div class="jrn-things-intro">What I have stumbled across out here, in the order I found it.</div>';
+    for (const t of thingsFound.entries) {
+      const loc = t.place ? escapeHtml(t.place) : `${fmt(t.x)} / ${fmt(t.z)}`;
+      const dayStr = t.day ? `DAY ${t.day}` : '';
+      const timeStr = [dayStr, t.clock].filter(Boolean).join(' // ');
+      const countStr = (t.count && t.count > 1) ? ` ×${t.count}` : '';
+      html += `<div class="jrn-entry jrn-thing">
+        <div class="jrn-head">
+          <span class="jrn-time">${escapeHtml(t.name)}${countStr}</span>
+          <span class="jrn-phase">${escapeHtml(timeStr)} // ${loc}</span>
+        </div>
+        ${t.desc ? `<div class="jrn-text jrn-thing-text">${escapeHtml(t.desc)}</div>` : ''}
+      </div>`;
+    }
+  }
+
+  // 3) Auto-composed Field Journal (phase transitions). Only show its header
+  // if one of the sections above rendered, so an empty journal still reads
+  // cleanly.
+  const hasSectionsAbove =
+    (typeof fieldNotes !== 'undefined' && fieldNotes.entries && fieldNotes.entries.length) ||
+    (typeof thingsFound !== 'undefined' && thingsFound.entries && thingsFound.entries.length);
+  if (hasSectionsAbove) {
     html += '<div class="jrn-section-title" style="margin-top: 24px;">▶ FIELD JOURNAL</div>';
   }
-  // Regular journal entries
   if (journal.entries.length === 0) {
     html += '<div class="jrn-empty">No entries yet. Entries are written at each phase transition (dawn, day, dusk, evening, night).</div>';
   } else {
@@ -18469,7 +19661,26 @@ function updateInvDetail() {
     <div class="desc">${def.desc}</div>
     <div style="margin-top:8px;font-size:11px;color:var(--amber-dim);letter-spacing:2px;">
       QTY ${have} &middot; UNIT ${def.weight} kg &middot; ${def.rare ? 'RARE ARTIFACT' : 'BASE VALUE ' + def.value + ' caps'}
+    </div>
+    <div style="margin-top:12px;">
+      <button id="inv-stash-btn" class="inv-stash-btn">STASH ONE HERE</button>
+      <div class="inv-stash-hint">Leave one at your current position. It stays on the map until you collect it.</div>
     </div>`;
+  const stashBtn = document.getElementById('inv-stash-btn');
+  if (stashBtn) {
+    stashBtn.addEventListener('click', () => {
+      const entry = caches.stash(invSelected, 1);
+      if (entry) {
+        if (typeof addComm === 'function') {
+          addComm('TITAN-7', `Stashed ${ITEMS[invSelected].name} at this position. Marked on map.`, true);
+        }
+        if (typeof sfxClick === 'function') sfxClick();
+        // If we just stashed the last of this item, clear selection
+        if ((inventory.items.get(invSelected) || 0) <= 0) invSelected = null;
+        renderInventory();
+      }
+    });
+  }
 }
 
 // ============================================================
@@ -18494,10 +19705,12 @@ function renderCodex() {
   // Categorize all unlocked entries
   const unlockedArchive = [];
   const unlockedRecovered = [];
+  const unlockedContracts = [];
   for (const entryId of codex.unlocked) {
     const e = CODEX_ENTRIES_BY_ID[entryId];
     if (!e) continue;
     if (e.category === 'recovered') unlockedRecovered.push(e);
+    else if (e.category === 'contracts') unlockedContracts.push(e);
     else unlockedArchive.push(e);
   }
   const totalRecovered = CODEX_ENTRIES.filter(e => e.category === 'recovered').length;
@@ -18505,11 +19718,14 @@ function renderCodex() {
   let html = `<div class="cdx-tabs">
     <button class="cdx-tab ${codex.activeTab === 'archive' ? 'active' : ''}" data-tab="archive">▶ ARCHIVES <span class="cdx-tab-count">${unlockedArchive.length}</span></button>
     <button class="cdx-tab ${codex.activeTab === 'recovered' ? 'active' : ''}" data-tab="recovered">▶ RECOVERED <span class="cdx-tab-count">${unlockedRecovered.length} / ${totalRecovered}</span></button>
+    <button class="cdx-tab ${codex.activeTab === 'contracts' ? 'active' : ''}" data-tab="contracts">▶ CONTRACTS <span class="cdx-tab-count">${unlockedContracts.length}</span></button>
   </div>`;
   if (codex.activeTab === 'archive') {
     html += renderCodexArchiveTab(unlockedArchive);
-  } else {
+  } else if (codex.activeTab === 'recovered') {
     html += renderCodexRecoveredTab(unlockedRecovered);
+  } else {
+    html += renderCodexContractsTab(unlockedContracts);
   }
   body.innerHTML = html;
   // Wire tab buttons
@@ -18595,9 +19811,22 @@ function renderCodexRecoveredTab(unlockedRecovered) {
   return html;
 }
 
-// ============================================================
-// SALVAGE TOAST
-// ============================================================
+function renderCodexContractsTab(unlockedContracts) {
+  if (unlockedContracts.length === 0) {
+    return '<div class="cdx-empty">No contracts closed yet.<br><br>HALLORAN posts work to the WANTED board in the GREENROOM. Accept a contract, find the target in the field, and decide how it ends.<br><br>This ledger remembers what you found, and what you chose.</div>';
+  }
+  let html = '<div class="cdx-recovered-intro">A ledger of the contracts you have closed. Who you found, where, and what you decided.</div>';
+  for (const e of unlockedContracts) {
+    html += `<div class="cdx-story cdx-recovered">
+      <div class="cdx-story-title">${e.title}</div>
+      <div class="cdx-entry">
+        <div class="cdx-entry-head"><span class="cdx-entry-title">${e.title}</span><span>${e.source}</span></div>
+        <div class="cdx-entry-text cdx-recovered-text">${e.text}</div>
+      </div>
+    </div>`;
+  }
+  return html;
+}
 let salvageToastT = 0;
 function showSalvageToast(yields) {
   const t = document.getElementById('salvage-toast');
@@ -19901,6 +21130,8 @@ const GREENROOM_REGULARS = [
     bio: "Curates the firmware library. Verifies patches. Trusted unconditionally. Signs off `- cablehead`." },
   { handle: 'HARLOW',      role: 'user',  online: false, lastSeen: 'yesterday',
     bio: "Radio operator from a southern outpost. Posts weather, road conditions, traveler reports. Signs off `// harlow`." },
+  { handle: 'HALLORAN',    role: 'user',  online: false, lastSeen: '11:08 CST',
+    bio: "Contract broker. Posts work to the WANTED board, takes a cut, asks no questions. Terse and unsentimental, but not cruel. Signs off `// halloran`." },
 ];
 
 const GREENROOM_POSTS_GENERAL = [
@@ -20015,7 +21246,108 @@ const GREENROOM_BOARDS = {
                    desc: 'History, memorials, mysteries. OLD_LION keeps the threads.' },
   TRADE:         { name: 'TRADE',         posts: GREENROOM_POSTS_TRADE,
                    desc: 'Buy, sell, trade. Pickup missions. Goodwill economy.' },
+  WANTED:        { name: 'WANTED',        posts: [],   // filled at runtime from BOUNTIES
+                   desc: 'Contracts. HALLORAN posts the work. The network does not ask why.' },
 };
+
+// ============================================================
+// BOUNTY CONTRACTS (Direction 1: you are the hunter)
+// ============================================================
+// HALLORAN is a terse contract broker who posts work to the WANTED board.
+// Each bounty is a small story. The hunt (travel into a search ring, find
+// and scan the target) is the gameplay; the resolution is a choice with
+// consequences in caps, caravan reputation, and GREENROOM rapport.
+//
+// targetType:
+//   'mech'    - hostile, reuses allied-mech chassis + enemy AI
+//   'figure'  - passive human at a remote spot; approach + scan to confirm
+//   'machine' - passive broken pre-war unit; approach + scan to confirm
+// Each resolution: { id, label, desc, requires?, caps, items?, repFaction?,
+//   repDelta?, rapportDelta?, codexLine, comm? }
+//   requires: optional gate ('disable' resolutions may need the target's hp
+//   brought low first, handled in the resolve flow).
+const BOUNTIES = {
+  vesper: {
+    id: 'vesper',
+    name: 'COL-4 // VESPER',
+    handle: 'VESPER',
+    targetType: 'mech',
+    tell: 'Hits caravans on the open road. Runs in daylight. Will not answer hails.',
+    post: {
+      author: 'HALLORAN',
+      subject: 'CONTRACT // COL-4 VESPER // caravan raider',
+      body: "Putting this up because the caravans asked and I owe two of them.\n\nCOL-4, callsign VESPER. Was a line mech on a freight route out of the western gap. Pilot went quiet eight, nine weeks ago. Since then VESPER has hit four caravans on the open road. Took cargo, took fuel, left people walking.\n\nNobody knows what happened in that cockpit. Some say the pilot died and the mech is running on a bad loop. Some say the pilot is very much alive and decided the road owes them.\n\nLast seen working the open ground between the western ridges. Travels in daylight. Will not answer a hail.\n\nBring it down, or bring it in. Your call. Pay is better if the pilot walks away breathing, because the caravans would rather know than wonder.\n\n// halloran",
+    },
+    resolutions: [
+      { id: 'disable', label: 'DISABLE AND RECOVER THE PILOT', requires: 'lowhp',
+        desc: 'Cripple the mech without destroying it. Recover whoever is inside.',
+        caps: 140, items: [{ id: 'circuit_board', count: 2 }], repFaction: 'random', repDelta: 1.6,
+        comm: 'HALLORAN', commText: 'Pilot is alive. Shaken, but alive. The caravans will sleep easier knowing. Good work. // halloran',
+        codexLine: 'Disabled COL-4 VESPER and recovered the pilot alive. The caravans wanted to know more than they wanted revenge.' },
+      { id: 'destroy', label: 'DESTROY IT', requires: null,
+        desc: 'End the threat the direct way. Full pay, but the road remembers.',
+        caps: 180, items: [{ id: 'scrap_alloy', count: 4 }], repFaction: 'random', repDelta: 0.4,
+        comm: 'HALLORAN', commText: 'It is done. Pay is in your account. The caravans are quiet about it. One of their own, even gone bad, is still one of their own. // halloran',
+        codexLine: 'Destroyed COL-4 VESPER on the open ground. The caravans paid, and said little.' },
+    ],
+  },
+  holloway: {
+    id: 'holloway',
+    name: 'HOLLOWAY',
+    handle: 'HOLLOWAY',
+    targetType: 'figure',
+    tell: 'On foot. Keeps to the far quiet places, away from the roads. Does not want to be found.',
+    post: {
+      author: 'HALLORAN',
+      subject: 'CONTRACT // HOLLOWAY // deserter',
+      body: "An outpost up north wants a man named Holloway brought back. He walked off his post six weeks ago and took nothing but a coat and a week of rations. They are calling it desertion. They are paying for a return.\n\nI will be straight with you: I do not know the whole story and I did not ask. Outposts pay, I post. But the man is on foot and unarmed as far as anyone knows, and he is not hiding because he did something. He is hiding because he does not want to go back.\n\nYou will find him in the far quiet country, away from the roads, where a man goes when he wants the world to lose track of him.\n\nWhat you do when you find him is between you and him.\n\n// halloran",
+    },
+    resolutions: [
+      { id: 'return', label: 'BRING HIM IN', requires: null,
+        desc: 'Honor the contract. The outpost pays. Holloway does not forgive you.',
+        caps: 120, repFaction: 'random', repDelta: 0.8,
+        comm: 'HALLORAN', commText: 'The outpost has him. They paid the full rate. I did not ask what they wanted him for and you did not either. // halloran',
+        codexLine: 'Brought Holloway back to the outpost that wanted him. He did not say a word the whole way.' },
+      { id: 'release', label: 'LET HIM GO', requires: null,
+        desc: 'Walk away. No pay. Some on the network will hear about it, and not all of them will be angry.',
+        caps: 0, rapportDelta: 2,
+        comm: 'OLD_LION', commText: 'Word travels. You let Holloway walk. The outpost is sore about it. I am not. Some debts are not ours to collect. // old lion',
+        codexLine: 'Found Holloway in the quiet country and let him keep walking. Took no pay. Slept fine.' },
+      { id: 'warn', label: 'WARN HIM AND LEAVE', requires: null,
+        desc: 'Tell him others will come, and move on. He remembers it.',
+        caps: 0, rapportDelta: 1, flag: 'holloway_warned',
+        comm: 'HOLLOWAY', commText: 'He did not say thank you. He just nodded, picked up his coat, and went further east than I would have gone. He will remember the face that warned him.',
+        codexLine: 'Warned Holloway that others would come, and left him to it. He went east.' },
+    ],
+  },
+  unit7: {
+    id: 'unit7',
+    name: 'UNIT 7',
+    handle: 'UNIT-7',
+    targetType: 'machine',
+    tell: 'A pre-war machine, malfunctioning, circling near a settlement. Loud. Does not respond to anything.',
+    post: {
+      author: 'HALLORAN',
+      subject: 'CONTRACT // UNIT 7 // malfunction near settlement',
+      body: "There is a pre-war maintenance unit near one of the southern settlements that has stopped working right. Designation on the hull reads UNIT 7. It circles. It will not stop circling. Sometimes it walks into things. Sometimes it walks into people.\n\nIt is not hostile in the way a sentinel is hostile. There is no aggression in it. There is just a broken loop running a body that weighs four tons, in a place where children live.\n\nThe settlement has asked, more than once, for someone to make it stop. They do not want to do it themselves. I understand why. The thing is not a threat the way a raider is a threat. It is something worse to put down. It is just broken.\n\nThere is only one way this contract closes. Make it quick.\n\n// halloran",
+    },
+    resolutions: [
+      { id: 'mercy', label: 'END IT', requires: null,
+        desc: 'There is no bringing this one in. Make it quick and clean.',
+        caps: 110, items: [{ id: 'rare_earth', count: 1 }], rapportDelta: 1,
+        comm: 'HALLORAN', commText: 'The settlement says thank you. They mean it. Nobody is glad it had to happen. That is the right way to feel about it. // halloran',
+        codexLine: 'Stopped UNIT 7 near the southern settlement. It was not a threat. It was just broken. I made it quick.' },
+    ],
+  },
+};
+
+// BOUNTIES is now defined, so it is safe to initialize the bounty runtime
+// state (its load() reads BOUNTIES). This call lives here, after the data,
+// rather than next to the module definition, to avoid a temporal dead zone
+// (the module is declared earlier in the file than this data block).
+bounties.load();
+
+
 
 // Pre-existing replies attached to specific posts. Each thread that has
 // existing community responses gets them listed here. Player replies will
@@ -21338,6 +22670,9 @@ function showGreenroomBoard(boardId) {
   greenroom.focusIdx = 0;
   const board = GREENROOM_BOARDS[boardId];
   if (!board) { showGreenroomBoardsList(); return; }
+  // The WANTED board is generated from BOUNTIES at view time so it reflects
+  // current contract status (posted / active / closed).
+  if (boardId === 'WANTED') { board.posts = buildWantedPosts(); }
   // Compose the post list: static posts + encrypted posts for this board + dynamic spawned posts
   const staticPosts = board.posts;
   const encPosts = [];
@@ -21390,6 +22725,11 @@ function showGreenroomBoard(boardId) {
 }
 
 function findPostById(postId) {
+  // WANTED board posts are generated dynamically from BOUNTIES.
+  if (postId === 'wanted_intro' || (postId && postId.startsWith('wanted_'))) {
+    const wp = buildWantedPosts().find(p => p.id === postId);
+    if (wp) return wp;
+  }
   // Static posts first
   for (const board of Object.values(GREENROOM_BOARDS)) {
     const p = board.posts.find(x => x.id === postId);
@@ -21472,6 +22812,37 @@ ${encryptedNotice}
       <div>${escapeHtml(r.body)}</div>
     </div>`;
   }
+  // Bounty contract action (WANTED board threads carrying a _bountyId).
+  if (post._bountyId && typeof bounties !== 'undefined') {
+    const bid = post._bountyId;
+    const def = BOUNTIES[bid];
+    const st = bounties.state[bid] || { status: 'posted' };
+    html += `<div class="gr-divider" style="margin: 20px 0 8px 0;">─── contract ──────────────────</div>`;
+    html += `<div class="gr-thread-meta" style="margin-bottom:8px;">TELL: ${escapeHtml(def.tell)}</div>`;
+    if (st.status === 'closed') {
+      const res = (def.resolutions || []).find(r => r.id === st.resolvedWith);
+      html += `<div class="gr-prompt-line" style="color:rgba(78,255,126,0.6);">[Contract closed${res ? ': ' + escapeHtml(res.label.toLowerCase()) : ''}.]</div>`;
+    } else if (st.status === 'active') {
+      html += `<div class="gr-thread-line gr-bounty-abandon" data-bountyid="${bid}">
+        <span class="gr-thread-marker">[X]</span>
+        <span class="gr-thread-meta">[accepted]</span>
+        <span>ABANDON THIS CONTRACT</span><span></span>
+      </div>`;
+      html += `<div class="gr-prompt-line" style="margin-top:6px;color:rgba(120,220,200,0.7);">Search ring is marked on your recon map. Find the target in the field.</div>`;
+    } else {
+      // posted - offer accept
+      const full = bounties.activeCount() >= bounties.maxActive;
+      if (full) {
+        html += `<div class="gr-prompt-line" style="color:#ff8060;">Contract backlog full (${bounties.maxActive}). Close or abandon one to take this.</div>`;
+      } else {
+        html += `<div class="gr-thread-line gr-bounty-accept" data-bountyid="${bid}">
+          <span class="gr-thread-marker">[1]</span>
+          <span class="gr-thread-meta">[contract]</span>
+          <span>ACCEPT THIS CONTRACT</span><span></span>
+        </div>`;
+      }
+    }
+  }
   // Reply UI
   const hasReplied = !!(greenroom.playerReplies[postId] && greenroom.playerReplies[postId].length);
   const options = GREENROOM_REPLY_OPTIONS[postId];
@@ -21498,6 +22869,37 @@ ${encryptedNotice}
     row.addEventListener('click', () => {
       const optIdx = parseInt(row.getAttribute('data-optidx'), 10);
       submitGreenroomReply(postId, optIdx);
+    });
+  });
+  // Wire bounty accept
+  document.querySelectorAll('#gr-body .gr-bounty-accept').forEach(row => {
+    row.addEventListener('click', () => {
+      const bid = row.getAttribute('data-bountyid');
+      const res = bounties.accept(bid);
+      if (res.ok) {
+        grSfxPostBlip && grSfxPostBlip();
+        if (typeof addComm === 'function') {
+          const def = BOUNTIES[bid];
+          addComm('HALLORAN', `Contract accepted: ${def.name}. Search ring is on your map. // halloran`, false);
+        }
+      } else {
+        if (typeof addComm === 'function') addComm('TITAN-7', `Cannot accept: ${res.reason}.`, true);
+      }
+      // Re-render the thread to reflect new status
+      showGreenroomThread(postId);
+    });
+  });
+  // Wire bounty abandon
+  document.querySelectorAll('#gr-body .gr-bounty-abandon').forEach(row => {
+    row.addEventListener('click', () => {
+      const bid = row.getAttribute('data-bountyid');
+      bounties.abandon(bid);
+      grSfxMenuMove && grSfxMenuMove();
+      if (typeof addComm === 'function') {
+        const def = BOUNTIES[bid];
+        addComm('HALLORAN', `Contract released: ${def.name}. No hard feelings. // halloran`, false);
+      }
+      showGreenroomThread(postId);
     });
   });
   document.querySelector('#gr-body .gr-menu-item').addEventListener('click', (e) => {
@@ -22581,13 +23983,32 @@ function updateNpcPrompt() {
                   document.getElementById('settings-overlay').classList.contains('show');
   if (blocked) { promptEl.classList.remove('show'); return; }
   const near = findNearestInteractableNpc();
-  if (!near) { promptEl.classList.remove('show'); return; }
+  if (!near) {
+    // No NPC nearby: check for a stashed cache within pickup range and offer
+    // to collect it through the same prompt UI.
+    if (typeof caches !== 'undefined') {
+      const c = caches.findNear(player.pos.x, player.pos.z, caches.pickupRadius);
+      if (c) {
+        const def = (typeof ITEMS !== 'undefined') ? ITEMS[c.itemId] : null;
+        document.getElementById('npc-prompt-name').textContent = 'CACHE: ' + (def ? def.name : 'UNKNOWN') + (c.count > 1 ? ' x' + c.count : '');
+        document.getElementById('npc-prompt-role').textContent = 'stashed here' + (c.day ? ' on day ' + c.day : '');
+        promptEl.classList.add('show');
+        promptEl.dataset.npcId = '';
+        promptEl.dataset.cacheId = String(c.id);
+        return;
+      }
+    }
+    promptEl.classList.remove('show');
+    promptEl.dataset.cacheId = '';
+    return;
+  }
   const def = NPC_DEFS[near.npcId];
   if (!def) { promptEl.classList.remove('show'); return; }
   document.getElementById('npc-prompt-name').textContent = def.name;
   document.getElementById('npc-prompt-role').textContent = def.role;
   promptEl.classList.add('show');
   promptEl.dataset.npcId = near.npcId;
+  promptEl.dataset.cacheId = '';
 }
 
 // ----- DIALOG OVERLAY -----
@@ -25171,6 +26592,7 @@ function _loopBody() {
     trackJournalMovement(dt);
     updatePlayerMech(dt);
     drainGarrisonQueue();
+    if (typeof updateBounties === 'function') updateBounties(dt);
     updateCaravans(dt);
     updateAnomalies(dt);
     updateSalvageToast(dt);
@@ -25209,6 +26631,7 @@ function _loopBody() {
     grid.position.z = ground.position.z;
     updateMeteors(dt);
     updateAurora(dt, tod.nightAmt || 0);
+    if (typeof rareMoments !== 'undefined') rareMoments.update(dt);
     updateCampfires(dt, tod.nightAmt || 0);
     updateLightning(dt);
     updateBirds(dt);
@@ -25270,6 +26693,9 @@ document.getElementById('start-btn').addEventListener('click', () => {
   initAudio();
   // Re-apply settings now that audio nodes exist
   if (typeof settings !== 'undefined' && settings.apply) settings.apply();
+  // Apply mech personalization (accent color, charm, stencil) now that the
+  // mech materials and cockpit DOM exist.
+  if (typeof personalize !== 'undefined' && personalize.apply) personalize.apply();
   sfxClick();
   document.body.classList.add('playing');
   document.getElementById('start-screen').classList.add('fade');
@@ -25432,6 +26858,10 @@ document.getElementById('start-btn').addEventListener('click', () => {
         'titan7_npcs',
         'titan7_placeNames',
         'titan7_fieldNotes',
+        'titan7_personalize',
+        'titan7_thingsFound',
+        'titan7_caches',
+        'titan7_bounties',
       ];
       for (const k of keys) {
         try { localStorage.removeItem(k); } catch (err) {}
@@ -25601,6 +27031,18 @@ settings.apply();
     document.querySelectorAll('#s-hud-scale button').forEach(b => {
       b.classList.toggle('active', b.dataset.value === c.hudScale);
     });
+    // Mech personalization
+    if (typeof personalize !== 'undefined' && personalize.current) {
+      const p = personalize.current;
+      document.querySelectorAll('#s-accent button').forEach(b => {
+        b.classList.toggle('active', b.dataset.value === p.accent);
+      });
+      document.querySelectorAll('#s-decoration button').forEach(b => {
+        b.classList.toggle('active', b.dataset.value === p.decoration);
+      });
+      const stencilInput = document.getElementById('s-stencil');
+      if (stencilInput) stencilInput.value = p.stencil;
+    }
   }
 
   // Open buttons
@@ -25674,6 +27116,34 @@ settings.apply();
     });
   });
 
+  // Mech personalization controls
+  document.querySelectorAll('#s-accent button').forEach(b => {
+    b.addEventListener('click', () => {
+      personalize.set('accent', b.dataset.value);
+      syncSettingsUI();
+    });
+  });
+  document.querySelectorAll('#s-decoration button').forEach(b => {
+    b.addEventListener('click', () => {
+      personalize.set('decoration', b.dataset.value);
+      syncSettingsUI();
+    });
+  });
+  {
+    const stencilInput = document.getElementById('s-stencil');
+    if (stencilInput) {
+      const commitStencil = () => {
+        const v = (stencilInput.value || 'TITAN-7').toUpperCase().slice(0, 16).trim() || 'TITAN-7';
+        personalize.set('stencil', v);
+      };
+      stencilInput.addEventListener('input', commitStencil);
+      stencilInput.addEventListener('keydown', (e) => {
+        e.stopPropagation();  // don't let game hotkeys fire while typing
+        if (e.key === 'Enter') { e.preventDefault(); stencilInput.blur(); }
+      });
+    }
+  }
+
   // Hotkey to open/close settings (O key) and ESC to close
   document.addEventListener('keydown', (e) => {
     // O key (only when not typing in an input)
@@ -25724,6 +27194,19 @@ settings.apply();
   if (dlg) {
     dlg.addEventListener('click', (e) => {
       if (e.target === dlg && typeof npcCloseDialog === 'function') npcCloseDialog();
+    });
+  }
+  // Bounty resolution dialog: close button + click-outside
+  const bClose = document.getElementById('bounty-dialog-close');
+  if (bClose) {
+    bClose.addEventListener('click', () => {
+      if (typeof closeBountyResolution === 'function') closeBountyResolution();
+    });
+  }
+  const bDlg = document.getElementById('bounty-dialog');
+  if (bDlg) {
+    bDlg.addEventListener('click', (e) => {
+      if (e.target === bDlg && typeof closeBountyResolution === 'function') closeBountyResolution();
     });
   }
   // ESC closes the dialog
