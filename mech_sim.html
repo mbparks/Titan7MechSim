@@ -20428,8 +20428,10 @@ const KEYMAP_CARDS = [
       { keys: ['L-MB'],   desc: 'Scan / interact',     note: 'aim at target and left-click' },
       { keys: ['R-MB'],   desc: 'Fire chaingun (hold)' },
       { keys: ['F'],      desc: 'Fire missile' },
+      { keys: ['E'],      desc: 'Interact',            note: 'resolve contract, collect cache, talk to NPC in range' },
       { keys: ['Q'],      desc: 'Deploy / recall drone' },
       { keys: ['H'],      desc: 'Hail / barter',       note: 'dialogue or trade if in range' },
+      { keys: ['B'],      desc: 'Field note',          note: 'pin a freeform note to current coordinates' },
       { keys: ['P'],      desc: 'Photo mode',          note: 'free camera, capture stills' },
       { keys: ['Enter'],  desc: 'Capture photo',       note: 'while in photo mode' },
     ],
@@ -20454,6 +20456,14 @@ const KEYMAP_CARDS = [
       { keys: [']'],     desc: 'Tune up 0.1 MHz',     note: 'Shift+] for 1.0 MHz step' },
       { keys: ['\\'],    desc: 'Snap to nearest channel' },
       { keys: ['/'],     desc: 'Toggle scan',         note: 'auto-sweep up the dial' },
+    ],
+  },
+  {
+    title: 'MAP (while open)',
+    rows: [
+      { keys: ['R-MB'],       desc: 'Name / edit place',  note: 'right-click anywhere on the map' },
+      { keys: ['Shift', 'R-MB'], desc: 'Clear route' },
+      { keys: ['L-MB'],       desc: 'Set waypoint' },
     ],
   },
   {
